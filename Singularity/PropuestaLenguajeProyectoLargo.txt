@@ -1,0 +1,69 @@
+10+1
+1+1
+set var1 to 8
+
+set var2 to "Patito cuac cuac"
+
+set var3 to 8.5
+
+set var4 to false
+
+set var5 as list
+set var5 at 3 to 8
+
+set var6 as  matrix of size 3 by 5
+
+set var6 at [1,2] to 1.1
+
+print var1
+
+# Variable defined for reading to it
+read to var7
+
+set var1 to var1 + var7
+set var1 to var1 - var7
+set var1 to var1 * var7
+set var1 to var1 / var7
+
+# Definir bien cómo marcar los bloques de código
+if var1 = var7
+begin
+	print "They're equal"
+end
+if not
+begin
+	print "The're different"
+end
+
+# while var1 is not var2
+while var1 is different from 8 and var1 < var7
+begin
+	print var1
+	set var1 to var1 + 1
+
+	while var9 counting from var1 to 9
+	begin
+		print var5 at var9
+	end
+end
+call print_two_variable with parameters (var1, var7)
+
+
+define function print_two_variables with arguments var1, var2
+begin
+	print var1
+	print var2
+end
+
+# Function using recursion
+define function factorial with arguments num_to_factor
+begin
+	if num_to_factor = 1
+	begin
+		answer 1
+	end
+	if not
+	begin
+		answer num_to_factor * call factorial with parameters (num_to_factor - 1)
+	end
+end
