@@ -28,6 +28,16 @@ int yyerror(const char *msg) {
 %token <var> IDENTIFIER
 %token <intval> INTEGER
 %token <floatval> FLOAT
+
+%token BEGIN_BLOCK
+%token END_BLOCK
+%token WHILE
+%token COUNTING
+%token DEFINE
+%token FUNCTION
+%token ANSWER
+%token CALL
+%token WITH
 %token PARAMETERS
 %token ARGUMENTS
 %token NOT

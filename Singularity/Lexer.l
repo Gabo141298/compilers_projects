@@ -20,6 +20,15 @@
 %%
 
 [ \r\n\t]* 		{ continue; /* Skip blanks. */ }
+"begin" 		{return BEGIN_BLOCK;} 
+"end" 			{return END_BLOCK;}
+"while" 		{return WHILE;}
+"counting" 		{return COUNTING;}
+"define" 		{return DEFINE;}
+"function" 		{return FUNCTION;}
+"answer" 		{return ANSWER;}
+"call" 			{return CALL;}
+"with"			{return WITH;}
 "parameters"	{ return PARAMETERS; }
 "arguments"		{ return ARGUMENTS; }
 "not"			{ return NOT; }
