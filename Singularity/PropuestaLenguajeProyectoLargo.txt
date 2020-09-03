@@ -1,5 +1,3 @@
-10+1
-1+1
 set var1 to 8
 
 set var2 to "Patito cuac cuac"

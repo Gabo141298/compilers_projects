@@ -24,5 +24,5 @@ int main(int argc, char** argv) {
     yyin = myfile;
 
     // Parse through the input:
-    yyparse();
+    yylex();
 }
