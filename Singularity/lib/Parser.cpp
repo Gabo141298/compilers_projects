@@ -75,8 +75,8 @@
  * To generate the parser run: "bison Parser.y"
  */
 
-#include "Parser.h"
-#include "Lexer.h"
+#include "lib/Parser.h"
+#include "lib/Lexer.h"
 
 int yyerror(const char *msg) {
     return 0;
