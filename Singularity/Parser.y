@@ -16,8 +16,8 @@ int yyerror(const char *msg) {
 
 %}
 
-%output  "Parser.c"
-%defines "Parser.h"
+%output  "lib/Parser.c"
+%defines "lib/Parser.h"
 
 %union {
     char* var;

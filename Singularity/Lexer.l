@@ -13,7 +13,7 @@
 
 %}
 
-%option outfile="Lexer.c" header-file="Lexer.h"
+%option outfile="lib/Lexer.c" header-file="lib/Lexer.h"
 
 %option noyywrap
 
