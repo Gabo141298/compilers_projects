@@ -58,6 +58,15 @@ int yyerror(const char *msg) {
 %token SUBSTRACTION
 %token MULTIPLICATION
 %token DIVISION
+%token EQUALS
+%token GEQ
+%token LEQ
+%token GREATER
+%token LESS
+%token OPEN_PARENTHESIS
+%token CLOSE_PARENTHESIS
+%token QUOTES
+%token HASH
 
 %%
 

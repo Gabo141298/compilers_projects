@@ -49,6 +49,17 @@
 "-"				{ return SUBSTRACTION; }
 "*"				{ return MULTIPLICATION; }
 "/"				{ return DIVISION; }
+"="				{ return EQUALS; }
+">="			{ return GEQ; }
+"<="			{ return LEQ; }
+">"				{ return GREATER; }
+"greater than"	{ return GREATER; }
+"<"				{ return LESS; }
+"less than"		{ return LESS; }
+"("				{ return OPEN_PARENTHESIS; }
+")"				{ return CLOSE_PARENTHESIS; }
+"\""			{ return QUOTES; }
+"#"				{ return HASH; }
 [a-zA-Z][a-zA-Z0-9]*	{
 							yylval.var = strdup(yytext);
 							return IDENTIFIER;
