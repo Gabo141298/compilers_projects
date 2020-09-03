@@ -20,6 +20,16 @@
 %%
 
 [ \r\n\t]* 		{ continue; /* Skip blanks. */ }
+"set"			{return SET;}
+"to"			{return TO;}
+"as"			{return AS;}
+"list"			{return LIST;}
+"matrix"		{return MATRIX;}
+"at"			{return AT;}
+"read"			{return READ;}
+"print"			{return PRINT;}
+"if"			{return IF;}
+"otherwise"		{return OTHERWISE;}
 "begin" 		{return BEGIN_BLOCK;} 
 "end" 			{return END_BLOCK;}
 "while" 		{return WHILE;}

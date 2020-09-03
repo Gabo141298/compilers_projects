@@ -29,6 +29,16 @@ int yyerror(const char *msg) {
 %token <intval> INTEGER
 %token <floatval> FLOAT
 
+%token SET
+%token TO
+%token AS
+%token LIST
+%token MATRIX
+%token AT
+%token READ
+%token PRINT
+%token IF
+%token OTHERWISE
 %token BEGIN_BLOCK
 %token END_BLOCK
 %token WHILE
