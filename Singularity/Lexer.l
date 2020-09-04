@@ -174,6 +174,7 @@
 				}
 ["][^"]*["]		{
 					printf("%s-%s\n", yytext, "STRING");
+					yylval.string = strdup(yytext);
 					/* return STRING */
 				}
 "\""			{

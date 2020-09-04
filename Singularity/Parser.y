@@ -21,6 +21,7 @@ int yyerror(const char *msg) {
 
 %union {
     char* var;
+    char* string;
     long long intval;
     double floatval;
 }
@@ -28,6 +29,7 @@ int yyerror(const char *msg) {
 %token <var> IDENTIFIER
 %token <intval> INTEGER
 %token <floatval> FLOAT
+%token <string> STRING
 
 %token SET
 %token TO
@@ -65,7 +67,6 @@ int yyerror(const char *msg) {
 %token LESS
 %token OPEN_PARENTHESIS
 %token CLOSE_PARENTHESIS
-%token STRING
 %token QUOTES_ERROR
 %token HASH
 
