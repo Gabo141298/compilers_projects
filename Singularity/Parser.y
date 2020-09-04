@@ -65,7 +65,8 @@ int yyerror(const char *msg) {
 %token LESS
 %token OPEN_PARENTHESIS
 %token CLOSE_PARENTHESIS
-%token QUOTES
+%token STRING
+%token QUOTES_ERROR
 %token HASH
 
 %%

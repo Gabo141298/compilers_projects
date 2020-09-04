@@ -172,9 +172,13 @@
 					printf("%s-%s\n", yytext, "CLOSE_PARENTHESIS");
 					/* return CLOSE_PARENTHESIS; */
 				}
+["][^"]*["]		{
+					printf("%s-%s\n", yytext, "STRING");
+					/* return STRING */
+				}
 "\""			{
-					printf("%s-%s\n", yytext, "QUOTES");
-					/* return QUOTES; */
+					printf("%s-%s\n", yytext, "QUOTES_ERROR");
+					/* return QUOTES_ERROR; */
 				}
 "#"				{
 					printf("%s-%s\n", yytext, "HASH");
