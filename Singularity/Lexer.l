@@ -1,8 +1,7 @@
 %{
 
 /*
- * Lexer.l file
- * To generate the lexical analyzer run: "flex Lexer.l"
+ * Creado por Quantum Refraction
  */
 
 #include "Parser.h"

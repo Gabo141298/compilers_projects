@@ -1,8 +1,7 @@
 %{
 
 /*
- * Parser.y file
- * To generate the parser run: "bison Parser.y"
+ * Creado por Quantum Refraction
  */
 
 #include "Parser.h"

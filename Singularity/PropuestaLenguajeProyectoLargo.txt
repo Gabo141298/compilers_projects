@@ -23,12 +23,11 @@ set var1 to var1 - var7
 set var1 to var1 * var7
 set var1 to var1 / var7
 
-# Definir bien cómo marcar los bloques de código
 if var1 = var7
 begin
 	print "They're equal"
 end
-if not
+otherwise
 begin
 	print "The're different"
 end
@@ -60,7 +59,7 @@ begin
 	begin
 		answer 1
 	end
-	if not
+	otherwise
 	begin
 		answer num_to_factor * call factorial with parameters (num_to_factor - 1)
 	end

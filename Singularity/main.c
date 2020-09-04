@@ -1,3 +1,12 @@
+/**
+ * Desarrollado por Quantum Refraction
+ * 
+ * Detalles para ejecutar el programa:
+ * 1. En una línea de comandos, ejecutar el comando ./make
+ * 2. Correr ./singularity <nombre archivo>
+ *    donde nombre archivo se refiere al nombre del programa de Singularity que se quiere compilar
+ */
+
 #include "lib/Parser.h"
 #include "lib/Lexer.h"
 
