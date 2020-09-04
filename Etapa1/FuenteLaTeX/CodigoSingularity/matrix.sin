@@ -1,0 +1,21 @@
+define function start
+begin
+    set accumulator_matrix as matrix of size 3 by 3 
+    while row counting from 0 to 3
+    begin
+        while col counting from 0 to 3
+        begin
+            set accumulator_matrix at[row,col]  to row + col
+        end
+    end
+
+    while row counting from 0 to 3
+    begin
+        while col counting from 0 to 3
+        begin
+            print(acumulator_matrix at [row, col])
+            print(", ")
+        end
+        print("\n")
+    end
+end
