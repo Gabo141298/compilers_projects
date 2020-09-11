@@ -23,10 +23,6 @@
 					printf("%s-%s\n", yytext, "SET");
 					/* return SET; */
 				}
-"to"			{
-					printf("%s-%s\n", yytext, "TO");
-					/* return TO; */
-				}
 "as"			{
 					printf("%s-%s\n", yytext, "AS");
 					/* return AS; */
@@ -35,9 +31,13 @@
 					printf("%s-%s\n", yytext, "LIST");
 					/* return LIST; */
 				}
-"matrix"		{
+"matrix of size"		{
 					printf("%s-%s\n", yytext, "MATRIX");
 					/* return MATRIX; */
+				}
+"by"			{
+					printf("%s-%s\n", yytext, "BY");
+					return BY;
 				}
 "at"			{
 					printf("%s-%s\n", yytext, "AT");
@@ -171,6 +171,20 @@
 					printf("%s-%s\n", yytext, "CLOSE_PARENTHESIS");
 					/* return CLOSE_PARENTHESIS; */
 				}
+
+"(at)? ["		{
+					printf("%s-%s\n", yytext, "OPEN_BRACKETS");
+					return OPEN_BRACKETS;
+				}
+"]"				{
+					printf("%s-%s\n", yytext, "CLOSE_BRACKETS");
+					return CLOSE_BRACKETS;
+				}
+","				{
+					printf("%s-%s\n", yytext, "COMMA");
+					return COMMA;
+				}
+
 ["][^"]*["]		{
 					printf("%s-%s\n", yytext, "STRING");
 					yylval.string = strdup(yytext);

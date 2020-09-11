@@ -35,6 +35,7 @@ int yyerror(const char *msg) {
 %token AS
 %token LIST
 %token MATRIX
+%token BY
 %token AT
 %token READ
 %token PRINT
@@ -68,11 +69,34 @@ int yyerror(const char *msg) {
 %token CLOSE_PARENTHESIS
 %token QUOTES_ERROR
 %token HASH
+%token OPEN_BRACKETS
+%token CLOSE_BRACKETS
+%token COMMA
 
 %%
 
 input
     :
     ;
+
+set : SET IDENTIFIER assignment;
+read: READ TO IDENTIFIER
+assignment: TO numvalue | AS data_structure | pos_assignment;
+print: PRINT value
+ 
+
+function: DEFINE FUNCTION IDENTIFIER block;
+block: BEGIN_BLOCK body END_BLOCK;
+// Falta las otras posibles cosas de body
+body: set | body
+
+pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value; 
+position: intvalue | intvalue COMMA intvalue;
+
+data_structure: LIST | MATRIX intvalue BY intvalue;
+
+intvalue: INTEGER | IDENTIFIER;
+numvalue: intvalue | FLOAT
+value: numvalue | STRING;
 
 %%
