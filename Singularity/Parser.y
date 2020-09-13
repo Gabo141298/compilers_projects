@@ -72,6 +72,9 @@ int yyerror(const char *msg) {
 %token OPEN_BRACKETS
 %token CLOSE_BRACKETS
 %token COMMA
+%token IS
+%token FALSE
+%token TRUE
 
 %%
 
@@ -94,6 +97,16 @@ pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value;
 position: intvalue | intvalue COMMA intvalue;
 
 data_structure: LIST | MATRIX intvalue BY intvalue;
+
+if_statement: IF condition block; 
+
+condition: comparison | boolean | NOT condition;
+
+comparison: value comp_operator value;
+
+comp_operator: XOR | LEQ | GREATER | LESS | EQUALS | IS NOT; 
+
+boolean: TRUE | FALSE;
 
 intvalue: INTEGER | IDENTIFIER;
 numvalue: intvalue | FLOAT

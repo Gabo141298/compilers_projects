@@ -103,6 +103,10 @@
 					printf("%s-%s\n", yytext, "ARGUMENTS");
 					/* return ARGUMENTS; */
 				}
+"is"			{
+					printf("%s-%s\n", yytext, "IS");
+					/* return IS; */
+				}
 "not"			{
 					printf("%s-%s\n", yytext, "NOT");
 					/* return NOT; */
@@ -118,6 +122,16 @@
 "xor"			{
 					printf("%s-%s\n", yytext, "XOR");
 					/* return XOR; */
+				}
+"false"			{
+					printf("%s-%s\n", yytext, "FALSE");
+					/* return FALSE; */
+
+				}
+"true"			{
+					printf("%s-%s\n", yytext, "TRUE");
+					/* return TRUE; */
+
 				}
 "+"				{
 					printf("%s-%s\n", yytext, "ADDITION");
