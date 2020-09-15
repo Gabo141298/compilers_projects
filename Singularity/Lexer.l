@@ -111,6 +111,10 @@
 					printf("%s-%s\n", yytext, "NOT");
 					/* return NOT; */
 				}
+"from"			{
+					printf("%s-%s\n", yytext, "FROM");
+					/* return FROM; */
+				}
 "and"			{
 					printf("%s-%s\n", yytext, "AND");
 					/* return AND; */

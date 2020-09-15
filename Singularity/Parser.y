@@ -75,6 +75,7 @@ int yyerror(const char *msg) {
 %token IS
 %token FALSE
 %token TRUE
+%token FROM
 
 %%
 
@@ -99,6 +100,10 @@ position: intvalue | intvalue COMMA intvalue;
 data_structure: LIST | MATRIX intvalue BY intvalue;
 
 if_statement: IF condition block; 
+
+while: WHILE condition block;
+
+while_counting: WHILE IDENTIFIER COUNTING FROM intvalue TO intvalue block;
 
 condition: comparison | boolean | NOT condition;
 
