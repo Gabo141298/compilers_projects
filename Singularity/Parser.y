@@ -84,7 +84,11 @@ input
     ;
 
 block: BEGIN_BLOCK body END_BLOCK;
-body: set | body
+
+body: statement | body
+
+// Poner todas las demás cosas que puede ser un statement
+statement: set
 
 set : SET IDENTIFIER assignment;
 
@@ -95,8 +99,6 @@ assignment: TO numvalue | AS data_structure | pos_assignment;
 print: PRINT value 
 
 function: DEFINE FUNCTION IDENTIFIER block;
-
-// Falta las otras posibles cosas de body
 
 pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value; 
 position: intvalue | intvalue COMMA intvalue;
