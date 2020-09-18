@@ -83,16 +83,20 @@ input
     :
     ;
 
+block: BEGIN_BLOCK body END_BLOCK;
+body: set | body
+
 set : SET IDENTIFIER assignment;
+
 read: READ TO IDENTIFIER
+
 assignment: TO numvalue | AS data_structure | pos_assignment;
-print: PRINT value
- 
+
+print: PRINT value 
 
 function: DEFINE FUNCTION IDENTIFIER block;
-block: BEGIN_BLOCK body END_BLOCK;
+
 // Falta las otras posibles cosas de body
-body: set | body
 
 pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value; 
 position: intvalue | intvalue COMMA intvalue;
