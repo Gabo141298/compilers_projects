@@ -10,6 +10,7 @@
 #include <iostream>
 
 int yyerror(const char *msg) {
+    std::cout << msg << std::endl;
     return 0;
 }
 
@@ -77,22 +78,28 @@ int yyerror(const char *msg) {
 %token TRUE
 %token FROM
 
-%%
 
-input
-    :
-    ;
+
+%%
+%start input;
+input: statement;
+
+block: BEGIN_BLOCK body END_BLOCK;
+
+body: statement | body;
+
+// Poner todas las demás cosas que puede ser un statement
+statement: set;
 
 set : SET IDENTIFIER assignment;
-read: READ TO IDENTIFIER
-assignment: TO numvalue | AS data_structure | pos_assignment;
-print: PRINT value
- 
+
+read: READ TO IDENTIFIER;
+
+assignment: TO numvalue {std::cout << "Funciona" << std::endl;}| AS data_structure | pos_assignment;
+
+print: PRINT value; 
 
 function: DEFINE FUNCTION IDENTIFIER block;
-block: BEGIN_BLOCK body END_BLOCK;
-// Falta las otras posibles cosas de body
-body: set | body
 
 pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value; 
 position: intvalue | intvalue COMMA intvalue;
@@ -113,8 +120,9 @@ comp_operator: XOR | LEQ | GREATER | LESS | EQUALS | IS NOT;
 
 boolean: TRUE | FALSE;
 
-intvalue: INTEGER | IDENTIFIER;
-numvalue: intvalue | FLOAT
+
+numvalue: intvalue | FLOAT;
+intvalue:  INTEGER  | IDENTIFIER;
 value: numvalue | STRING;
 
 %%
