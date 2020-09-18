@@ -6,7 +6,7 @@
 
 class Piece
 {
-  private: 
+  protected: 
   	/// The symbol of the piece ( 'K','Q','R','B','N','P', etc).
   	char symbol;
 

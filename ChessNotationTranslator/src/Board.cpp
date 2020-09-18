@@ -21,11 +21,15 @@ Board::Board()
 		else 
 		{
 			// All the other rows start with the same piece, either pawns or nothing
-			for (int col = 1; col < 7; ++col)
+			for (int col = 0; col < this->boardSize; ++col)
 			{
 				// The second row is full of black pawns
 				if (row == 1)
+				{
 					squares[row][col] = new Piece('p');
+					// std::cout << "Estoy haciendo peones" << row << col;
+				}	
+
 				// The second to last row is full of white pawns
 				else if (row == 6)
 					squares[row][col] = new Piece('P');
@@ -35,6 +39,12 @@ Board::Board()
 			}
 		}
 	}
+	// for(int row = 0; row < boardSize; ++row)
+	// {
+ // 		for(int col = 0; col < boardSize; ++col)
+ // 			std::cout << squares[row][col]->symbol << ' ';
+ // 		std::cout << std::endl;
+	// }
 }
 
 Board::~Board()
@@ -53,7 +63,13 @@ std::ostream& operator<<(std::ostream &out, const Board &board)
 	for(int row = 0; row < board.boardSize; ++row)
 	{
  		for(int col = 0; col < board.boardSize; ++col)
- 			out << board.squares[row][col] << ' ';
+ 		{
+ 			if(board.squares[row][col] == nullptr)
+ 				out << '_';
+ 			else
+ 				out	 << *board.squares[row][col];
+ 			out << ' ';
+ 		}
  		out << std::endl;
 	}
 
