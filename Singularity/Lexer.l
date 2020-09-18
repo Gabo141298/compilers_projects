@@ -20,9 +20,13 @@
 
 [ \r\n\t]* 		{ continue; /* Skip blanks. */ }
 "set"			{
-					/* printf("%s-%s\n", yytext, "SET"); */
+					/*printf("%s-%s\n", yytext, "SET");*/
 					return SET;
 				}
+"to"            {
+                    /*printf("%s-%s\n", yytext, "TO");*/
+					return TO;
+                }
 "as"			{
 					/* printf("%s-%s\n", yytext, "AS"); */
 					return AS;
@@ -217,7 +221,7 @@
 					return HASH;
 				}
 [a-zA-Z_][a-zA-Z0-9_]*	{
-							/* printf("%s-%s\n", yytext, "IDENTIFIER"); */
+							/*printf("%s-%s\n", yytext, "IDENTIFIER");*/
 							yylval.var = strdup(yytext);
 							return IDENTIFIER;
 						}
