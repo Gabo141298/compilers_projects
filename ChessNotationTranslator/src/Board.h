@@ -17,6 +17,7 @@ class Board
 
 
   private: 
+  	Piece* factory(char symbol);
 
   public:
   	const static unsigned char boardSize = 8;

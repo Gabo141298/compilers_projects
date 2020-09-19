@@ -1,5 +1,19 @@
 #include "Board.h"
 
+#include "Bishop.h"
+
+Piece* Board::factory(char symbol)
+{
+	switch(symbol)
+	{
+		case 'B':
+		case 'b':
+			return new Bishop(symbol);
+		default: 
+			return nullptr;
+	}
+}
+
 Board::Board()
 {
 	// Initialize the board with the normal chess starting position
@@ -9,14 +23,14 @@ Board::Board()
 		// Lower case means a black piece, upper case is a white piece
 		if (row == 0 || row == 7)
 		{
-			squares[row][0] = (row == 0) ? new Piece('r') : new Piece('R');
-			squares[row][1] = (row == 0) ? new Piece('n') : new Piece('N');
-			squares[row][2] = (row == 0) ? new Piece('b') : new Piece('B');
-			squares[row][3] = (row == 0) ? new Piece('q') : new Piece('Q');
-			squares[row][4] = (row == 0) ? new Piece('k') : new Piece('K');
-			squares[row][5] = (row == 0) ? new Piece('b') : new Piece('B');
-			squares[row][6] = (row == 0) ? new Piece('n') : new Piece('N');
-			squares[row][7] = (row == 0) ? new Piece('r') : new Piece('R');
+			squares[row][0] = (row == 0) ? factory('r') : factory('R');
+			squares[row][1] = (row == 0) ? factory('n') : factory('N');
+			squares[row][2] = (row == 0) ? factory('b') : factory('B');
+			squares[row][3] = (row == 0) ? factory('q') : factory('Q');
+			squares[row][4] = (row == 0) ? factory('k') : factory('K');
+			squares[row][5] = (row == 0) ? factory('b') : factory('B');
+			squares[row][6] = (row == 0) ? factory('n') : factory('N');
+			squares[row][7] = (row == 0) ? factory('r') : factory('R');
 		}
 		else 
 		{
@@ -26,13 +40,13 @@ Board::Board()
 				// The second row is full of black pawns
 				if (row == 1)
 				{
-					squares[row][col] = new Piece('p');
+					squares[row][col] = factory('p');
 					// std::cout << "Estoy haciendo peones" << row << col;
 				}	
 
 				// The second to last row is full of white pawns
 				else if (row == 6)
-					squares[row][col] = new Piece('P');
+					squares[row][col] = factory('P');
 				// All the other rows have nothing
 				else
 					squares[row][col] = nullptr;
