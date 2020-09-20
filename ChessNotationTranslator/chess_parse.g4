@@ -8,7 +8,7 @@ KING 		: 'Rey' ;
 BISHOP 		: 'Alfil' ;
 ROOK 		: 'Torre' ;
 PAWN 		: 'Peon' ;
-QUEEN 		: ('Reina | Dama') ;
+QUEEN 		: ('Reina' | 'Dama') ;
 
 IN 			: 'en' ;
 FILE 		: [a-hA-H] ;
