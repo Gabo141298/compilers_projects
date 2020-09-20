@@ -88,16 +88,16 @@ block: BEGIN_BLOCK body END_BLOCK;
 
 body: statement | body;
 
-// Poner todas las demás cosas que puede ser un statement
-statement: set;
+// Falta function, data_structure, while_counting
+statement: set | print | if_statement | while;
 
 set : SET IDENTIFIER assignment;
 
 read: READ TO IDENTIFIER;
 
-assignment: TO numvalue {std::cout << "Funciona" << std::endl;}| AS data_structure | pos_assignment;
+assignment: TO numvalue | AS data_structure | pos_assignment;
 
-print: PRINT value; 
+print: PRINT value ; 
 
 function: DEFINE FUNCTION IDENTIFIER block;
 
@@ -106,19 +106,19 @@ position: intvalue | intvalue COMMA intvalue;
 
 data_structure: LIST | MATRIX intvalue BY intvalue;
 
-if_statement: IF condition block; 
+if_statement: {std::cout << "if" << std::endl;} IF condition block {std::cout << "fi" << std::endl;}; 
 
-while: WHILE condition block;
+while: {std::cout << "while" << std::endl;} WHILE condition block {std::cout << "elihw" << std::endl;};
 
 while_counting: WHILE IDENTIFIER COUNTING FROM intvalue TO intvalue block;
 
-condition: comparison | boolean | NOT condition;
+condition: comparison | {std::cout << "boolean" << std::endl;} boolean | {std::cout << "not" << std::endl;} NOT condition;
 
-comparison: value comp_operator value;
+comparison: {std::cout << "comparison" << std::endl;} value comp_operator value;
 
-comp_operator: XOR | LEQ | GREATER | LESS | EQUALS | IS NOT; 
+comp_operator: {std::cout << "xor" << std::endl;} XOR | LEQ | GREATER | LESS | EQUALS | IS NOT; 
 
-boolean: TRUE | FALSE;
+boolean: {std::cout << "true" << std::endl;} TRUE | {std::cout << "false" << std::endl;} FALSE;
 
 
 numvalue: intvalue | FLOAT;

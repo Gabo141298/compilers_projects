@@ -1,0 +1,4 @@
+if true
+begin
+print 5
+end
