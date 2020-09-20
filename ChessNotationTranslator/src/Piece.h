@@ -52,7 +52,7 @@ class Piece
 
   	}
   	
-  	  /*! 
+  	/*! 
     * @brief Checks if a given cell in the board is empty.
     * @param row The row to check in the board.
     * @param file The file to check in the board.
