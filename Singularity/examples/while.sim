@@ -1,0 +1,4 @@
+while true
+begin
+print 10
+end
