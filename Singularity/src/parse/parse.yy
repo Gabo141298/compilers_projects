@@ -1,31 +1,54 @@
-%code requires
-{
-    #include <string>
-}
+%{     /* PARSER */
 
-%{
+#include "parser.hh"
+#include "scanner.hh"
 
-/*
- * Creado por Quantum Refraction
- */
-
-#include <iostream>
-
-extern int yylex();
-
-int yyerror(const char *msg) {
-    std::cout << msg << std::endl;
-    return 0;
-}
-
+#define yylex driver.scanner_->yylex
 %}
 
-%output  "lib/Parser.cpp"
-%defines "lib/Parser.h"
+%code requires
+{
+  #include <string>
+  #include <iostream>
+  #include "driver.hh"
+  #include "location.hh"
+  #include "position.hh"
+}
 
-%union {
+%code provides
+{
+  namespace parse
+  {
+    // Forward declaration of the Driver class
+    class Driver;
+
+    inline void
+    yyerror (const char* msg)
+    {
+      std::cerr << msg << std::endl;
+    }
+  }
+}
+
+
+
+%require "2.4"
+%language "C++"
+%locations
+%defines
+%debug
+%define api.namespace {parse}
+%define parser_class_name {Parser}
+%parse-param {Driver &driver}
+%lex-param {Driver &driver}
+%error-verbose
+
+%union
+{
     std::string* var;
 }
+
+%token TOK_EOF 0
 
 %token <var> IDENTIFIER INTEGER FLOAT STRING
 
@@ -125,4 +148,15 @@ numvalue: intvalue | FLOAT;
 intvalue:  INTEGER  | IDENTIFIER;
 value: numvalue | STRING;
 
+
+
 %%
+
+namespace parse
+{
+    void Parser::error(const location&, const std::string& m)
+    {
+        std::cerr << *driver.location_ << ": " << m << std::endl;
+        driver.error_ = (driver.error_ == 127 ? 127 : driver.error_ + 1);
+    }
+}
