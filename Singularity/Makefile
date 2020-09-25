@@ -1,17 +1,17 @@
 # Makefile
 
-FILES	= lib/Lexer.c lib/Parser.c main.c
+FILES	= lib/Lexer.cpp lib/Parser.cpp main.cpp
 CC	= g++
 CFLAGS	= -g -ansi 
 
 singularity: $(FILES)
 	$(CC) $(CFLAGS) $(FILES) -o singularity
 
-lib/Lexer.c: Lexer.l
+lib/Lexer.cpp: Lexer.l
 	flex Lexer.l
 
-lib/Parser.c: Parser.y lib/Lexer.c
-	bison Parser.y -Wconflicts-sr
+lib/Parser.cpp: Parser.y lib/Lexer.cpp
+	bison -d Parser.y -Wconflicts-sr
 
 clean:
-	rm -f *.o *~ lib/Lexer.c lib/Lexer.h lib/Parser.c lib/Parser.h singularity
+	rm -rf *.o *~ lib/*.h lib/*.cpp singularity

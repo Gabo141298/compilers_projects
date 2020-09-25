@@ -1,13 +1,17 @@
+%code requires
+{
+    #include <string>
+}
+
 %{
 
 /*
  * Creado por Quantum Refraction
  */
 
-#include "Parser.h"
-#include "Lexer.h"
-
 #include <iostream>
+
+extern int yylex();
 
 int yyerror(const char *msg) {
     std::cout << msg << std::endl;
@@ -16,20 +20,14 @@ int yyerror(const char *msg) {
 
 %}
 
-%output  "lib/Parser.c"
+%output  "lib/Parser.cpp"
 %defines "lib/Parser.h"
 
 %union {
-    char* var;
-    char* string;
-    long long intval;
-    double floatval;
+    std::string* var;
 }
 
-%token <var> IDENTIFIER
-%token <intval> INTEGER
-%token <floatval> FLOAT
-%token <string> STRING
+%token <var> IDENTIFIER INTEGER FLOAT STRING
 
 %token SET
 %token TO

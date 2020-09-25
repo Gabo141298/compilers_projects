@@ -13,9 +13,6 @@
 #include <cstdio>
 #include <iostream>
 
-extern int yyparse();
-extern FILE *yyin;
-
 int main(int argc, char** argv) {
     if(argc <= 1)
     {
@@ -29,11 +26,11 @@ int main(int argc, char** argv) {
         std::cout << "Can't open file: " << argv[1] << std::endl;
         return -1;
     }
-    // Set flex to read from it instead of defaulting to STDIN:
-    yyin = myfile;
-
-    // Parse through the input:
-    yyparse();
-
+    //std::string str = argv[1];
+    //str += '\n';
+    //YY_BUFFER_STATE bp = yy_scan_string(str.c_str(), str.length());  // Creates a buffer from the string
+    //yy_switch_to_buffer(bp);                   // Use the buffer
+    int ret = yyparse();                       // Parse the string
+    //yy_delete_buffer(bp);
 }
 

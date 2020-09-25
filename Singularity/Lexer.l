@@ -4,16 +4,18 @@
  * Creado por Quantum Refraction
  */
 
+#include <string>
+
 #include "Parser.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#define SAVE_TOKEN yylval.var = new std::string(yytext, yyleng)
+
+int yywrap() { return 1; }
 
 %}
 
-%option outfile="lib/Lexer.c" header-file="lib/Lexer.h"
-
+%option outfile="lib/Lexer.cpp" header-file="lib/Lexer.h"
+%option c++
 %option noyywrap
 
 %%
@@ -209,7 +211,7 @@
 
 ["][^"]*["]		{
 					/* printf("%s-%s\n", yytext, "STRING"); */
-					yylval.string = strdup(yytext);
+					SAVE_TOKEN;
 					/* return STRING */
 				}
 "\""			{
@@ -222,17 +224,17 @@
 				}
 [a-zA-Z_][a-zA-Z0-9_]*	{
 							/*printf("%s-%s\n", yytext, "IDENTIFIER");*/
-							yylval.var = strdup(yytext);
+							SAVE_TOKEN;
 							return IDENTIFIER;
 						}
 [0-9]+\.[0-9]+	{
 					/* printf("%s-%s\n", yytext, "FLOAT"); */
-					yylval.floatval = strtod(yytext, NULL); 
+					SAVE_TOKEN; 
 					return FLOAT; 
 				}
 [0-9]+      	{
 					/* printf("%s-%s\n", yytext, "INTEGER"); */
-					yylval.intval = strtoll(yytext, NULL, 10); 
+					SAVE_TOKEN;
 					return INTEGER;
 				}
 .				{ continue; /* Ignore unexpected characters. */}
