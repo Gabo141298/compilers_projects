@@ -79,17 +79,16 @@ int yyerror(const char *msg) {
 %token FROM
 
 
-
 %%
 %start input;
 input: statement;
 
-block: BEGIN_BLOCK body END_BLOCK;
+block: {std::cout << "1" << std::endl;}  BEGIN_BLOCK body END_BLOCK {std::cout << "4" << std::endl;} ;
 
-body: statement | body;
+body: {std::cout << "2" << std::endl;}  statement | statement body;
 
 // Falta function, data_structure, while_counting
-statement: set | print | if_statement | while;
+statement: read | set | print | if_statement | while | while_counting | function;
 
 set : SET IDENTIFIER assignment;
 
@@ -97,9 +96,9 @@ read: READ TO IDENTIFIER;
 
 assignment: TO numvalue | AS data_structure | pos_assignment;
 
-print: PRINT value ; 
+print: {std::cout << "3" << std::endl;}  PRINT value ; 
 
-function: DEFINE FUNCTION IDENTIFIER block;
+function: DEFINE FUNCTION IDENTIFIER {std::cout << (char*) $3 << std::endl;}  block;
 
 pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value; 
 position: intvalue | intvalue COMMA intvalue;
@@ -108,7 +107,7 @@ data_structure: LIST | MATRIX intvalue BY intvalue;
 
 if_statement: {std::cout << "if" << std::endl;} IF condition block {std::cout << "fi" << std::endl;}; 
 
-while: {std::cout << "while" << std::endl;} WHILE condition block {std::cout << "elihw" << std::endl;};
+while: WHILE condition block;
 
 while_counting: WHILE IDENTIFIER COUNTING FROM intvalue TO intvalue block;
 

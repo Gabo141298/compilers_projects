@@ -1,0 +1,4 @@
+define function print_number with arguments number
+begin
+	print number
+end
