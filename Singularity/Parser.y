@@ -83,12 +83,12 @@ int yyerror(const char *msg) {
 %start input;
 input: statement;
 
-block: {std::cout << "1" << std::endl;}  BEGIN_BLOCK body END_BLOCK {std::cout << "4" << std::endl;} ;
+block: BEGIN_BLOCK body END_BLOCK;
 
-body: {std::cout << "2" << std::endl;}  statement | statement body;
+body: statement | statement body;
 
-// Falta function, data_structure, while_counting
-statement: read | set | print | if_statement | while | while_counting | function;
+// Falta data_structure, while_counting
+statement: read | set | print | if_statement | while | while_counting |  function;
 
 set : SET IDENTIFIER assignment;
 
@@ -96,16 +96,19 @@ read: READ TO IDENTIFIER;
 
 assignment: TO numvalue | AS data_structure | pos_assignment;
 
-print: {std::cout << "3" << std::endl;}  PRINT value ; 
+print: PRINT value; 
 
-function: DEFINE FUNCTION IDENTIFIER {std::cout << (char*) $3 << std::endl;}  block;
+function: DEFINE FUNCTION IDENTIFIER block | DEFINE FUNCTION IDENTIFIER WITH ARGUMENTS arguments block  ;
+
+arguments: IDENTIFIER | IDENTIFIER COMMA arguments;
 
 pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value; 
+
 position: intvalue | intvalue COMMA intvalue;
 
 data_structure: LIST | MATRIX intvalue BY intvalue;
 
-if_statement: {std::cout << "if" << std::endl;} IF condition block {std::cout << "fi" << std::endl;}; 
+if_statement: IF condition block; 
 
 while: WHILE condition block;
 
