@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <llvm/Value.h>
+#include <llvm/IR/Value.h>
 
 namespace SNode
 {
@@ -13,6 +13,7 @@ class CodeGenContext;
 class Statement;
 class Expression;
 class VariableDeclaration;
+class Function;
 
 typedef std::vector<Statement*> StatementList;
 typedef std::vector<Expression*> ExpressionList;
@@ -25,25 +26,6 @@ public:
     virtual llvm::Value* codeGen(CodeGenContext& context) { }
 };
 
-class Program {
-public:
-    FunctionList functions;
-    Program() {}
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-}
-
-class Function {
-public:
-    const Identifier& type;
-    const Identifier& id;
-    VariableList arguments;
-    Block& block;
-    Function(const Identifier& type, const Identifier& id, 
-            const VariableList& arguments, NBlock& block) :
-        type(type), id(id), arguments(arguments), block(block) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
 class Expression : public Node {
 };
 
@@ -51,42 +33,77 @@ class Statement : public Node {
 };
 
 class Value : public Expression{
-}
+};
 
 class Integer : public Value {
 public:
     long long value;
     Integer(long long value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 
 class Double : public Value {
 public:
     double value;
     Double(double value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 
 class String : public Value {
 public:
     std::string value;
     String(const std::string& value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 
 class Identifier : public Value {
 public:
     std::string name;
     Identifier(const std::string& name) : name(name) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 
 class Boolean : public Value {
-    public
+public:
     bool value;
     Boolean(bool value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-}
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class Program {
+public:
+    FunctionList functions;
+    Program() {}
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class Body : public Expression {
+public:
+    StatementList statements;
+    Body() {}
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class Block : public Expression {
+public:
+    Body& body;
+    Block(Body& body) :
+        body(body) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class Function {
+public:
+    const Identifier& id;
+    VariableList arguments;
+    Block& block;
+    Function(const Identifier& id, Block& block) :
+        id(id), block(block) { }
+    Function(const Identifier& id, 
+            const VariableList& arguments, Block& block) :
+        id(id), arguments(arguments), block(block) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
 
 class MethodCall : public Expression {
 public:
@@ -95,10 +112,10 @@ public:
     MethodCall(const Identifier& id, ExpressionList& arguments) :
         id(id), arguments(arguments) { }
     MethodCall(const Identifier& id) : id(id) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 
-class BinaryOperator : public Expression {
+/*class BinaryOperator : public Expression {
 public:
     int op;
     Expression& lhs;
@@ -106,75 +123,79 @@ public:
     BinaryOperator(Expression& lhs, int op, Expression& rhs) :
         lhs(lhs), rhs(rhs), op(op) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-};
+};*/
 
-class Assignment : public Expression {
-public:
-    Identifier& lhs;
-    Expression& rhs;
-    Assignment(Identifier& lhs, Expression& rhs) : 
-        lhs(lhs), rhs(rhs) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-class Body : public Expression {
-    StatementList statements;
-    Body() {}
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-}
-
-class Block : public Expression {
-public:
-    Body* body;
-    Block() { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-class ExpressionStatement : public Statement {
+/*class ExpressionStatement : public Statement {
 public:
     Expression& expression;
     ExpressionStatement(Expression& expression) : 
         expression(expression) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-};
+};*/
 
-class VariableDeclaration : public Statement {
+class VariableAssignment : public Statement {
 public:
     Identifier& id;
     Expression *assignmentExpr;
-    VariableDeclaration(Identifier& id, Expression *assignmentExpr) :
+    VariableAssignment(Identifier& id, Expression *assignmentExpr) :
         id(id), assignmentExpr(assignmentExpr) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 
 class DataStructure : public Expression {
-}
+};
+
+class Position : public Expression {
+};
+
+class ListPosition : public Position {
+public:
+    Value& position;
+    ListPosition(Value& position) :
+        position(position) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class MatrixPosition : public Position {
+public:
+    Value& row;
+    Value& col;
+    MatrixPosition(Value& row, Value& col) :
+        row(row), col(col) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class DataPositionAssignment : public Expression {
+public:
+    Position& position;
+    Expression& expression;
+    DataPositionAssignment(Position& position, Expression& expression) : 
+        position(position), expression(expression) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
 
 class List : public DataStructure {
+public:
     std::vector<Value> values;
     List() {}
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-}
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
 
 class Matrix : public DataStructure {
+public:
+    Value* row;
+    Value* col;
     std::vector<std::vector<Value>> matrix;
-    Matrix(Integer* row, Integer* col)
-    {
-        if(row->value > 0 && col->value > 0)
-        {
-            this->matrix.resize(row->value);
-            for(long long currentCol = 0; currentCol < col->value, ++currentCol)
-                this->matrix[currentCol].resize(col->value);
-        }
-    }
-    Matrix(Identifier* row, Identifier* col)
-    {
-        if(row->value > 0 && col->value > 0)
-        {
-            this->matrix.resize(row->value);
-            for(long long currentCol = 0; currentCol < col->value, ++currentCol)
-                this->matrix[currentCol].resize(col->value);
-        }
-    }
-}
+    Matrix(Value* row, Value* col) :
+        row(row), col(col) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class Read : public Statement {
+public:
+    Identifier* identifier;
+    Read(const std::string& identifier) :
+        identifier(new SNode::Identifier(identifier)) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
 }

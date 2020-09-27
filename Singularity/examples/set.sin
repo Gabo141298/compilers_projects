@@ -1,1 +1,4 @@
-set print_number to 5
+define function start
+begin
+	set print_number to 5
+end

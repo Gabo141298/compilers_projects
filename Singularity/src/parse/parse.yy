@@ -42,21 +42,25 @@ SNode::Program* programBlock;
 %defines
 %debug
 %define api.namespace {parse}
-%define parser_class_name {Parser}
+%define api.parser.class {Parser}
 %parse-param {Driver &driver}
 %lex-param {Driver &driver}
-%error-verbose
+%define parse.error verbose
 
 %union
 {
     SNode::Node* node;
     SNode::Block* block;
+    SNode::Body* body;
     SNode::Expression* expression;
     SNode::Statement* statement;
     SNode::Identifier* identifier;
     SNode::Program* program;
+    SNode::Function* function;
     SNode::Value* value;
     SNode::DataStructure* dataStructure;
+    SNode::Position* position;
+    SNode::DataPositionAssignment* dataPosAssignment;
     std::string* var;
 }
 
@@ -116,27 +120,31 @@ SNode::Program* programBlock;
 %type <body> body
 %type <value> value boolean numvalue intvalue
 %type <expression> assignment
-%type <statement> statement set
+%type <position> position 
+%type <statement> statement set read
 %type <dataStructure> data_structure
+%type <dataPosAssignment> pos_assignment
+%type <function> function
 
 %%
 %start input;
-input: program { programBlock = $1 } ;
+input: program { programBlock = $1; } ;
 
 program: function { $$ = new SNode::Program(); $$->functions.push_back($1); }
             | program function { $1->functions.push_back($2); }
             ;
 
-block: BEGIN_BLOCK
-        body { $$ = new SNode::Block(); $$->body = $2; }
-        END_BLOCK;
+block:  BEGIN_BLOCK
+        body
+        END_BLOCK { $$ = new SNode::Block(*$2); }
+        ;
 
 body:       statement { $$ = new SNode::Body(); $$->statements.push_back($<statement>1); }
             | body statement { $1->statements.push_back($<statement>2); }
             ;
 
-statement: read 
-            | set { $$ = $1 }
+statement: read { $$ = $1; }
+            | set { $$ = $1; }
             | print 
             | if_statement 
             | while 
@@ -144,29 +152,32 @@ statement: read
             ;
 
 set : SET IDENTIFIER assignment 
-            { $$ = new SNode::VariableDeclaration($2, $3); }
+            { $$ = new SNode::VariableAssignment(*(new SNode::Identifier(*$2)), $3); delete $2; }
             ;
 
-read: READ TO IDENTIFIER;
+read: READ TO IDENTIFIER { $$ = new SNode::Read(*$3); delete $3; };
 
-assignment: TO numvalue { $$ = $2 } 
-            | AS data_structure { $$ = $2 }
-            | pos_assignment { $$ = $1 }
+assignment: TO numvalue { $$ = $2; } 
+            | AS data_structure { $$ = $2; }
+            | pos_assignment { $$ = $1; }
             ;
 
 print: PRINT value; 
 
-function: DEFINE FUNCTION IDENTIFIER block 
+function: DEFINE FUNCTION IDENTIFIER block
+            { $$ = new SNode::Function(*(new SNode::Identifier(*$3)), *$4); delete $3; }
             | DEFINE FUNCTION IDENTIFIER WITH ARGUMENTS arguments block
             ;
 
 arguments: IDENTIFIER 
             | IDENTIFIER COMMA arguments;
 
-pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value; 
+pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value
+            { $$ = new SNode::DataPositionAssignment(*$2, *$5); }
+            ; 
 
-position: intvalue 
-            | intvalue COMMA intvalue;
+position: intvalue { $$ = new SNode::ListPosition(*$1); }
+            | intvalue COMMA intvalue { $$ = new SNode::MatrixPosition(*$1, *$3); };
 
 data_structure: LIST { $$ = new SNode::List(); }
             | MATRIX intvalue BY intvalue { $$ = new SNode::Matrix($2, $4); }
