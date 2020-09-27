@@ -3,6 +3,9 @@
 all:
 	@make -C build
 
+configure:
+	./configure
+
 clean:
 	@rm -frv build/
 	@rm -frv parser

@@ -3,6 +3,9 @@
 #include <iostream>
 #include <string>
 
+#include "node.h"
+extern SNode::Block* programBlock;
+
 int main(int argc, char** argv)
 {
     parse::Driver driver;
@@ -13,6 +16,8 @@ int main(int argc, char** argv)
     }
     std::string filename(argv[1]);
     driver.parse_file(filename);
+
+    std::cout << programBlock << std::endl;
 
     return 0;
 }
