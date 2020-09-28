@@ -95,7 +95,7 @@ public:
     virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 
-class Program {
+class Program : public Node {
 public:
     FunctionList functions;
     Program() {}
@@ -117,7 +117,7 @@ public:
     virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 
-class Function {
+class Function : public Node {
 public:
     const Identifier& id;
     VariableList arguments;
@@ -127,6 +127,25 @@ public:
     Function(const Identifier& id, 
             const VariableList& arguments, Block& block) :
         id(id), arguments(arguments), block(block) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class FunctionCall : public Expression {
+public:
+    const Identifier& id;
+    VariableList arguments;
+    FunctionCall(const Identifier& id) :
+        id(id) { }
+    FunctionCall(const Identifier& id, const VariableList& arguments) :
+        id(id), arguments(arguments) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class Answer : public Statement {
+public:
+    Expression& returnExpression;
+    Answer(Expression& returnExpression) :
+        returnExpression(returnExpression) {}
     virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 

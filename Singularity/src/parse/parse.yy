@@ -122,9 +122,9 @@ SNode::Program* programBlock;
 %type <block> block
 %type <body> body
 %type <value> value boolean numvalue intvalue
-%type <expression> assignment expression condition comparison
+%type <expression> assignment expression condition comparison func_call
 %type <position> position 
-%type <statement> statement set read print if_statement while while_counting
+%type <statement> statement set read print if_statement while while_counting answer
 %type <dataStructure> data_structure
 %type <dataPosAssignment> pos_assignment
 %type <function> function
@@ -155,6 +155,7 @@ statement: read { $$ = $1; }
             | if_statement { $$ = $1; }
             | while { $$ = $1; }
             | while_counting { $$ = $1; }
+            | answer { $$ = $1; }
             ;
 
 set : SET IDENTIFIER assignment 
@@ -246,7 +247,14 @@ expression: value { $$ = $1; }
             | expression DIVISION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::division, *$3); }
             ;
 
-func_call: ;
+func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2))); delete $2; }
+            | CALL IDENTIFIER WITH PARAMETERS OPEN_PARENTHESIS arguments CLOSE_PARENTHESIS
+            { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2)), *$6); delete $2; }
+            ;
+
+answer: ANSWER expression
+        { $$ = new SNode::Answer(*$2); }
+        ;
 
 %%
 
