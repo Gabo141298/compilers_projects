@@ -17,16 +17,7 @@ int main(int argc, char** argv)
     std::string filename(argv[1]);
     driver.parse_file(filename);
 
-    /*std::cout << programBlock << ' ' << programBlock->functions.size() << std::endl;
-
-    for(size_t curFunc = 0; curFunc < programBlock->functions.size(); ++curFunc)
-    {
-    	std::cout << "Función: " << programBlock->functions[curFunc]->id.name << std::endl;
-    	for(size_t curStat = 0; curStat < programBlock->functions[curFunc]->block.body.statements.size(); ++curStat)
-    	{
-    		std::cout << &(programBlock->functions[curFunc]->block.body.statements[curStat]) << std::endl;
-    	}
-    }*/
+    programBlock->print();
 
     return 0;
 }
