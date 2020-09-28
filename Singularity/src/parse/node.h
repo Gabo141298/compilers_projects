@@ -9,6 +9,31 @@
 
 namespace SNode
 {
+enum Operation
+{
+    addition,
+    substraction,
+    multiplication,
+    division
+};
+
+enum ComparisonOperation
+{
+    leq,
+    geq,
+    greater,
+    less,
+    equals,
+    isNot
+};
+
+enum BooleanOperation
+{
+    bAnd,
+    bOr,
+    bXor
+};
+
 class CodeGenContext;
 class Statement;
 class Expression;
@@ -115,15 +140,43 @@ public:
     virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 
-/*class BinaryOperator : public Expression {
+class ArithmeticOperator : public Expression {
 public:
-    int op;
-    Expression& lhs;
-    Expression& rhs;
-    BinaryOperator(Expression& lhs, int op, Expression& rhs) :
-        lhs(lhs), rhs(rhs), op(op) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};*/
+    Operation op;
+    Expression& left;
+    Expression& right;
+    ArithmeticOperator(Expression& left, Operation op, Expression& right) :
+        left(left), right(right), op(op) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class ComparisonOperator : public Expression {
+public:
+    ComparisonOperation op;
+    Expression& left;
+    Expression& right;
+    ComparisonOperator(Expression& left, ComparisonOperation op, Expression& right) :
+        left(left), right(right), op(op) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class BooleanOperator : public Expression {
+public:
+    BooleanOperation op;
+    Expression& left;
+    Expression& right;
+    BooleanOperator(Expression& left, BooleanOperation op, Expression& right) :
+        left(left), right(right), op(op) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class NotOperator : public Expression {
+public:
+    Expression& expression;
+    NotOperator(Expression& expression) :
+        expression(expression) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
 
 /*class ExpressionStatement : public Statement {
 public:
@@ -193,9 +246,35 @@ public:
 
 class Read : public Statement {
 public:
-    Identifier* identifier;
+    Identifier& identifier;
     Read(const std::string& identifier) :
-        identifier(new SNode::Identifier(identifier)) { }
+        identifier(*(new SNode::Identifier(identifier))) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class Print : public Statement {
+public:
+    Expression& expression;
+    Print(Expression& expression) :
+        expression(expression) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class If : public Statement {
+public:
+    Expression& condition;
+    Block& block;
+    If(Expression& condition, Block& block) :
+        condition(condition), block(block) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class While : public Statement {
+public:
+    Expression& condition;
+    Block& block;
+    While(Expression& condition, Block& block) :
+        condition(condition), block(block) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 }
