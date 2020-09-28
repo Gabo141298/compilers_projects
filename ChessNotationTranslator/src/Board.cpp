@@ -2,6 +2,7 @@
 
 #include "Bishop.h"
 #include "Knight.h"
+#include "King.h"
 
 Piece* Board::factory(char symbol)
 {
@@ -13,6 +14,9 @@ Piece* Board::factory(char symbol)
 		case 'N':
 		case 'n':
 			return new Knight(symbol);
+		case 'K':
+		case 'k':
+			return new King(symbol);
 		default: 
 			return nullptr;
 	}
