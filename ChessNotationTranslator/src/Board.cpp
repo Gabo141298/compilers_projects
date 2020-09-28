@@ -3,6 +3,7 @@
 #include "Bishop.h"
 #include "Knight.h"
 #include "King.h"
+#include "Pawn.h"
 #include "Queen.h"
 #include "Rook.h"
 
@@ -19,6 +20,9 @@ Piece* Board::factory(char symbol)
 		case 'N':
 		case 'n':
 			return new Knight(symbol);
+		case 'P':
+		case 'p':
+			return new Pawn(symbol);
 		case 'Q':
 		case 'q':
 			return new Queen(symbol);
