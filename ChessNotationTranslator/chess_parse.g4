@@ -1,31 +1,47 @@
 grammar chess_parse;
 
 // Lexer
-WS : [ \t\r\n,]+ -> skip ;
+WS : [' '|'\t' | '\r' | '\n'] -> skip ;
 
-KNIGHT		: 'Caballo' ;
+KNIGHT		: 'Caballo';
 KING 		: 'Rey' ;
 BISHOP 		: 'Alfil' ;
 ROOK 		: 'Torre' ;
 PAWN 		: 'Peon' ;
 QUEEN 		: ('Reina' | 'Dama') ;
+COMMA 		: ',' -> channel(HIDDEN);
 
 IN 			: 'en' ;
 FILE 		: [a-hA-H] ;
 RANK 		: [1-8] ;
-
 CAPTURES 	: 'toma' ;
 
-ID	 		: [^,]+ ;
+// Review
+ID	 		: ([a-zA-Z_]+[a-zA-Z_0-9]+)?;
+
+NUMBER:		[0-9]+;
+
+DATE		: NUMBER '.' NUMBER '.' NUMBER;
+ROUNDS		: NUMBER;
+
+
+game: header play;
 
 // Syntax
+header		: ID DATE NUMBER ID ID;
+
+play: move | 
+	  play move;
+	 
+move : commute  | capture  ;
+
 square 		: FILE RANK ;
 
 in_position : IN RANK
 			| IN FILE
 			;
 
-movement 	: piece square 
+commute 	: piece square 
 			| piece in_position square
 			;
 
