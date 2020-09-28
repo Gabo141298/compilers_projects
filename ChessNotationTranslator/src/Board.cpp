@@ -3,6 +3,8 @@
 #include "Bishop.h"
 #include "Knight.h"
 #include "King.h"
+#include "Queen.h"
+#include "Rook.h"
 
 Piece* Board::factory(char symbol)
 {
@@ -11,12 +13,18 @@ Piece* Board::factory(char symbol)
 		case 'B':
 		case 'b':
 			return new Bishop(symbol);
-		case 'N':
-		case 'n':
-			return new Knight(symbol);
 		case 'K':
 		case 'k':
 			return new King(symbol);
+		case 'N':
+		case 'n':
+			return new Knight(symbol);
+		case 'Q':
+		case 'q':
+			return new Queen(symbol);
+		case 'R':
+		case 'r':
+			return new Rook(symbol);
 		default: 
 			return nullptr;
 	}
@@ -49,7 +57,6 @@ Board::Board()
 				if (row == 1)
 				{
 					squares[row][col] = factory('p');
-					// std::cout << "Estoy haciendo peones" << row << col;
 				}	
 
 				// The second to last row is full of white pawns
@@ -61,12 +68,6 @@ Board::Board()
 			}
 		}
 	}
-	// for(int row = 0; row < boardSize; ++row)
-	// {
- // 		for(int col = 0; col < boardSize; ++col)
- // 			std::cout << squares[row][col]->symbol << ' ';
- // 		std::cout << std::endl;
-	// }
 }
 
 Board::~Board()
