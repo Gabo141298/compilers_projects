@@ -37,12 +37,12 @@ enum BooleanOperation
 class CodeGenContext;
 class Statement;
 class Expression;
-class VariableDeclaration;
+class Identifier;
 class Function;
 
 typedef std::vector<Statement*> StatementList;
 typedef std::vector<Expression*> ExpressionList;
-typedef std::vector<VariableDeclaration*> VariableList;
+typedef std::vector<Identifier*> VariableList;
 typedef std::vector<Function*> FunctionList;
 
 class Node {
@@ -275,6 +275,17 @@ public:
     Block& block;
     While(Expression& condition, Block& block) :
         condition(condition), block(block) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+};
+
+class WhileCounting : public Statement {
+public:
+    Identifier& counter;
+    Value& beginValue;
+    Value& endValue;
+    Block& block;
+    WhileCounting(Identifier& counter, Value& beginValue, Value& endValue, Block& block) :
+        counter(counter), beginValue(beginValue), endValue(endValue), block(block) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
 };
 }

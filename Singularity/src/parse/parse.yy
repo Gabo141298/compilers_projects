@@ -64,6 +64,7 @@ SNode::Program* programBlock;
     std::string* var;
     SNode::ComparisonOperation compOper;
     SNode::BooleanOperation boolOper;
+    SNode::VariableList* variableList;
 }
 
 %token TOK_EOF 0
@@ -129,6 +130,7 @@ SNode::Program* programBlock;
 %type <function> function
 %type <compOper> comp_operator
 %type <boolOper> boolean_operator
+%type <variableList> arguments
 
 %%
 %start input;
@@ -171,10 +173,11 @@ print: PRINT expression { $$ = new SNode::Print(*$2); };
 function: DEFINE FUNCTION IDENTIFIER block
             { $$ = new SNode::Function(*(new SNode::Identifier(*$3)), *$4); delete $3; }
             | DEFINE FUNCTION IDENTIFIER WITH ARGUMENTS arguments block
+            { $$ = new SNode::Function(*(new SNode::Identifier(*$3)), *$6, *$7); delete $3; }
             ;
 
-arguments: IDENTIFIER 
-            | arguments COMMA IDENTIFIER;
+arguments: IDENTIFIER { $$ = new SNode::VariableList(); $$->push_back(new SNode::Identifier(*$1)); delete $1; }
+            | arguments COMMA IDENTIFIER { $1->push_back(new SNode::Identifier(*$3)); delete $3; };
 
 pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value
             { $$ = new SNode::DataPositionAssignment(*$2, *$5); }
@@ -191,7 +194,8 @@ if_statement: IF condition block { $$ = new SNode::If(*$2, *$3); };
 
 while: WHILE condition block { $$ = new SNode::While(*$2, *$3); };;
 
-while_counting: WHILE IDENTIFIER COUNTING FROM intvalue TO intvalue block;
+while_counting: WHILE IDENTIFIER COUNTING FROM intvalue TO intvalue block
+                { $$ = new SNode::WhileCounting(*(new SNode::Identifier(*$2)), *$5, *$7, *$8); delete $2; };
 
 condition: comparison { $$ = $1; }
             | boolean { $$ = $1; }
