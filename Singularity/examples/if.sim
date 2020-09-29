@@ -1,4 +1,7 @@
-if true
+define function start
 begin
-print 5
+	if true
+	begin
+		print 5
+	end
 end

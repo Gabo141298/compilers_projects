@@ -2,12 +2,12 @@ define function start
 begin
     read to n
     set numbers as list
-    while i counting from 0 to n
+    while i counting from 1 to n
     begin
         read to numbers at i
     end
     set acum to 0
-    while i counting from 0 to n
+    while i counting from 1 to n
     begin
         set acum to acum + numbers at i
     end

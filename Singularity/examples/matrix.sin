@@ -14,8 +14,8 @@ begin
         while col counting from 0 to 3
         begin
             print(acumulator_matrix at [row, col])
-            print(", ")
+            print ", "
         end
-        print("\n")
+        print "\n"
     end
 end

@@ -1,1 +1,4 @@
-print 5
+define function start
+begin
+	print 5
+end

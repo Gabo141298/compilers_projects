@@ -206,10 +206,13 @@ public:
 
         id.print(tabs + 1);
 
-        printTabs(tabs + 1);
-        std::cout << "parameters:" << std::endl;
-        for(size_t index = 0; index < parameters.size(); ++ index)
-            parameters[index]->print(tabs + 1);
+        if(parameters.size() > 0)
+        {
+            printTabs(tabs + 1);
+            std::cout << "parameters:" << std::endl;
+            for(size_t index = 0; index < parameters.size(); ++ index)
+                parameters[index]->print(tabs + 1);
+        }
     }
 };
 
@@ -227,6 +230,23 @@ public:
         printTabs(tabs + 1);
         std::cout << "Expression:" << std::endl;
         returnExpression.print(tabs + 1);
+    }
+};
+
+class ExpressionStatement : public Statement {
+public:
+    Expression& expression;
+    ExpressionStatement(Expression& expression) : 
+        expression(expression) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context) {};
+    void print(size_t tabs = 0) const override
+    {
+        printTabs(tabs);
+        std::cout << "ExpressionStatement:" << std::endl;
+
+        printTabs(tabs + 1);
+        std::cout << "Expression:" << std::endl;
+        expression.print(tabs + 1);
     }
 };
 

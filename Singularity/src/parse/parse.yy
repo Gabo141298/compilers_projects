@@ -156,6 +156,7 @@ statement: read { $$ = $1; }
             | while { $$ = $1; }
             | while_counting { $$ = $1; }
             | answer { $$ = $1; }
+            | func_call { $$ = new SNode::ExpressionStatement(*$1); }
             ;
 
 set : SET IDENTIFIER assignment 

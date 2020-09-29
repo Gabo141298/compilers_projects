@@ -1,4 +1,7 @@
-while true
+define function start
 begin
-print 10
+	while true
+	begin
+		print 10
+	end
 end
