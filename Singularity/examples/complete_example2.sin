@@ -31,7 +31,9 @@ begin
 	set mat as matrix of size M by N
 	while row counting from 0 to M
 	begin
-		while col counting from 0 to N
+		set mat at[row,0] to call lowest with parameters (matrix at[row], M)
+		set mat at[row,N-1] to call greatest with parameters (matrix at[row], M)
+		while col counting from 1 to N-1
 		begin
 			set mat at[row,col] to row * col
 		end

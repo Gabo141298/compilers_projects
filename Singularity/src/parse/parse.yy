@@ -68,6 +68,7 @@ SNode::Program* programBlock;
     SNode::If* ifStatement;
     SNode::OtherwiseIf* otherwiseIf;
     SNode::Otherwise* otherwise;
+    SNode::ExpressionList* expressionList;
 }
 
 %token TOK_EOF 0
@@ -138,6 +139,7 @@ SNode::Program* programBlock;
 %type <compOper> comp_operator
 %type <boolOper> boolean_operator
 %type <variableList> arguments
+%type <expressionList> parameters
 
 %%
 %start input;
@@ -188,12 +190,15 @@ function: DEFINE FUNCTION IDENTIFIER block
 arguments: IDENTIFIER { $$ = new SNode::VariableList(); $$->push_back(new SNode::Identifier(*$1)); delete $1; }
             | arguments COMMA IDENTIFIER { $1->push_back(new SNode::Identifier(*$3)); delete $3; };
 
+parameters: expression { $$ = new SNode::ExpressionList(); $$->push_back($1); }
+            | parameters COMMA expression { $1->push_back($3);  };
+
 pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO expression
             { $$ = new SNode::DataPositionAssignment(*$2, *$5); }
             ; 
 
-position: intvalue { $$ = new SNode::ListPosition(*$1); }
-            | intvalue COMMA intvalue { $$ = new SNode::MatrixPosition(*$1, *$3); };
+position: expression { $$ = new SNode::ListPosition(*$1); }
+            | expression COMMA expression { $$ = new SNode::MatrixPosition(*$1, *$3); };
 
 data_structure: LIST { $$ = new SNode::List(); }
             | MATRIX intvalue BY intvalue { $$ = new SNode::Matrix($2, $4); }
@@ -267,7 +272,7 @@ expression: IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS {  $$ = new SNode::
             ;
 
 func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2))); delete $2; }
-            | CALL IDENTIFIER WITH PARAMETERS OPEN_PARENTHESIS arguments CLOSE_PARENTHESIS
+            | CALL IDENTIFIER WITH PARAMETERS OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS
             { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2)), *$6); delete $2; }
             ;
 

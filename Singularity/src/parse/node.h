@@ -194,10 +194,10 @@ public:
 class FunctionCall : public Expression {
 public:
     const Identifier& id;
-    VariableList parameters;
+    ExpressionList parameters;
     FunctionCall(const Identifier& id) :
         id(id) { }
-    FunctionCall(const Identifier& id, const VariableList& parameters) :
+    FunctionCall(const Identifier& id, const ExpressionList& parameters) :
         id(id), parameters(parameters) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override
@@ -384,8 +384,8 @@ public:
 
 class ListPosition : public Position {
 public:
-    Value& position;
-    ListPosition(Value& position) :
+    Expression& position;
+    ListPosition(Expression& position) :
         position(position) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override
@@ -401,9 +401,9 @@ public:
 
 class MatrixPosition : public Position {
 public:
-    Value& row;
-    Value& col;
-    MatrixPosition(Value& row, Value& col) :
+    Expression& row;
+    Expression& col;
+    MatrixPosition(Expression& row, Expression& col) :
         row(row), col(col) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override
