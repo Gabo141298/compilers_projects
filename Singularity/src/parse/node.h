@@ -363,6 +363,25 @@ class DataStructure : public Expression {
 class Position : public Expression {
 };
 
+class PositionAccess : public Expression {
+public: 
+    Identifier& id;
+    Position& position;
+    PositionAccess(Identifier& id, Position& position) :
+        id(id), position(position) {}
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    void print(size_t tabs = 0) const override
+    {
+        printTabs(tabs);
+        std::cout << "PositionAccess: " << std::endl;
+
+        id.print(tabs + 1);
+
+        position.print(tabs + 1);
+    }
+
+};
+
 class ListPosition : public Position {
 public:
     Value& position;
@@ -492,9 +511,7 @@ public:
     Expression& condition;
     Block& block;
     Statement* otherwise;
-    If(Expression& condition, Block& block) :
-        condition(condition), block(block) { }
-    If(Expression& condition, Block& block, Statement* otherwise) :
+    If(Expression& condition, Block& block, Statement* otherwise = nullptr) :
         condition(condition), block(block), otherwise(otherwise) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override
@@ -505,6 +522,9 @@ public:
         printTabs(tabs + 1);
         std::cout << "Condition:" << std::endl;
         condition.print(tabs + 1);
+
+        if (otherwise)
+            otherwise->print(tabs + 1);
 
         block.print(tabs + 1);
     }

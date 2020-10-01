@@ -1,0 +1,39 @@
+define function lowest with arguments listNumber, size
+begin
+	set minor to listNumber at[0]
+	while index counting from 0 to size
+	begin
+		if listNumber  < minor
+		begin
+			print n
+		end
+	end
+
+	answer minor
+end
+
+define function greatest with arguments listNumber, size
+begin
+	set biggest to listNumber at[0]
+	while index counting from 0 to size
+	begin
+		if listNumber > biggest
+		begin
+			print n
+		end
+	end
+
+	answer biggest
+end
+
+define function create_matrix with arguments M, N
+begin
+	set mat as matrix of size M by N
+	while row counting from 0 to M
+	begin
+		while col counting from 0 to N
+		begin
+			set mat at[row,col] to row * col
+		end
+	end
+end

@@ -174,7 +174,7 @@ read: READ TO IDENTIFIER { $$ = new SNode::Read(*$3); delete $3; };
 
 assignment: TO expression { $$ = $2; } 
             | AS data_structure { $$ = $2; }
-            | pos_assignment { $$ = $1; }
+            | pos_assignment { $$ = $1; } 
             ;
 
 print: PRINT expression { $$ = new SNode::Print(*$2); }; 
@@ -188,7 +188,7 @@ function: DEFINE FUNCTION IDENTIFIER block
 arguments: IDENTIFIER { $$ = new SNode::VariableList(); $$->push_back(new SNode::Identifier(*$1)); delete $1; }
             | arguments COMMA IDENTIFIER { $1->push_back(new SNode::Identifier(*$3)); delete $3; };
 
-pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value
+pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO expression
             { $$ = new SNode::DataPositionAssignment(*$2, *$5); }
             ; 
 
@@ -214,6 +214,7 @@ while_counting: WHILE IDENTIFIER COUNTING FROM expression TO expression block
                 { $$ = new SNode::WhileCounting(*(new SNode::Identifier(*$2)), *$5, *$7, *$8); delete $2; };
 
 condition: comparison { $$ = $1; }
+            | IDENTIFIER { $$ = new SNode::Identifier(*$1); delete $1; }
             | boolean { $$ = $1; }
             | NOT condition { $$ = new SNode::NotOperator(*$2); }
             | condition boolean_operator condition
@@ -255,7 +256,8 @@ value: numvalue { $$ = $1; }
             | boolean { $$ = $1; }
             ;
 
-expression: value { $$ = $1; }
+expression: IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS {  $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3); delete $1; }
+            | value { $$ = $1; }
             | func_call
             | expression ADDITION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::addition, *$3); }
             | expression SUBSTRACTION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::substraction, *$3); }
