@@ -24,7 +24,8 @@ enum ComparisonOperation
     greater,
     less,
     equals,
-    isNot
+    isNot,
+    module
 };
 
 enum BooleanOperation

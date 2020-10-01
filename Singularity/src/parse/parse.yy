@@ -242,7 +242,6 @@ boolean: TRUE { $$ = new SNode::Boolean(true); }
             | FALSE { $$ = new SNode::Boolean(false); }
             ;
 
-
 numvalue: intvalue { $$ = $1; }
             | FLOAT { $$ = new SNode::Double(atof($1->c_str())); delete $1; }
             ;
@@ -262,6 +261,7 @@ expression: value { $$ = $1; }
             | expression SUBSTRACTION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::substraction, *$3); }
             | expression MULTIPLICATION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::multiplication, *$3); }
             | expression DIVISION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::division, *$3); }
+            | expression MODULE expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::division, *$3);}
             ;
 
 func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2))); delete $2; }
