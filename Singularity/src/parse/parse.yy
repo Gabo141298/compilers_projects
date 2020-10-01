@@ -109,6 +109,7 @@ SNode::Program* programBlock;
 %token LEQ
 %token GREATER
 %token LESS
+%token MODULE
 %token OPEN_PARENTHESIS
 %token CLOSE_PARENTHESIS
 %token QUOTES_ERROR
@@ -229,6 +230,7 @@ comp_operator: LEQ { $$ = SNode::ComparisonOperation::leq; }
             | LESS { $$ = SNode::ComparisonOperation::less; }
             | EQUALS { $$ = SNode::ComparisonOperation::equals; }
             | IS NOT { $$ = SNode::ComparisonOperation::isNot; }
+            | MODULE { $$ = SNode::ComparisonOperation::module; }
             ;
 
 boolean_operator: XOR { $$ = SNode::BooleanOperation::bXor; }
