@@ -1,0 +1,28 @@
+define function prime_number with arguments i, n
+begin
+	set isPrime to TRUE
+
+	if n = 0 or n = 1
+	begin
+		set isPrime to FALSE
+	end   
+	otherwise 
+	begin
+		while index counting from 2 to n/2
+		begin
+			if n % i = 0
+			begin
+				set isPrime to FALSE
+			end
+		end
+	end
+
+	if isPrime
+	begin	
+		print "It is a prime number"
+	end
+	otherwise
+	begin
+		print "It is not a prime number"
+	end
+end

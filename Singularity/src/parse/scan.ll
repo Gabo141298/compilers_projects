@@ -72,10 +72,6 @@ typedef parse::Parser::token_type token_type;
                     /* printf("%s-%s\n", yytext, "BY"); */
                     return token::BY;
                 }
-"at"            {
-                    /* printf("%s-%s\n", yytext, "AT"); */
-                    return token::AT;
-                }
 "read"          {
                     /* printf("%s-%s\n", yytext, "READ"); */
                     return token::READ;
@@ -93,7 +89,7 @@ typedef parse::Parser::token_type token_type;
                     return token::OTHERWISE;
                 }
 "begin"         {
-                    /* printf("%s-%s\n", yytext, "BEGIN_BLOCK"); */
+                    /*printf("%s-%s\n", yytext, "BEGIN_BLOCK"); */
                     return token::BEGIN_BLOCK;
                 } 
 "end"           {
@@ -202,6 +198,10 @@ typedef parse::Parser::token_type token_type;
                     /* printf("%s-%s\n", yytext, "GREATER"); */
                     return token::GREATER;
                 }
+"%"             {
+                    /* printf("%s-%s\n", yytext, "MODULE"); */
+                    return token::MODULE;
+                }        
 "greater than"  {
                     /* printf("%s-%s\n", yytext, "GREATER"); */
                     return token::GREATER;
@@ -222,8 +222,7 @@ typedef parse::Parser::token_type token_type;
                     /* printf("%s-%s\n", yytext, "CLOSE_PARENTHESIS"); */
                     return token::CLOSE_PARENTHESIS;
                 }
-
-"(at)? ["       {
+(at)?"["        {
                     /* printf("%s-%s\n", yytext, "OPEN_BRACKETS"); */
                     return token::OPEN_BRACKETS;
                 }

@@ -42,7 +42,7 @@ SNode::Program* programBlock;
 %defines
 %debug
 %define api.namespace {parse}
-%define api.parser.class {Parser}
+%define parser_class_name{Parser}
 %parse-param {Driver &driver}
 %lex-param {Driver &driver}
 %define parse.error verbose
@@ -65,6 +65,10 @@ SNode::Program* programBlock;
     SNode::ComparisonOperation compOper;
     SNode::BooleanOperation boolOper;
     SNode::VariableList* variableList;
+    SNode::If* ifStatement;
+    SNode::OtherwiseIf* otherwiseIf;
+    SNode::Otherwise* otherwise;
+    SNode::ExpressionList* expressionList;
 }
 
 %token TOK_EOF 0
@@ -106,6 +110,7 @@ SNode::Program* programBlock;
 %token LEQ
 %token GREATER
 %token LESS
+%token MODULE
 %token OPEN_PARENTHESIS
 %token CLOSE_PARENTHESIS
 %token QUOTES_ERROR
@@ -124,13 +129,17 @@ SNode::Program* programBlock;
 %type <value> value boolean numvalue intvalue
 %type <expression> assignment expression condition comparison func_call
 %type <position> position 
-%type <statement> statement set read print if_statement while while_counting answer
+%type <statement> statement set read print while while_counting answer 
+%type <ifStatement> if_statement 
+%type <otherwise> otherwise
+%type <otherwiseIf> otherwiseIf
 %type <dataStructure> data_structure
 %type <dataPosAssignment> pos_assignment
 %type <function> function
 %type <compOper> comp_operator
 %type <boolOper> boolean_operator
 %type <variableList> arguments
+%type <expressionList> parameters
 
 %%
 %start input;
@@ -167,7 +176,7 @@ read: READ TO IDENTIFIER { $$ = new SNode::Read(*$3); delete $3; };
 
 assignment: TO expression { $$ = $2; } 
             | AS data_structure { $$ = $2; }
-            | pos_assignment { $$ = $1; }
+            | pos_assignment { $$ = $1; } 
             ;
 
 print: PRINT expression { $$ = new SNode::Print(*$2); }; 
@@ -181,25 +190,36 @@ function: DEFINE FUNCTION IDENTIFIER block
 arguments: IDENTIFIER { $$ = new SNode::VariableList(); $$->push_back(new SNode::Identifier(*$1)); delete $1; }
             | arguments COMMA IDENTIFIER { $1->push_back(new SNode::Identifier(*$3)); delete $3; };
 
-pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO value
+parameters: expression { $$ = new SNode::ExpressionList(); $$->push_back($1); }
+            | parameters COMMA expression { $1->push_back($3);  };
+
+pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO expression
             { $$ = new SNode::DataPositionAssignment(*$2, *$5); }
             ; 
 
-position: intvalue { $$ = new SNode::ListPosition(*$1); }
-            | intvalue COMMA intvalue { $$ = new SNode::MatrixPosition(*$1, *$3); };
+position: expression { $$ = new SNode::ListPosition(*$1); }
+            | expression COMMA expression { $$ = new SNode::MatrixPosition(*$1, *$3); };
 
 data_structure: LIST { $$ = new SNode::List(); }
             | MATRIX intvalue BY intvalue { $$ = new SNode::Matrix($2, $4); }
             ;
 
-if_statement: IF condition block { $$ = new SNode::If(*$2, *$3); }; 
+if_statement: IF condition block { $$ = new SNode::If(*$2, *$3); }
+                | IF condition block otherwiseIf { $$ = new SNode::If(*$2, *$3, $4); }
+                | IF condition block otherwise { $$ = new SNode::If(*$2, *$3, $4); }
+                ;
+
+otherwiseIf: OTHERWISE if_statement { $$ = new SNode::OtherwiseIf(*$2); } ;
+
+otherwise: OTHERWISE block { $$ = new SNode::Otherwise(*$2); } ;
 
 while: WHILE condition block { $$ = new SNode::While(*$2, *$3); };;
 
-while_counting: WHILE IDENTIFIER COUNTING FROM intvalue TO intvalue block
+while_counting: WHILE IDENTIFIER COUNTING FROM expression TO expression block
                 { $$ = new SNode::WhileCounting(*(new SNode::Identifier(*$2)), *$5, *$7, *$8); delete $2; };
 
 condition: comparison { $$ = $1; }
+            | IDENTIFIER { $$ = new SNode::Identifier(*$1); delete $1; }
             | boolean { $$ = $1; }
             | NOT condition { $$ = new SNode::NotOperator(*$2); }
             | condition boolean_operator condition
@@ -216,6 +236,7 @@ comp_operator: LEQ { $$ = SNode::ComparisonOperation::leq; }
             | LESS { $$ = SNode::ComparisonOperation::less; }
             | EQUALS { $$ = SNode::ComparisonOperation::equals; }
             | IS NOT { $$ = SNode::ComparisonOperation::isNot; }
+            | MODULE { $$ = SNode::ComparisonOperation::module; }
             ;
 
 boolean_operator: XOR { $$ = SNode::BooleanOperation::bXor; }
@@ -227,7 +248,6 @@ boolean: TRUE { $$ = new SNode::Boolean(true); }
             | FALSE { $$ = new SNode::Boolean(false); }
             ;
 
-
 numvalue: intvalue { $$ = $1; }
             | FLOAT { $$ = new SNode::Double(atof($1->c_str())); delete $1; }
             ;
@@ -238,18 +258,21 @@ intvalue:  INTEGER { $$ = new SNode::Integer(atoll($1->c_str())); delete $1; }
 
 value: numvalue { $$ = $1; }
             | STRING { $$ = new SNode::String(*$1); delete $1; }
+            | boolean { $$ = $1; }
             ;
 
-expression: value { $$ = $1; }
+expression: IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS {  $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3); delete $1; }
+            | value { $$ = $1; }
             | func_call
             | expression ADDITION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::addition, *$3); }
             | expression SUBSTRACTION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::substraction, *$3); }
             | expression MULTIPLICATION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::multiplication, *$3); }
             | expression DIVISION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::division, *$3); }
+            | expression MODULE expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::division, *$3);}
             ;
 
 func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2))); delete $2; }
-            | CALL IDENTIFIER WITH PARAMETERS OPEN_PARENTHESIS arguments CLOSE_PARENTHESIS
+            | CALL IDENTIFIER WITH PARAMETERS OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS
             { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2)), *$6); delete $2; }
             ;
 

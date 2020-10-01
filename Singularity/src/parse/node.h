@@ -24,7 +24,8 @@ enum ComparisonOperation
     greater,
     less,
     equals,
-    isNot
+    isNot,
+    module
 };
 
 enum BooleanOperation
@@ -193,10 +194,10 @@ public:
 class FunctionCall : public Expression {
 public:
     const Identifier& id;
-    VariableList parameters;
+    ExpressionList parameters;
     FunctionCall(const Identifier& id) :
         id(id) { }
-    FunctionCall(const Identifier& id, const VariableList& parameters) :
+    FunctionCall(const Identifier& id, const ExpressionList& parameters) :
         id(id), parameters(parameters) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override
@@ -362,10 +363,29 @@ class DataStructure : public Expression {
 class Position : public Expression {
 };
 
+class PositionAccess : public Expression {
+public: 
+    Identifier& id;
+    Position& position;
+    PositionAccess(Identifier& id, Position& position) :
+        id(id), position(position) {}
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    void print(size_t tabs = 0) const override
+    {
+        printTabs(tabs);
+        std::cout << "PositionAccess: " << std::endl;
+
+        id.print(tabs + 1);
+
+        position.print(tabs + 1);
+    }
+
+};
+
 class ListPosition : public Position {
 public:
-    Value& position;
-    ListPosition(Value& position) :
+    Expression& position;
+    ListPosition(Expression& position) :
         position(position) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override
@@ -381,9 +401,9 @@ public:
 
 class MatrixPosition : public Position {
 public:
-    Value& row;
-    Value& col;
-    MatrixPosition(Value& row, Value& col) :
+    Expression& row;
+    Expression& col;
+    MatrixPosition(Expression& row, Expression& col) :
         row(row), col(col) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override
@@ -490,8 +510,9 @@ class If : public Statement {
 public:
     Expression& condition;
     Block& block;
-    If(Expression& condition, Block& block) :
-        condition(condition), block(block) { }
+    Statement* otherwise;
+    If(Expression& condition, Block& block, Statement* otherwise = nullptr) :
+        condition(condition), block(block), otherwise(otherwise) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override
     {
@@ -501,6 +522,39 @@ public:
         printTabs(tabs + 1);
         std::cout << "Condition:" << std::endl;
         condition.print(tabs + 1);
+
+        if (otherwise)
+            otherwise->print(tabs + 1);
+
+        block.print(tabs + 1);
+    }
+};
+
+class OtherwiseIf : public Statement {
+public:
+    If& if_statement;
+    OtherwiseIf(If& if_statement) : 
+        if_statement( if_statement ) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    void print(size_t tabs = 0) const override
+    {
+        printTabs(tabs);
+        std::cout << "Otherwise if: " << std::endl;
+
+        if_statement.print(tabs + 1);
+    }   
+};
+
+class Otherwise : public Statement {
+public:
+    Block& block;
+    Otherwise(Block& block) :  
+         block(block) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    void print(size_t tabs = 0) const override
+    {
+        printTabs(tabs);
+        std::cout << "Otherwise: " << std::endl;
 
         block.print(tabs + 1);
     }
@@ -529,10 +583,10 @@ public:
 class WhileCounting : public Statement {
 public:
     Identifier& counter;
-    Value& beginValue;
-    Value& endValue;
+    Expression& beginValue;
+    Expression& endValue;
     Block& block;
-    WhileCounting(Identifier& counter, Value& beginValue, Value& endValue, Block& block) :
+    WhileCounting(Identifier& counter, Expression& beginValue, Expression& endValue, Block& block) :
         counter(counter), beginValue(beginValue), endValue(endValue), block(block) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override

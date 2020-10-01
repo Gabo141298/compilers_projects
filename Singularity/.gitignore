@@ -1,2 +1,6 @@
 build/
 parser
+src/parse/CMakeFiles/
+src/Makefile
+src/parse/Makefile
+src/parse/cmake_install.cmake

@@ -1,0 +1,4 @@
+define function lowest
+begin
+	print 0
+end
