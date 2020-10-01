@@ -490,8 +490,11 @@ class If : public Statement {
 public:
     Expression& condition;
     Block& block;
+    Statement* otherwise;
     If(Expression& condition, Block& block) :
         condition(condition), block(block) { }
+    If(Expression& condition, Block& block, Statement* otherwise) :
+        condition(condition), block(block), otherwise(otherwise) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override
     {
@@ -501,6 +504,36 @@ public:
         printTabs(tabs + 1);
         std::cout << "Condition:" << std::endl;
         condition.print(tabs + 1);
+
+        block.print(tabs + 1);
+    }
+};
+
+class OtherwiseIf : public Statement {
+public:
+    If& if_statement;
+    OtherwiseIf(If& if_statement) : 
+        if_statement( if_statement ) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    void print(size_t tabs = 0) const override
+    {
+        printTabs(tabs);
+        std::cout << "Otherwise if: " << std::endl;
+
+        if_statement.print(tabs + 1);
+    }   
+};
+
+class Otherwise : public Statement {
+public:
+    Block& block;
+    Otherwise(Block& block) :  
+         block(block) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    void print(size_t tabs = 0) const override
+    {
+        printTabs(tabs);
+        std::cout << "Otherwise: " << std::endl;
 
         block.print(tabs + 1);
     }
@@ -529,10 +562,10 @@ public:
 class WhileCounting : public Statement {
 public:
     Identifier& counter;
-    Value& beginValue;
-    Value& endValue;
+    Expression& beginValue;
+    Expression& endValue;
     Block& block;
-    WhileCounting(Identifier& counter, Value& beginValue, Value& endValue, Block& block) :
+    WhileCounting(Identifier& counter, Expression& beginValue, Expression& endValue, Block& block) :
         counter(counter), beginValue(beginValue), endValue(endValue), block(block) { }
     virtual llvm::Value* codeGen(CodeGenContext& context){};
     void print(size_t tabs = 0) const override

@@ -42,7 +42,7 @@ SNode::Program* programBlock;
 %defines
 %debug
 %define api.namespace {parse}
-%define api.parser.class {Parser}
+%define parser_class_name{Parser}
 %parse-param {Driver &driver}
 %lex-param {Driver &driver}
 %define parse.error verbose
@@ -65,6 +65,9 @@ SNode::Program* programBlock;
     SNode::ComparisonOperation compOper;
     SNode::BooleanOperation boolOper;
     SNode::VariableList* variableList;
+    SNode::If* ifStatement;
+    SNode::OtherwiseIf* otherwiseIf;
+    SNode::Otherwise* otherwise;
 }
 
 %token TOK_EOF 0
@@ -124,7 +127,10 @@ SNode::Program* programBlock;
 %type <value> value boolean numvalue intvalue
 %type <expression> assignment expression condition comparison func_call
 %type <position> position 
-%type <statement> statement set read print if_statement while while_counting answer
+%type <statement> statement set read print while while_counting answer 
+%type <ifStatement> if_statement 
+%type <otherwise> otherwise
+%type <otherwiseIf> otherwiseIf
 %type <dataStructure> data_structure
 %type <dataPosAssignment> pos_assignment
 %type <function> function
@@ -192,11 +198,18 @@ data_structure: LIST { $$ = new SNode::List(); }
             | MATRIX intvalue BY intvalue { $$ = new SNode::Matrix($2, $4); }
             ;
 
-if_statement: IF condition block { $$ = new SNode::If(*$2, *$3); }; 
+if_statement: IF condition block { $$ = new SNode::If(*$2, *$3); }
+                | IF condition block otherwiseIf { $$ = new SNode::If(*$2, *$3, $4); }
+                | IF condition block otherwise { $$ = new SNode::If(*$2, *$3, $4); }
+                ;
+
+otherwiseIf: OTHERWISE if_statement { $$ = new SNode::OtherwiseIf(*$2); } ;
+
+otherwise: OTHERWISE block { $$ = new SNode::Otherwise(*$2); } ;
 
 while: WHILE condition block { $$ = new SNode::While(*$2, *$3); };;
 
-while_counting: WHILE IDENTIFIER COUNTING FROM intvalue TO intvalue block
+while_counting: WHILE IDENTIFIER COUNTING FROM expression TO expression block
                 { $$ = new SNode::WhileCounting(*(new SNode::Identifier(*$2)), *$5, *$7, *$8); delete $2; };
 
 condition: comparison { $$ = $1; }
@@ -238,6 +251,7 @@ intvalue:  INTEGER { $$ = new SNode::Integer(atoll($1->c_str())); delete $1; }
 
 value: numvalue { $$ = $1; }
             | STRING { $$ = new SNode::String(*$1); delete $1; }
+            | boolean { $$ = $1; }
             ;
 
 expression: value { $$ = $1; }
