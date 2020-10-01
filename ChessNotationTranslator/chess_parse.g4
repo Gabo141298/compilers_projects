@@ -19,6 +19,7 @@ IN 			: 'en' ;
 FILE 		: [a-hA-H] ;
 RANK 		: [1-8] ;
 CAPTURES 	: 'toma' ;
+PROMOTES_TO	: 'corona a';
 
 // Review
 //ID	 		: ([a-zA-Z_]+[a-zA-Z_0-9 ]+)?;
@@ -34,15 +35,20 @@ game: header play;
 // Syntax
 header		: ID DATE NUMBER ID ID;
 
-play: move | 
-	  play move;
+play		: move
+			| play move;
 	 
-move : commute  | capture  | SHORT_CASTLING;
+move 		: commute | capture | promotion | SHORT_CASTLING;
 
 square 		: FILE RANK ;
 
 in_position : IN RANK
 			| IN FILE
+			;
+
+promotion 	: PAWN square PROMOTES_TO promotion_piece
+			| PAWN CAPTURES square PROMOTES_TO promotion_piece
+			| PAWN in_position CAPTURES square PROMOTES_TO promotion_piece
 			;
 
 commute 	: piece square 
@@ -60,3 +66,9 @@ piece 		: KNIGHT
 			| PAWN
 			| QUEEN
 			;
+
+promotion_piece	: KNIGHT
+				| BISHOP
+				| ROOK
+				| QUEEN
+				;
