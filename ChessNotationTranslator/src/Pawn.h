@@ -5,6 +5,13 @@
 
 class Pawn : public Piece
 {
+  private: 
+    /// Stores if the pawn just made its first move by advancing two squares. Useful for en passant.
+    bool justMovedTwice = false;
+  private:
+    /// Checks if it can take a pawn next to it en passant
+    bool canEnPassant(short row, short file);
+
   public:
   	Pawn(char symbol, Board* board, Coordinates position);
 
@@ -22,6 +29,9 @@ class Pawn : public Piece
 
     /// Checks if the pawn is still in its starting position (meaning this is its first move).
     bool isFirstMove();
+
+    /// Returns the value of the justMovedTwice 
+    inline bool getJustMovedTwice() { return this->justMovedTwice; }
 };
 
 #endif

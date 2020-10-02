@@ -1,5 +1,6 @@
 #include <cctype>
 
+#include "Board.h"
 #include "Pawn.h"
 
 Pawn::Pawn(char symbol, Board* board, Coordinates position)
@@ -28,9 +29,28 @@ MoveTypes Pawn::getPossibleMoves()
         possibleMoves.capturingMoves.push_back( Coordinates(currentPosition.row+direction, currentPosition.file+1) );
     if ( isEnemy(currentPosition.row+direction, currentPosition.file-1) )
         possibleMoves.capturingMoves.push_back( Coordinates(currentPosition.row+direction, currentPosition.file-1) );
+
+    // En passant. Take the enemy next to you, by moving diagonally. It's a weird move, look it up.
+    if ( canEnPassant(currentPosition.row, currentPosition.file+1))
+        possibleMoves.capturingMoves.push_back( Coordinates(currentPosition.row+direction, currentPosition.file+1) );
+    if ( canEnPassant(currentPosition.row, currentPosition.file-1))
+        possibleMoves.capturingMoves.push_back( Coordinates(currentPosition.row+direction, currentPosition.file-1) );
     
     // Return all the possible commutingMoves and capturingMoves that the player could make with that pawn
     return possibleMoves;
+}
+
+bool Pawn::canEnPassant(short row, short file)
+{
+    Piece* pieceToCheck = this->board->getSquare(row,file);
+
+    // First we have to check that the square has a piece, and that piece is an opponent pawn
+    if ( pieceToCheck && this->isEnemy(row,file) && (pieceToCheck->getSymbol() == 'P' || pieceToCheck->getSymbol() == 'p') )
+        // Now we check if the pawn just moved twice: the requisite for en passant captures
+        //if ( pieceToCheck->getJustMovedTwice()) 
+            return true;
+
+    return false;
 }
 
 bool Pawn::isFirstMove()

@@ -21,16 +21,21 @@ struct Coordinates
     {}
 };
 
-/** Struct that  stores two arrays,  each with different types
+/** Struct that  stores 5 arrays,  each with different types
  *  of moves. The first one, "commutingMoves",  are moves that
- *  the piece can make to an empty cell. The other, "capturing
- *  "moves", are moves when the piece moves and captures a pie
- *  ce in another cell.
+ *  the piece can make to an empty cell. The second, "capturing
+ *  "moves", are moves when the piece moves and captures a piece 
+ *  in another cell. The third and four are special moves only
+ *  pawns can make. The last one is a special move only the king
+ *  can make.
  */
  struct MoveTypes
  {
      std::vector<Coordinates> commutingMoves;
      std::vector<Coordinates> capturingMoves;
+     std::vector<Coordinates> enPassantMoves;
+     std::vector<Coordinates> promotionMoves;
+     std::vector<Coordinates> castle;
  };
 
 class Piece
@@ -91,7 +96,10 @@ class Piece
     inline int currentX() const { return currentPosition.file; }
     inline int currentY() const { return currentPosition.row; }
 
-    void setPosition(Coordinates newPosition);
+    inline void setPosition(Coordinates newPosition) {currentPosition = newPosition; }
+
+    /// Returns the Coordinates struct of the piece
+    inline Coordinates getPosition() const { return this->currentPosition; }
 
 };
 

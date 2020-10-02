@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-int main (int argc, char *argv[]) 
+int main () 
 { 
 	Board* board = new Board(); 
 	std::cout << *board;
