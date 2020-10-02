@@ -6,7 +6,7 @@
 class Rook : public Piece
 {
   public:
-  	Rook(char symbol);
+  	Rook(char symbol, Board* board, Coordinates position);
 
   	/*!
     * @details Determine all the possible cells to which a given

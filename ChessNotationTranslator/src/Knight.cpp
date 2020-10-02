@@ -2,9 +2,8 @@
 
 #include "Knight.h"
 
-Knight::Knight(char symbol)
-    : Piece{symbol}
-
+Knight::Knight(char symbol, Board* board, Coordinates position)
+    : Piece{symbol, board, position }
 {
     
 }

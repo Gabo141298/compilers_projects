@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+class Board;
+
 /// Struct that stores the row and file of a cell in the board.
 struct Coordinates
 {
@@ -34,20 +36,26 @@ struct Coordinates
 class Piece
 {
   protected: 
-  	/// The piece has to know its current position in the board
-    Coordinates currentPosition;
-
   	/// The symbol of the piece ( 'K','Q','R','B','N','P', etc).
   	char symbol;
 
   	/// A matrix that contains pointers to the pieces in the game.
-    Piece*** board;
+    Board* board;
+
+    /// The piece has to know its current position in the board
+    Coordinates currentPosition;
 
   public: 
   	Piece(){}
 
-  	explicit Piece(char symbol)
-  	: symbol{symbol}
+    virtual ~Piece(){}
+
+    /// A piece requires its symbol, the board to access which squares have
+    /// which pieces, and the currentPosition to know where they start
+  	explicit Piece(char symbol, Board* board, Coordinates currentPosition)
+  	: symbol{symbol}, 
+      board(board), 
+      currentPosition(currentPosition)
   	{
 
   	}

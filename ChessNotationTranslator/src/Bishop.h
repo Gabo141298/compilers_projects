@@ -6,7 +6,7 @@
 class Bishop : public Piece
 {
   public:
-  	Bishop(char symbol);
+  	Bishop(char symbol, Board* board, Coordinates position);
 
   	/*!
     * @details Determine all the possible cells to which a given

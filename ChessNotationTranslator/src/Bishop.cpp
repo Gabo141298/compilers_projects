@@ -1,7 +1,7 @@
 #include "Bishop.h"
 
-Bishop::Bishop(char symbol)
-    : Piece{symbol}
+Bishop::Bishop(char symbol, Board* board, Coordinates position)
+    : Piece{symbol, board, position }
 {
 
 }

@@ -2,8 +2,8 @@
 
 #include "Rook.h"
 
-Rook::Rook( char symbol)
-    : Piece (symbol)
+Rook::Rook(char symbol, Board* board, Coordinates position)
+    : Piece{symbol, board, position }
 {
    
 }

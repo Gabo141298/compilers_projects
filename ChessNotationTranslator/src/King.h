@@ -6,7 +6,7 @@
 class King : public Piece
 {
   public:
-  	King(char symbol);
+  	King(char symbol, Board* board, Coordinates position);
 
   	/*!
     * @details Determine all the possible cells to which the

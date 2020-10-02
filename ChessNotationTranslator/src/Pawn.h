@@ -6,7 +6,7 @@
 class Pawn : public Piece
 {
   public:
-  	Pawn(char symbol);
+  	Pawn(char symbol, Board* board, Coordinates position);
 
   	/*!
     * @brief Determine all of the moves in which the given pawn can move.

@@ -2,8 +2,8 @@
 
 #include "Queen.h"
 
-Queen::Queen(char symbol)
-: Piece(symbol)
+Queen::Queen(char symbol, Board* board, Coordinates position)
+    : Piece{symbol, board, position }
 {
 }
 

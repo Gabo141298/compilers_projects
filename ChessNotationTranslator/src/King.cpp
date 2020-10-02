@@ -2,8 +2,8 @@
 
 #include "King.h"
 
-King::King( char symbol)
-    : Piece (symbol)
+King::King(char symbol, Board* board, Coordinates position)
+    : Piece{symbol, board, position }
 {
 }
 

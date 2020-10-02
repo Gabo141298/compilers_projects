@@ -6,7 +6,7 @@
 class Queen : public Piece
 {
   public:
-  	Queen(char symbol);
+  	Queen(char symbol, Board* board, Coordinates position);
 
   	/*!
     * @details Determine all the possible cells to which a given

@@ -2,12 +2,10 @@
 
 #include "Pawn.h"
 
-Pawn::Pawn( char symbol)
-    : Piece (symbol)
+Pawn::Pawn(char symbol, Board* board, Coordinates position)
+    : Piece{symbol, board, position }
 {
-
 }
-
 
 MoveTypes Pawn::getPossibleMoves()
 {

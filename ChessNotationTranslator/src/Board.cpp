@@ -7,28 +7,29 @@
 #include "Queen.h"
 #include "Rook.h"
 
-Piece* Board::factory(char symbol)
+Piece* Board::factory(char symbol, int row, int col)
 {
+	Coordinates position(row,col);
 	switch(symbol)
 	{
 		case 'B':
 		case 'b':
-			return new Bishop(symbol);
+			return new Bishop(symbol, this, position);
 		case 'K':
 		case 'k':
-			return new King(symbol);
+			return new King(symbol, this, position);
 		case 'N':
 		case 'n':
-			return new Knight(symbol);
+			return new Knight(symbol, this, position);
 		case 'P':
 		case 'p':
-			return new Pawn(symbol);
+			return new Pawn(symbol, this, position);
 		case 'Q':
 		case 'q':
-			return new Queen(symbol);
+			return new Queen(symbol, this, position);
 		case 'R':
 		case 'r':
-			return new Rook(symbol);
+			return new Rook(symbol, this, position);
 		default: 
 			return nullptr;
 	}
@@ -43,29 +44,31 @@ Board::Board()
 		// Lower case means a black piece, upper case is a white piece
 		if (row == 0 || row == 7)
 		{
-			squares[row][0] = (row == 0) ? factory('r') : factory('R');
-			squares[row][1] = (row == 0) ? factory('n') : factory('N');
-			squares[row][2] = (row == 0) ? factory('b') : factory('B');
-			squares[row][3] = (row == 0) ? factory('q') : factory('Q');
-			squares[row][4] = (row == 0) ? factory('k') : factory('K');
-			squares[row][5] = (row == 0) ? factory('b') : factory('B');
-			squares[row][6] = (row == 0) ? factory('n') : factory('N');
-			squares[row][7] = (row == 0) ? factory('r') : factory('R');
+			squares[row][0] = factory( (row == 0) ? 'r' : 'R', row, 0); 
+			squares[row][1] = factory( (row == 0) ? 'n' : 'N', row, 1); 
+			squares[row][2] = factory( (row == 0) ? 'b' : 'B', row, 2); 
+			squares[row][3] = factory( (row == 0) ? 'q' : 'Q', row, 3); 
+			squares[row][4] = factory( (row == 0) ? 'k' : 'K', row, 4); 
+			squares[row][5] = factory( (row == 0) ? 'b' : 'B', row, 5); 
+			squares[row][6] = factory( (row == 0) ? 'n' : 'N', row, 6); 
+			squares[row][7] = factory( (row == 0) ? 'r' : 'R', row, 7); 
 		}
 		else 
 		{
 			// All the other rows start with the same piece, either pawns or nothing
 			for (int col = 0; col < this->boardSize; ++col)
 			{
+				Coordinates position(row, col);
+
 				// The second row is full of black pawns
 				if (row == 1)
 				{
-					squares[row][col] = factory('p');
+					squares[row][col] = factory('p', row, col);
 				}	
 
 				// The second to last row is full of white pawns
 				else if (row == 6)
-					squares[row][col] = factory('P');
+					squares[row][col] = factory('P', row, col);
 				// All the other rows have nothing
 				else
 					squares[row][col] = nullptr;
