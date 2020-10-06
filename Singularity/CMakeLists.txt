@@ -6,8 +6,8 @@ include_directories(/usr/lib/llvm/include/)
 project(parser)
 
 set(CXX "clang++")
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -W -Werror --verbose ")
-set(CMAKE_CXX_FLAGS "-O3 -Wall -W -pedantic --verbose ")
+set(CMAKE_CXX_FLAGS_DEBUG "-Wall -W -Werror")
+set(CMAKE_CXX_FLAGS "-O3 -Wall -W -pedantic")
 
 #Defines subdirectory
 add_subdirectory(src/)

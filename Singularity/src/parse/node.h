@@ -14,7 +14,8 @@ enum Operation
     addition,
     substraction,
     multiplication,
-    division
+    division,
+    modulo
 };
 
 enum ComparisonOperation
@@ -46,11 +47,32 @@ typedef std::vector<Expression*> ExpressionList;
 typedef std::vector<Identifier*> VariableList;
 typedef std::vector<Function*> FunctionList;
 
+struct RightSideArithExpr {
+    Operation op;
+    Expression& exp;
+    RightSideArithExpr(Operation op, Expression& exp) :
+        op(op), exp(exp) {}
+};
+
+struct RightSideCompExpr {
+    ComparisonOperation op;
+    Expression& exp;
+    RightSideCompExpr(ComparisonOperation op, Expression& exp) :
+        op(op), exp(exp) {}
+};
+
+struct RightSideBoolExpr {
+    BooleanOperation op;
+    Expression& exp;
+    RightSideBoolExpr(BooleanOperation op, Expression& exp) :
+        op(op), exp(exp) {}
+};
+
 class Node {
 public:
     virtual ~Node() {}
-    virtual llvm::Value* codeGen(CodeGenContext& context) { }
-    virtual void print(size_t tabs) const {};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
+    virtual void print(size_t tabs) const { (void)tabs; }
 protected:
     void printTabs(size_t tabs = 0) const
     {
@@ -72,7 +94,7 @@ class Integer : public Value {
 public:
     long long value;
     Integer(long long value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -84,7 +106,7 @@ class Double : public Value {
 public:
     double value;
     Double(double value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -96,7 +118,7 @@ class String : public Value {
 public:
     std::string value;
     String(const std::string& value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -108,7 +130,7 @@ class Identifier : public Value {
 public:
     std::string name;
     Identifier(const std::string& name) : name(name) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -120,7 +142,7 @@ class Boolean : public Value {
 public:
     bool value;
     Boolean(bool value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -132,7 +154,7 @@ class Body : public Expression {
 public:
     StatementList statements;
     Body() {}
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -150,7 +172,7 @@ public:
     Body& body;
     Block(Body& body) :
         body(body) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -169,7 +191,7 @@ public:
     Function(const Identifier& id, 
             const VariableList& arguments, Block& block) :
         id(id), arguments(arguments), block(block) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -199,7 +221,7 @@ public:
         id(id) { }
     FunctionCall(const Identifier& id, const ExpressionList& parameters) :
         id(id), parameters(parameters) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -222,7 +244,7 @@ public:
     Expression& returnExpression;
     Answer(Expression& returnExpression) :
         returnExpression(returnExpression) {}
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -239,7 +261,7 @@ public:
     Expression& expression;
     ExpressionStatement(Expression& expression) : 
         expression(expression) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context) {};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -253,12 +275,12 @@ public:
 
 class ArithmeticOperator : public Expression {
 public:
-    Operation op;
     Expression& left;
+    Operation op;
     Expression& right;
     ArithmeticOperator(Expression& left, Operation op, Expression& right) :
-        left(left), right(right), op(op) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+        left(left), op(op), right(right) { }
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -276,12 +298,12 @@ public:
 
 class ComparisonOperator : public Expression {
 public:
-    ComparisonOperation op;
     Expression& left;
+    ComparisonOperation op;
     Expression& right;
     ComparisonOperator(Expression& left, ComparisonOperation op, Expression& right) :
-        left(left), right(right), op(op) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+        left(left), op(op), right(right) { }
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -299,12 +321,12 @@ public:
 
 class BooleanOperator : public Expression {
 public:
-    BooleanOperation op;
     Expression& left;
+    BooleanOperation op;
     Expression& right;
     BooleanOperator(Expression& left, BooleanOperation op, Expression& right) :
-        left(left), right(right), op(op) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+        left(left), op(op), right(right) { }
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -325,7 +347,7 @@ public:
     Expression& expression;
     NotOperator(Expression& expression) :
         expression(expression) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -343,7 +365,7 @@ public:
     Expression* assignmentExpr;
     VariableAssignment(Identifier& id, Expression* assignmentExpr) :
         id(id), assignmentExpr(assignmentExpr) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -369,7 +391,7 @@ public:
     Position& position;
     PositionAccess(Identifier& id, Position& position) :
         id(id), position(position) {}
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -387,7 +409,7 @@ public:
     Expression& position;
     ListPosition(Expression& position) :
         position(position) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -405,7 +427,7 @@ public:
     Expression& col;
     MatrixPosition(Expression& row, Expression& col) :
         row(row), col(col) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -427,7 +449,7 @@ public:
     Expression& expression;
     DataPositionAssignment(Position& position, Expression& expression) : 
         position(position), expression(expression) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -447,7 +469,7 @@ class List : public DataStructure {
 public:
     std::vector<Value> values;
     List() {}
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -462,7 +484,7 @@ public:
     std::vector<std::vector<Value>> matrix;
     Matrix(Value* row, Value* col) :
         row(row), col(col) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -483,7 +505,7 @@ public:
     Identifier& identifier;
     Read(const std::string& identifier) :
         identifier(*(new SNode::Identifier(identifier))) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -497,7 +519,7 @@ public:
     Expression& expression;
     Print(Expression& expression) :
         expression(expression) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -513,7 +535,7 @@ public:
     Statement* otherwise;
     If(Expression& condition, Block& block, Statement* otherwise = nullptr) :
         condition(condition), block(block), otherwise(otherwise) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -535,7 +557,7 @@ public:
     If& if_statement;
     OtherwiseIf(If& if_statement) : 
         if_statement( if_statement ) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -550,7 +572,7 @@ public:
     Block& block;
     Otherwise(Block& block) :  
          block(block) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -566,7 +588,7 @@ public:
     Block& block;
     While(Expression& condition, Block& block) :
         condition(condition), block(block) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -588,7 +610,7 @@ public:
     Block& block;
     WhileCounting(Identifier& counter, Expression& beginValue, Expression& endValue, Block& block) :
         counter(counter), beginValue(beginValue), endValue(endValue), block(block) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -614,7 +636,7 @@ class Program : public Node {
 public:
     FunctionList functions;
     Program() {}
-    virtual llvm::Value* codeGen(CodeGenContext& context){};
+    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
