@@ -9,6 +9,7 @@ BISHOP 		: 'Alfil' ;
 ROOK 		: 'Torre' ;
 PAWN 		: 'Peon' ;
 SHORT_CASTLING    : 'Enroque corto';
+LONG_CASTLING	  : 'Enroque largo';
 
 QUEEN 		: ('Reina' | 'Dama') ;
 COMMA 		: ',' -> channel(HIDDEN);
@@ -38,7 +39,7 @@ header		: ID DATE NUMBER ID ID;
 play		: move
 			| play move;
 	 
-move 		: commute | capture | promotion | SHORT_CASTLING;
+move 		: commute | capture | promotion | SHORT_CASTLING | LONG_CASTLING;
 
 square 		: FILE RANK ;
 
