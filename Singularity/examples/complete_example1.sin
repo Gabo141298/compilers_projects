@@ -1,10 +1,10 @@
-set global to 0
+set global to TRUE
 
 define function prime_number with arguments i, n
 begin
 	set isPrime to TRUE
 
-	if n = 0 or n = 1
+	if (n = 0 and global) or n = 1
 	begin
 		set isPrime to FALSE
 	end   

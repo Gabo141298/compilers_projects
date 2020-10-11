@@ -239,6 +239,17 @@ bool_cond: condition bool_cond2 {
                 }
             }
             | NOT bool_cond { $$ = new SNode::NotOperator(*$2); }
+            | OPEN_PARENTHESIS bool_cond CLOSE_PARENTHESIS bool_cond2 { 
+                if($4)
+                {
+                    $$ = new SNode::BooleanOperator(*$2, $4->op, $4->exp);
+                    delete $4;
+                }
+                else
+                {
+                    $$ = $2;
+                }
+            }
             ;
 
 bool_cond2: boolean_operator bool_cond { $$ = new SNode::RightSideBoolExpr($1, *$2); }
