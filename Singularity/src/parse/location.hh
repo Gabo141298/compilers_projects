@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.7.
+// A Bison parser, made by GNU Bison 3.7.2.
 
 // Locations for Bison parsers in C++
 
@@ -31,12 +31,12 @@
 // version 2.2 of Bison.
 
 /**
- ** \file /mnt/c/Users/Gabo/Documents/ucr/compiladores/Bison-Flex-CPP-template-master/src/parse/location.hh
+ ** \file location.hh
  ** Define the parse::location class.
  */
 
-#ifndef YY_YY_MNT_C_USERS_GABO_DOCUMENTS_UCR_COMPILADORES_BISON_FLEX_CPP_TEMPLATE_MASTER_SRC_PARSE_LOCATION_HH_INCLUDED
-# define YY_YY_MNT_C_USERS_GABO_DOCUMENTS_UCR_COMPILADORES_BISON_FLEX_CPP_TEMPLATE_MASTER_SRC_PARSE_LOCATION_HH_INCLUDED
+#ifndef YY_YY_LOCATION_HH_INCLUDED
+# define YY_YY_LOCATION_HH_INCLUDED
 
 # include <iostream>
 # include <string>
@@ -53,9 +53,9 @@
 #  endif
 # endif
 
-#line 40 "parse.yy"
+#line 44 "parse.yy"
 namespace parse {
-#line 59 "/mnt/c/Users/Gabo/Documents/ucr/compiladores/Bison-Flex-CPP-template-master/src/parse/location.hh"
+#line 59 "location.hh"
 
   /// A point in a source file.
   class position
@@ -299,8 +299,8 @@ namespace parse {
     return ostr;
   }
 
-#line 40 "parse.yy"
+#line 44 "parse.yy"
 } // parse
-#line 305 "/mnt/c/Users/Gabo/Documents/ucr/compiladores/Bison-Flex-CPP-template-master/src/parse/location.hh"
+#line 305 "location.hh"
 
-#endif // !YY_YY_MNT_C_USERS_GABO_DOCUMENTS_UCR_COMPILADORES_BISON_FLEX_CPP_TEMPLATE_MASTER_SRC_PARSE_LOCATION_HH_INCLUDED
+#endif // !YY_YY_LOCATION_HH_INCLUDED

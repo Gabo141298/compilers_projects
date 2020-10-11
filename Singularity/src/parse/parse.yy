@@ -64,11 +64,13 @@ SNode::Program* programBlock;
     std::string* var;
     SNode::ComparisonOperation compOper;
     SNode::BooleanOperation boolOper;
+    SNode::Operation arithOper;
     SNode::VariableList* variableList;
     SNode::If* ifStatement;
-    SNode::OtherwiseIf* otherwiseIf;
-    SNode::Otherwise* otherwise;
     SNode::ExpressionList* expressionList;
+    SNode::RightSideArithExpr* rsArithExpr;
+    SNode::RightSideCompExpr* rsCompExpr;
+    SNode::RightSideBoolExpr* rsBoolExpr;
 }
 
 %token TOK_EOF 0
@@ -110,7 +112,7 @@ SNode::Program* programBlock;
 %token LEQ
 %token GREATER
 %token LESS
-%token MODULE
+%token MODULO
 %token OPEN_PARENTHESIS
 %token CLOSE_PARENTHESIS
 %token QUOTES_ERROR
@@ -126,13 +128,11 @@ SNode::Program* programBlock;
 %type <program> program
 %type <block> block
 %type <body> body
-%type <value> value boolean numvalue intvalue
-%type <expression> assignment expression condition comparison func_call
+%type <value> value boolean intvalue
+%type <expression> assignment expression condition func_call bool_cond
 %type <position> position 
-%type <statement> statement set read print while while_counting answer 
-%type <ifStatement> if_statement 
-%type <otherwise> otherwise
-%type <otherwiseIf> otherwiseIf
+%type <statement> statement set read print while while_counting answer if_statement otherwise
+%type <ifStatement> if_condition
 %type <dataStructure> data_structure
 %type <dataPosAssignment> pos_assignment
 %type <function> function
@@ -140,6 +140,10 @@ SNode::Program* programBlock;
 %type <boolOper> boolean_operator
 %type <variableList> arguments
 %type <expressionList> parameters
+%type <arithOper> arith_oper
+%type <rsArithExpr> expression2
+%type <rsCompExpr> comparison
+%type <rsBoolExpr> bool_cond2
 
 %%
 %start input;
@@ -161,7 +165,7 @@ body:       statement { $$ = new SNode::Body(); $$->statements.push_back($<state
 statement: read { $$ = $1; }
             | set { $$ = $1; }
             | print { $$ = $1; }
-            | if_statement { $$ = $1; }
+            | if_condition { $$ = $1; }
             | while { $$ = $1; }
             | while_counting { $$ = $1; }
             | answer { $$ = $1; }
@@ -204,30 +208,47 @@ data_structure: LIST { $$ = new SNode::List(); }
             | MATRIX intvalue BY intvalue { $$ = new SNode::Matrix($2, $4); }
             ;
 
-if_statement: IF condition block { $$ = new SNode::If(*$2, *$3); }
-                | IF condition block otherwiseIf { $$ = new SNode::If(*$2, *$3, $4); }
-                | IF condition block otherwise { $$ = new SNode::If(*$2, *$3, $4); }
+if_condition: IF bool_cond block if_statement { $$ = new SNode::If(*$2, *$3, $4); }
                 ;
 
-otherwiseIf: OTHERWISE if_statement { $$ = new SNode::OtherwiseIf(*$2); } ;
+if_statement: %empty { $$ = nullptr; }
+                | OTHERWISE otherwise { $$ = $2; }
+                ;
 
-otherwise: OTHERWISE block { $$ = new SNode::Otherwise(*$2); } ;
+otherwise: if_condition { $$ = new SNode::OtherwiseIf(*$1); }
+            | block { $$ = new SNode::Otherwise(*$1); } 
+            ;
 
-while: WHILE condition block { $$ = new SNode::While(*$2, *$3); };;
+while: WHILE bool_cond block { $$ = new SNode::While(*$2, *$3); };;
 
 while_counting: WHILE IDENTIFIER COUNTING FROM expression TO expression block
                 { $$ = new SNode::WhileCounting(*(new SNode::Identifier(*$2)), *$5, *$7, *$8); delete $2; };
 
-condition: comparison { $$ = $1; }
-            | IDENTIFIER { $$ = new SNode::Identifier(*$1); delete $1; }
-            | boolean { $$ = $1; }
-            | NOT condition { $$ = new SNode::NotOperator(*$2); }
-            | condition boolean_operator condition
-            { $$ = new SNode::BooleanOperator(*$1, $2, *$3); }
+bool_cond: condition bool_cond2 {
+                if($2)
+                {
+                    $$ = new SNode::BooleanOperator(*$1, $2->op, $2->exp);
+                    delete $2;
+                }
+                else
+                {
+                    $$ = $1;
+                }
+            }
+            | NOT bool_cond { $$ = new SNode::NotOperator(*$2); }
             ;
 
-comparison: expression comp_operator expression
-            { $$ = new SNode::ComparisonOperator(*$1, $2, *$3); }
+bool_cond2: boolean_operator bool_cond { $$ = new SNode::RightSideBoolExpr($1, *$2); }
+            | %empty { $$ = nullptr; }
+            ;
+
+condition: expression comparison { $$ = new SNode::ComparisonOperator(*$1, $2->op, $2->exp); delete $2; }
+            | IDENTIFIER { $$ = new SNode::Identifier(*$1); delete $1; }
+            | boolean { $$ = $1; }
+            ;
+
+comparison: comp_operator expression
+            { $$ = new SNode::RightSideCompExpr($1, *$2); }
             ;
 
 comp_operator: LEQ { $$ = SNode::ComparisonOperation::leq; }
@@ -236,7 +257,6 @@ comp_operator: LEQ { $$ = SNode::ComparisonOperation::leq; }
             | LESS { $$ = SNode::ComparisonOperation::less; }
             | EQUALS { $$ = SNode::ComparisonOperation::equals; }
             | IS NOT { $$ = SNode::ComparisonOperation::isNot; }
-            | MODULE { $$ = SNode::ComparisonOperation::module; }
             ;
 
 boolean_operator: XOR { $$ = SNode::BooleanOperation::bXor; }
@@ -248,27 +268,41 @@ boolean: TRUE { $$ = new SNode::Boolean(true); }
             | FALSE { $$ = new SNode::Boolean(false); }
             ;
 
-numvalue: intvalue { $$ = $1; }
-            | FLOAT { $$ = new SNode::Double(atof($1->c_str())); delete $1; }
-            ;
-
 intvalue:  INTEGER { $$ = new SNode::Integer(atoll($1->c_str())); delete $1; }
             | IDENTIFIER { $$ = new SNode::Identifier(*$1); delete $1; }
             ;
 
-value: numvalue { $$ = $1; }
+value:      FLOAT { $$ = new SNode::Double(atof($1->c_str())); delete $1; }
+            | INTEGER { $$ = new SNode::Integer(atoll($1->c_str())); delete $1; }
+            | IDENTIFIER { $$ = new SNode::Identifier(*$1); delete $1; }
             | STRING { $$ = new SNode::String(*$1); delete $1; }
             | boolean { $$ = $1; }
             ;
 
 expression: IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS {  $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3); delete $1; }
-            | value { $$ = $1; }
+            | value expression2 { 
+                if($2) 
+                {
+                    $$ = new SNode::ArithmeticOperator(*$1, $2->op, $2->exp);
+                    delete $2;
+                }
+                else
+                {
+                    $$ = $1;
+                }
+            }
             | func_call
-            | expression ADDITION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::addition, *$3); }
-            | expression SUBSTRACTION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::substraction, *$3); }
-            | expression MULTIPLICATION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::multiplication, *$3); }
-            | expression DIVISION expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::division, *$3); }
-            | expression MODULE expression { $$ = new SNode::ArithmeticOperator(*$1, SNode::Operation::division, *$3);}
+            ;
+
+expression2: %empty { $$ = nullptr; }
+            | arith_oper expression { $$ = new SNode::RightSideArithExpr($1, *$2); }
+            ;
+
+arith_oper: ADDITION { $$ = SNode::Operation::addition; }
+            | SUBSTRACTION { $$ = SNode::Operation::substraction; }
+            | MULTIPLICATION { $$ = SNode::Operation::multiplication; }
+            | DIVISION { $$ = SNode::Operation::division; }
+            | MODULO { $$ = SNode::Operation::modulo; }
             ;
 
 func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2))); delete $2; }

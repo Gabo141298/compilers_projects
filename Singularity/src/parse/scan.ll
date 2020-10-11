@@ -200,7 +200,7 @@ typedef parse::Parser::token_type token_type;
                 }
 "%"             {
                     /* printf("%s-%s\n", yytext, "MODULE"); */
-                    return token::MODULE;
+                    return token::MODULO;
                 }        
 "greater than"  {
                     /* printf("%s-%s\n", yytext, "GREATER"); */
