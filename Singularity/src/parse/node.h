@@ -41,11 +41,13 @@ class Statement;
 class Expression;
 class Identifier;
 class Function;
+class VariableAssignment;
 
 typedef std::vector<Statement*> StatementList;
 typedef std::vector<Expression*> ExpressionList;
 typedef std::vector<Identifier*> VariableList;
 typedef std::vector<Function*> FunctionList;
+typedef std::vector<VariableAssignment*> GlobalList;
 
 struct RightSideArithExpr {
     Operation op;
@@ -635,6 +637,7 @@ public:
 class Program : public Node {
 public:
     FunctionList functions;
+    GlobalList globals;
     Program() {}
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
@@ -643,6 +646,8 @@ public:
         std::cout << "Program: " << std::endl;
         for(size_t index = 0; index < functions.size(); ++index)
             functions[index]->print(tabs + 1);
+        for(size_t index = 0; index < globals.size(); ++index)
+            globals[index]->print(tabs + 1);
     }
 };
 }

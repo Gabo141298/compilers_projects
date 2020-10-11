@@ -1,3 +1,5 @@
+set global to 0
+
 define function prime_number with arguments i, n
 begin
 	set isPrime to TRUE

@@ -71,6 +71,7 @@ SNode::Program* programBlock;
     SNode::RightSideArithExpr* rsArithExpr;
     SNode::RightSideCompExpr* rsCompExpr;
     SNode::RightSideBoolExpr* rsBoolExpr;
+    SNode::VariableAssignment* variableAssignment;
 }
 
 %token TOK_EOF 0
@@ -131,7 +132,8 @@ SNode::Program* programBlock;
 %type <value> value boolean intvalue
 %type <expression> assignment expression condition func_call bool_cond
 %type <position> position 
-%type <statement> statement set read print while while_counting answer if_statement otherwise
+%type <statement> statement read print while while_counting answer if_statement otherwise
+%type <variableAssignment> set
 %type <ifStatement> if_condition
 %type <dataStructure> data_structure
 %type <dataPosAssignment> pos_assignment
@@ -149,8 +151,9 @@ SNode::Program* programBlock;
 %start input;
 input: program { programBlock = $1; } ;
 
-program: function { $$ = new SNode::Program(); $$->functions.push_back($1); }
+program: %empty { $$ = new SNode::Program(); }
             | program function { $1->functions.push_back($2); }
+            | program set { $1->globals.push_back($2); }
             ;
 
 block:  BEGIN_BLOCK
