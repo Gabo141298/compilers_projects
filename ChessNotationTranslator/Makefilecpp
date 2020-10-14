@@ -21,14 +21,15 @@ GSOURCES=$(addsuffix .cpp,$(addprefix $(GENERATED)/$(GRAMMAR),$(ANTLRGEN)))
 
 all: parser
 
-parser: dirs antlr4 main.cpp $(OBJS)
-	$(CC) $(CCARGS) main.cpp  -o $(OUTPUT)/parser.o 
-	$(CC) $(LDARGS) $(OUTPUT)/parser.o $(OBJS) $(LIBS) -o parser
+parser: dirs antlr4 main.cpp chess_parseCustomVisitor.cpp $(OBJS)
+	$(CC) $(CCARGS) main.cpp -o $(OUTPUT)/parser.o 
+	$(CC) $(CCARGS) chess_parseCustomVisitor.cpp -o $(OUTPUT)/customVisitor.o 
+	$(CC) $(LDARGS) $(OUTPUT)/parser.o $(OUTPUT)/customVisitor.o  $(OBJS) $(LIBS) -o parser
 
 antlr4: $(GENERATED)/.generated;
  
 $(GENERATED)/.generated: $(GRAMMAR).g4
-	$(ANTLR4) -Dlanguage=Cpp -o $(GENERATED) $(GRAMMAR).g4
+	$(ANTLR4) -Dlanguage=Cpp -visitor -o $(GENERATED) $(GRAMMAR).g4
 	@touch $(GENERATED)/.generated
 
 $(OUTPUT)/%.o : $(GENERATED)/%.cpp
