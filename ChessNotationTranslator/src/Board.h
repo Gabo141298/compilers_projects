@@ -28,7 +28,7 @@ class Board
   	Piece* factory(char symbol, int row, int col);
 
   public:
-  	/// Defines the board size. Really, its not going to change
+  	/// Defines the board size. Really, it's not going to change
     const static unsigned char boardSize = 8;
     
     /// Overload of the print operator
