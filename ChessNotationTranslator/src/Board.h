@@ -41,6 +41,11 @@ class Board
   private: 
   	Piece* factory(char symbol, int row, int col);
 
+    void deletePieceFromBoard(int row, int col);
+
+    /// En passants only last one move. This method resets if after every turn
+    void resetOpponentEnPassants();
+
   public:
   	/// Defines the board size. Really, it's not going to change
     const static unsigned char boardSize = 8;
@@ -67,9 +72,6 @@ class Board
 
     /// Checks if the game ended. If it ended, then it creates the PGN file, as it was a valid game.
     void checkIfGameEnded();
-
-    /// En passants only last one move. This method resets if after every turn
-    void resetOpponentEnPassants();
 
     /// It assigns to selectedPiece the piece that is in the position given by rowPos and colPos.
     void savePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos);

@@ -117,8 +117,8 @@ class Piece
   	/// Returns the symbol of the piece ( 'p', 'K', 'r', etc. )
     inline char getSymbol() const { return this->symbol; }
 
-    inline int currentX() const { return currentPosition.file; }
-    inline int currentY() const { return currentPosition.row; }
+    inline int getRow() const { return currentPosition.file; }
+    inline int getFile() const { return currentPosition.row; }
 
     inline void setPosition(Coordinates newPosition) {currentPosition = newPosition; }
 

@@ -44,7 +44,7 @@ Board::Board()
 	{
 		// Sets the pieces for the first and last rows
 		// Lower case means a black piece, upper case is a white piece
-		if (row == 0 || row == 7)
+		if (row == 0)
 		{
 			squares[0][0] = factory( 'r', row, 0); 
 			squares[0][1] = factory( 'n', row, 1); 
@@ -132,6 +132,24 @@ void Board::savePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
     }
 }
 
+void Board::deletePieceFromBoard(int row, int col)
+{
+	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
+	
+	for ( auto iterator = pieces.begin(); iterator != pieces.end(); ++iterator )
+	{
+		if ( (*iterator)->getRow() == row && (*iterator)->getFile() == col)
+			if ( manager.getTurn() == 'W')
+				this->whitePieces.erase(iterator);
+			else
+				this->blackPieces.erase(iterator);
+
+	}
+
+    delete squares[row][col];
+    squares[row][col] = nullptr;
+}
+
 void Board::movePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
 {
     bool validMove = false;
@@ -151,8 +169,7 @@ void Board::movePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
     {
         if(colPos == validMoves.capturingMoves[index].file && rowPos == validMoves.capturingMoves[index].row)
         {
-            delete squares[rowPos][colPos];
-            squares[rowPos][colPos] = nullptr;
+        	deletePieceFromBoard(rowPos, colPos);
 
             // Makes the move from the last piece to the chosen cell
             movePiece(selectedPiece, rowPos, colPos);
