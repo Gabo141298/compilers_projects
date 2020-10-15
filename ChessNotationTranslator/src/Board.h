@@ -5,6 +5,7 @@
 #include "Piece.h"
 
 #include <iostream>
+#include <list>
 
 class Board
 {
@@ -17,6 +18,19 @@ class Board
 
     /// Keeps the valid moves from the last selected piece.
     MoveTypes validMoves;
+
+    /// Keeps track of all the squares that are under attack by black
+    std::list<Coordinates> squaresAttackedByBlack; 
+
+    /// Keeps track of all the squares that are under attack by white
+    std::list<Coordinates> squaresAttackedByWhite; 
+
+    /// Stores the white pieces
+    std::vector<Piece*> whitePieces; 
+
+    /// Stores the black pieces
+    std::vector<Piece*> blackPieces;
+
 
   public: 
   	Board();
@@ -34,8 +48,11 @@ class Board
     /// Overload of the print operator
   	friend std::ostream& operator<<(std::ostream &out, const Board& board);
 
-    /// Overload of the brackets
+    /// Get method for a piece in the board, given a row and a file
     inline Piece* getSquare(int row, int col) { return this->squares[row][col]; }
+
+    /// Get method for a piece in the board, given a coordinate
+    inline Piece* getSquare(Coordinates cell) { return this->squares[cell.row][cell.file]; }
 
     /// Checks if the current player in turn corresponds with the color of the piece selected
     bool isRightTurn(Piece* selectedPiece);
@@ -54,9 +71,18 @@ class Board
     /// En passants only last one move. This method resets if after every turn
     void resetOpponentEnPassants();
 
-      /// It assigns to selectedPiece the piece that is in the position given by rowPos and colPos.
+    /// It assigns to selectedPiece the piece that is in the position given by rowPos and colPos.
     void savePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos);
 
+    /// Checks if a piece is an enemy, depending on a color. If 
+    bool isEnemy(Coordinates cell);
+
+    /// Checks if any given square is being attacked by opponent pieces. Useful for king moves. 
+    bool isUnderAttack(Coordinates cell);
+
+    /// This is for the semantic analysis. It finds the piece that the player wanted to move by
+    /// looking at what piece can move to the given cell. It receives the piece symbol
+    Piece* findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity = '\0');
 };
 
 #endif

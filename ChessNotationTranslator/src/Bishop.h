@@ -15,7 +15,7 @@ class Bishop : public Piece
     *		  do moving to the upper left, upper right, lower left
     *		  and lower right.
     */
-    MoveTypes getPossibleMoves() override;
+    void calculatePossibleMoves() override;
 };
 
 #endif

@@ -11,10 +11,8 @@ King::King(char symbol, Board* board, Coordinates position)
 // The king can move vertically, horizontally and
 // diagonally in any direction, but only one square
 // at a time
-MoveTypes King::getPossibleMoves()
+void King::calculatePossibleMoves()
 {
-    MoveTypes possibleMoves;
-
     // The directions in which the king may go
     short x[] = { 1,1,0,-1,-1,-1,0,1 };
     short y[] = { 0,1,1,1,0,-1,-1,-1 };
@@ -33,6 +31,4 @@ MoveTypes King::getPossibleMoves()
         else if ( isEnemy(newX, newY) )
             possibleMoves.capturingMoves.push_back( Coordinates(newX, newY) );
     }
-
-    return possibleMoves;
 }

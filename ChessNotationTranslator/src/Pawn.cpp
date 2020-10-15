@@ -8,11 +8,8 @@ Pawn::Pawn(char symbol, Board* board, Coordinates position)
 {
 }
 
-MoveTypes Pawn::getPossibleMoves()
+void Pawn::calculatePossibleMoves()
 {
-    // Stores all the possible moves for that particular pawn
-    MoveTypes possibleMoves;
-
     // If the pawn is black, it moves up, if it is white, it moves down.
     int direction = (this->symbol == 'P') ? -1 : 1;
 
@@ -35,9 +32,6 @@ MoveTypes Pawn::getPossibleMoves()
         possibleMoves.capturingMoves.push_back( Coordinates(currentPosition.row+direction, currentPosition.file+1) );
     if ( canEnPassant(currentPosition.row, currentPosition.file-1))
         possibleMoves.capturingMoves.push_back( Coordinates(currentPosition.row+direction, currentPosition.file-1) );
-    
-    // Return all the possible commutingMoves and capturingMoves that the player could make with that pawn
-    return possibleMoves;
 }
 
 bool Pawn::canEnPassant(short row, short file)

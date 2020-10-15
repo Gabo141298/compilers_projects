@@ -19,6 +19,20 @@ struct Coordinates
     : row { row }
     , file { file }
     {}
+
+    inline  bool isOutOfBoundaries()
+    {
+        return (row < 0 || row > 7 || file < 0 || file > 7);
+    }
+
+    friend bool operator==(Coordinates& coordinate, Coordinates& other)
+    {
+        return ( (coordinate.row == other.row) && (coordinate.file == other.file) );
+    }
+
+    inline short getRow() { return this->row; }
+
+    inline short getFile() { return this->file; }
 };
 
 /** Struct that  stores 5 arrays,  each with different types
@@ -38,6 +52,11 @@ struct Coordinates
      std::vector<Coordinates> castle;
  };
 
+enum MoveTypeSymbols
+{
+    commuting, capturing, enPassant, promotion, castle
+};
+
 class Piece
 {
   protected: 
@@ -49,6 +68,9 @@ class Piece
 
     /// The piece has to know its current position in the board
     Coordinates currentPosition;
+
+    /// Stores the moves this piece can move to
+    MoveTypes possibleMoves;
 
   public: 
   	Piece(){}
@@ -88,7 +110,9 @@ class Piece
 
   	friend std::ostream& operator<<(std::ostream &out, const Piece &piece);
 
-  	virtual MoveTypes getPossibleMoves() = 0;
+  	virtual void calculatePossibleMoves() = 0;
+
+    inline MoveTypes& getPossibleMoves() { return this->possibleMoves; }
 
   	/// Returns the symbol of the piece ( 'p', 'K', 'r', etc. )
     inline char getSymbol() const { return this->symbol; }

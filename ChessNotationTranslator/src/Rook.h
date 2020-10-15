@@ -5,6 +5,9 @@
 
 class Rook : public Piece
 {
+  private: 
+  	bool hasMoved = false;
+
   public:
   	Rook(char symbol, Board* board, Coordinates position);
 
@@ -14,7 +17,9 @@ class Rook : public Piece
     * @return an std::vector with all the moves that the rook can
     *		  do moving to left, right, up or down
     */
-    MoveTypes getPossibleMoves() override;
+    void calculatePossibleMoves() override;
+
+    inline bool getHasMoved() { return hasMoved; }
 };
 
 #endif

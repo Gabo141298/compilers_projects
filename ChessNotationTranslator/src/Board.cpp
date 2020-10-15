@@ -7,6 +7,8 @@
 #include "Queen.h"
 #include "Rook.h"
 
+#include <cctype>
+
 Piece* Board::factory(char symbol, int row, int col)
 {
 	Coordinates position(row,col);
@@ -44,14 +46,31 @@ Board::Board()
 		// Lower case means a black piece, upper case is a white piece
 		if (row == 0 || row == 7)
 		{
-			squares[row][0] = factory( (row == 0) ? 'r' : 'R', row, 0); 
-			squares[row][1] = factory( (row == 0) ? 'n' : 'N', row, 1); 
-			squares[row][2] = factory( (row == 0) ? 'b' : 'B', row, 2); 
-			squares[row][3] = factory( (row == 0) ? 'q' : 'Q', row, 3); 
-			squares[row][4] = factory( (row == 0) ? 'k' : 'K', row, 4); 
-			squares[row][5] = factory( (row == 0) ? 'b' : 'B', row, 5); 
-			squares[row][6] = factory( (row == 0) ? 'n' : 'N', row, 6); 
-			squares[row][7] = factory( (row == 0) ? 'r' : 'R', row, 7); 
+			squares[0][0] = factory( 'r', row, 0); 
+			squares[0][1] = factory( 'n', row, 1); 
+			squares[0][2] = factory( 'b', row, 2); 
+			squares[0][3] = factory( 'q', row, 3); 
+			squares[0][4] = factory( 'k', row, 4); 
+			squares[0][5] = factory( 'b', row, 5); 
+			squares[0][6] = factory( 'n', row, 6); 
+			squares[0][7] = factory( 'r', row, 7); 
+
+			for (int col = 0; col < this->boardSize; ++col)
+				this->blackPieces.push_back(squares[row][col]);
+		}
+		else if ( row == 7)
+		{
+			squares[7][0] = factory( 'R', row, 0); 
+			squares[7][1] = factory( 'N', row, 1); 
+			squares[7][2] = factory( 'B', row, 2); 
+			squares[7][3] = factory( 'Q', row, 3); 
+			squares[7][4] = factory( 'K', row, 4); 
+			squares[7][5] = factory( 'B', row, 5); 
+			squares[7][6] = factory( 'N', row, 6); 
+			squares[7][7] = factory( 'R', row, 7); 
+
+			for (int col = 0; col < this->boardSize; ++col)
+				this->whitePieces.push_back(squares[row][col]);
 		}
 		else 
 		{
@@ -64,11 +83,15 @@ Board::Board()
 				if (row == 1)
 				{
 					squares[row][col] = factory('p', row, col);
+					this->blackPieces.push_back(squares[row][col]);
 				}	
 
 				// The second to last row is full of white pawns
 				else if (row == 6)
+				{
 					squares[row][col] = factory('P', row, col);
+					this->whitePieces.push_back(squares[row][col]);
+				}
 				// All the other rows have nothing
 				else
 					squares[row][col] = nullptr;
@@ -80,9 +103,9 @@ Board::Board()
 bool Board::isRightTurn(Piece* selectedPiece)
 {
     if ( islower(selectedPiece->getSymbol()) )
-        return ( manager.getTurn() == 1 );
+        return ( manager.getTurn() == 'B' );
 
-    return ( manager.getTurn() == 0 );
+    return ( manager.getTurn() == 'W' );
 }
 
 void Board::savePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
@@ -152,7 +175,7 @@ void Board::movePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
 
 void Board::resetOpponentEnPassants()
 {
-	char opponentSymbol = (manager.getTurn()) ? 'P' : 'p';
+	char opponentSymbol = (manager.getTurn() == 'W') ? 'P' : 'p';
 
 	// Initialize the board with the normal chess starting position
 	for (int row = 0; row < this->boardSize; ++row)
@@ -168,7 +191,59 @@ void Board::resetOpponentEnPassants()
 			}			
 		}
 	}
+}
 
+Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity)
+{
+	// Determines if I have to check the white or black pieces
+	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
+
+	// Goes piece by piece checking if it is the right one
+	for(auto iterator = this->whitePieces.begin(); iterator != this->whitePieces.end(); ++iterator)
+	{
+		if ((*iterator)->getSymbol() == pieceSymbol)
+		{
+			// Get the struct with all the moves in their own moveTypes vectors
+			MoveTypes& moves = (*iterator)->getPossibleMoves();
+
+			std::vector<Coordinates>* coordinates;
+
+			// Gets the vector with the type of moves that we need to find
+			switch(moveType)
+			{
+				case MoveTypeSymbols::commuting:  
+					coordinates = &moves.commutingMoves; 
+					break;
+
+				case MoveTypeSymbols::capturing:  
+					coordinates = &moves.capturingMoves; 
+					break;
+
+				case MoveTypeSymbols::promotion:  
+					coordinates = &moves.promotionMoves;
+					break;
+
+				case MoveTypeSymbols::enPassant:
+					coordinates = &moves.enPassantMoves;
+					break;
+
+				case MoveTypeSymbols::castle:
+					coordinates = &moves.castle;
+					break;
+			}
+
+			// We found a possible piece. check if it can move to the given cell
+			for (auto moveIterator = coordinates->begin(); moveIterator != coordinates->end(); ++moveIterator )
+			{
+				if ( *moveIterator == cell)
+					if (! ambiguity || ambiguity == moveIterator->getRow() || ambiguity == moveIterator->getFile())
+						return *iterator;
+			}
+		}
+	}
+
+	// No piece was found
+	return nullptr;
 }
 
 void Board::movePiece(Piece* selectedPiece, int rowPos, int colPos)
@@ -218,4 +293,42 @@ std::ostream& operator<<(std::ostream &out, const Board &board)
 	}
 
 	return out;
+}
+
+bool Board::isEnemy( Coordinates cell)
+{
+    // If it is out of boundaries or empty
+    if ( cell.isOutOfBoundaries() || getSquare(cell) == nullptr)
+        return false;
+
+    /*
+    Piece* piece = getSquare(cell);
+
+    // If the piece is black, check if the cell is upper case
+    if ( std::islower(piece->getSymbol() ) )
+        return std::isupper(getSquare(row,file)->getSymbol());
+
+    // Return true if the piece in the cell is the opposite color to this
+    return std::isupper(getSquare(row,file)->getSymbol()); */
+
+    return true;
+}
+
+
+bool Board::isUnderAttack(Coordinates cell)
+{
+	for ( int row = 0; row < boardSize; ++row)
+	{
+ 		for ( int col = 0; col < boardSize; ++col)
+ 		{
+ 			Piece* pieceToCheck = this->squares[row][col];
+ 			if ( pieceToCheck )
+ 				if ( isEnemy(cell) )
+ 				{
+ 					;
+ 				}
+ 		}
+	}
+
+	return false;
 }

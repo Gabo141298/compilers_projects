@@ -8,7 +8,7 @@ class Knight : public Piece
   public:
     Knight(char symbol, Board* board, Coordinates position);
 
-    MoveTypes getPossibleMoves();
+    void calculatePossibleMoves();
 };
 
 

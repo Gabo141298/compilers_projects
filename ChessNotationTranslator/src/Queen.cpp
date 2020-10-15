@@ -8,12 +8,9 @@ Queen::Queen(char symbol, Board* board, Coordinates position)
 }
 
 
-MoveTypes Queen::getPossibleMoves()
+void Queen::calculatePossibleMoves()
 {
-	// Store all the possible valid moves for the queen
-    MoveTypes possibleMoves;
-
-    // Stores the directions in which the queen can move
+	// Stores the directions in which the queen can move
     short xArray[] = { 1,0,-1,0,-1,1,1,-1 };
     short yArray[] = { 0,1,0,-1,-1,-1,1,1 };
 
@@ -38,7 +35,4 @@ MoveTypes Queen::getPossibleMoves()
         if( isEnemy(x,y) )
             possibleMoves.capturingMoves.push_back( Coordinates(x, y) );
     }
-
-    // Return all the possible valid moves the queen could make
-    return possibleMoves;
 }

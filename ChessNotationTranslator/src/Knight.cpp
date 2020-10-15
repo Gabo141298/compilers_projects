@@ -8,10 +8,8 @@ Knight::Knight(char symbol, Board* board, Coordinates position)
     
 }
 
-MoveTypes Knight::getPossibleMoves()
+void Knight::calculatePossibleMoves()
 {
-	MoveTypes possibleMoves;
-
     short x[] = { -2,-1,1,2,2,1,-1,-2 };
     short y[] = { -1,-2,-2,-1,1,2,2,1 };
 
@@ -25,6 +23,4 @@ MoveTypes Knight::getPossibleMoves()
         else if ( isEnemy(newX, newY) )
             possibleMoves.capturingMoves.push_back( Coordinates(newX, newY) );
     }
-
-    return possibleMoves;
 }

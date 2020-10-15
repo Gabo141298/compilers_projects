@@ -8,11 +8,8 @@ Rook::Rook(char symbol, Board* board, Coordinates position)
    
 }
 
-MoveTypes Rook::getPossibleMoves()
+void Rook::calculatePossibleMoves()
 {
-    // Store all the possible valid moves for the rook
-    MoveTypes possibleMoves;
-
     // Stores the directions in which the rook can move
     short xArray[] = { 1,0,-1,0 };
     short yArray[] = { 0,1,0,-1 };
@@ -38,7 +35,4 @@ MoveTypes Rook::getPossibleMoves()
         if( isEnemy(x,y) )
             possibleMoves.capturingMoves.push_back( Coordinates(x, y) );
     }
-
-    // Return all the possible valid moves the rook could make
-    return possibleMoves;
 }

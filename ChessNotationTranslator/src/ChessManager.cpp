@@ -2,7 +2,7 @@
 #include <iostream>
 
 ChessManager::ChessManager()
-    : turn { 0 }
+    : turn { 'W' }
 {
 }
 
@@ -31,7 +31,7 @@ char ChessManager::getGameState() const
     return this->gameState;
 }
 
-int ChessManager::getTurn()
+char ChessManager::getTurn()
 {
     return this->turn;
 }
