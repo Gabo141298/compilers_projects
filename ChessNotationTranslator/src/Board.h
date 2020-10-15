@@ -73,9 +73,6 @@ class Board
     /// Checks if the game ended. If it ended, then it creates the PGN file, as it was a valid game.
     void checkIfGameEnded();
 
-    /// It assigns to selectedPiece the piece that is in the position given by rowPos and colPos.
-    void savePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos);
-
     /// Checks if a piece is an enemy, depending on a color. If 
     bool isEnemy(Coordinates cell);
 
