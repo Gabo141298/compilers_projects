@@ -7,13 +7,16 @@
 
 class chess_parseCustomVisitor;
 
+enum endResult{Empate, GananBlancas, GananNegras, EnCurso};
+
 struct Header
 {
 	std::string tournament;
 	std::string date;
 	int round;
 	std::string whitesPlayer;
-	std::string blacksPlayer;	
+	std::string blacksPlayer;
+	endResult result;		
 	friend std::ostream& operator<<(std::ostream& stream, const Header& analyzer);
 
 };

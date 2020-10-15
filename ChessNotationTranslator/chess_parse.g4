@@ -33,7 +33,8 @@ DATE		: NUMBER '.' NUMBER '.' NUMBER;
 ROUNDS		: NUMBER;
 
 
-game: header play;
+game: header play 
+	  | header play GAME_END;
 
 // Syntax
 header		: ID DATE NUMBER ID ID;
