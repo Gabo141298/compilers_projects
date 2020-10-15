@@ -3,7 +3,7 @@ OUTPUT=output
 GENERATED=generated
 # runtime is where you downloaded and extracted https://www.antlr.org/download/antlr4-cpp-runtime-4.8-macos.zip
 RUNTIME=/runtime/Cpp/run/usr/local
-CCARGS=-c -I $(RUNTIME)/include/antlr4-runtime/ -I $(GENERATED) -std=c++11	
+CCARGS=-c -g -I $(RUNTIME)/include/antlr4-runtime/ -I $(GENERATED) -std=c++11	
 LDARGS=-g
 LIBS=$(RUNTIME)/lib/libantlr4-runtime.a
 JAVA=/usr/bin/java
