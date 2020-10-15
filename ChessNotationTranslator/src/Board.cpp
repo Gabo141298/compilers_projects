@@ -44,7 +44,7 @@ Board::Board()
 	{
 		// Sets the pieces for the first and last rows
 		// Lower case means a black piece, upper case is a white piece
-		if (row == 0 || row == 7)
+		if (row == 0)
 		{
 			squares[0][0] = factory( 'r', row, 0); 
 			squares[0][1] = factory( 'n', row, 1); 
