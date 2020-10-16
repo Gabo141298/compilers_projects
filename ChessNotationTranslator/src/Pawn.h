@@ -32,6 +32,8 @@ class Pawn : public Piece
 
     /// Returns the value of the justMovedTwice 
     inline bool getJustMovedTwice() { return this->justMovedTwice; }
+
+    inline void resetJustMovedTwice() { this->justMovedTwice = false; }
 };
 
 #endif

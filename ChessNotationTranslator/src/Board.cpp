@@ -183,8 +183,9 @@ void Board::resetOpponentEnPassants()
 	}
 }
 
-Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity)
+Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
 {
+	// We don't care about the color right now, 
 	// Determines if I have to check the white or black pieces
 	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
 
@@ -213,11 +214,13 @@ Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbol
 					coordinates = &moves.promotionMoves;
 					break;
 
-				case MoveTypeSymbols::enPassant:
-					coordinates = &moves.enPassantMoves;
+				case MoveTypeSymbols::shortCastle:
+					cell = (manager.getTurn() == 'W') ? Coordinates(7,6) : Coordinates(0,6);
+					coordinates = &moves.castle;
 					break;
 
-				case MoveTypeSymbols::castle:
+				case MoveTypeSymbols::longCastle:
+					cell = (manager.getTurn() == 'W') ? Coordinates(7,3) : Coordinates(0,3);
 					coordinates = &moves.castle;
 					break;
 			}
@@ -227,7 +230,36 @@ Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbol
 			{
 				if ( *moveIterator == cell)
 					if (! ambiguity || ambiguity == moveIterator->getRow() || ambiguity == moveIterator->getFile())
+					{	
+						// We found the right piece. Now make the move
+						makeMove(*iterator, cell, moveType);
 						return *iterator;
+					}
+			}
+
+			// The enPassant move is not explicitaly said, we must check it here if there was a pawn capture
+			if ( moveType == MoveTypeSymbols::capturing && pieceSymbol == 'P')
+			{
+				coordinates = &moves.enPassantMoves;
+
+				// We found a possible piece. check if it can move to the given cell
+				for (auto moveIterator = coordinates->begin(); moveIterator != coordinates->end(); ++moveIterator )
+				{
+					// The coordinate is the same as the one we want to find
+					if ( *moveIterator == cell)
+					{
+						// There was no abiguity, or there was one and the move found was in the right position
+						if (!ambiguity || ambiguity == moveIterator->getRow() || ambiguity == moveIterator->getFile())
+						{
+							// The move made was indeed enPassant, not a regular capture
+							moveType = MoveTypeSymbols::enPassant;
+
+							// We found the right piece. Now make the move
+							makeMove(*iterator, cell, moveType);
+							return *iterator;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -236,24 +268,53 @@ Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbol
 	return nullptr;
 }
 
-void Board::movePiece(Piece* selectedPiece, int rowPos, int colPos)
+void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType)
 {
+	// If the move was only moving a piece to a different square
+	if ( moveType == MoveTypeSymbols::commuting)
+	{
+		// This is the easiest case, we just have to move the piece to the new square
+		relocatePiece(piece, cell);
+	}
+	else if ( moveType == MoveTypeSymbols::capturing)
+	{
+		// This is the second easiest move, we move the piece and delete the last one
+		// the true parameter is to let it know there was a capture
+		relocatePiece(piece, cell, true);
+	}
     // If the piece is a pawn, and it is in the last rank, a promotion move ocurred
-    if ( ( selectedPiece->getSymbol() == 'P' || selectedPiece->getSymbol() == 'p') && ( rowPos == 7 || rowPos == 0 ) )
+    if ( ( piece->getSymbol() == 'P' || piece->getSymbol() == 'p') )
     {
         // Delete the pawn from the board
-        delete squares[selectedPiece->getPosition().row][selectedPiece->getPosition().file];
+        delete squares[piece->getPosition().row][piece->getPosition().file];
+        /*
 
         // The new piece will be either a black or a white queen
         char newSymbol = (rowPos) ? 'q' : 'Q';
 
         // Creates the piece and assign it a Queen image
-        squares[rowPos][colPos] = selectedPiece = new Queen(newSymbol, this, selectedPiece->getPosition());
+        squares[rowPos][colPos] = piece = new Queen(newSymbol, this, piece->getPosition());
+        */
     }
+}
 
-    // Make the piece move and add it to the board;
-    squares[rowPos][colPos] = selectedPiece;
-    squares[rowPos][colPos]->setPosition(Coordinates(rowPos, colPos));
+void Board::relocatePiece(Piece* piece, Coordinates cell, bool deletePiece)
+{
+	short row = piece->getRow();
+	short file = piece->getFile();
+
+	// The piece is no longer in this position
+	squares[row][file] = nullptr;
+
+	// This is when there was a capture, so the piece has to be removed
+	if (deletePiece)
+		deletePieceFromBoard( cell.getRow(), cell.getFile() );
+
+	// Now the board has the piece in the new position
+	squares[cell.getRow()][cell.getFile()] = piece;
+
+	// Call the method so that the piece knows its new place
+	piece->setPosition(cell);
 }
 
 Board::~Board()
