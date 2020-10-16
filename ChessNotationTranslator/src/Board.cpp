@@ -183,7 +183,7 @@ void Board::resetOpponentEnPassants()
 	}
 }
 
-Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
+bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
 {
 	// We don't care about the color right now, 
 	// Determines if I have to check the white or black pieces
@@ -233,7 +233,7 @@ Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbol
 					{	
 						// We found the right piece. Now make the move
 						makeMove(*iterator, cell, moveType);
-						return *iterator;
+						return true;
 					}
 			}
 
@@ -256,7 +256,7 @@ Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbol
 
 							// We found the right piece. Now make the move
 							makeMove(*iterator, cell, moveType);
-							return *iterator;
+							return true;
 						}
 					}
 				}
@@ -265,7 +265,7 @@ Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbol
 	}
 
 	// No piece was found
-	return nullptr;
+	return false;
 }
 
 void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType)
