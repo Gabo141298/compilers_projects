@@ -32,12 +32,13 @@ std::ostream& operator<<(std::ostream& stream, const Header& header)
 	return stream;
 }
 
-std::ostream& operator<<(std::ostream& stream, const SemanticAnalyzer& analyzer)
+std::ostream& operator<<(std::ostream& stream, SemanticAnalyzer& analyzer)
 {
+	// std::cout << "Holaaa";
 	stream << analyzer.header ;
-	std::string buf;
-	// while( analyzer.gameStream >> buf)
-	// 	stream << buf;
-	// stream << std::endl;
+	char ch;
+	while(analyzer.gameStream.get(ch) )
+		stream << ch;
+	stream << std::endl;
 	return stream;
 }
