@@ -2,6 +2,7 @@
 #include <iostream>
 #include <strstream>
 #include <string>
+#include <fstream> 
 
 #include "antlr4-runtime.h"
 #include "chess_parseLexer.h"
@@ -57,8 +58,12 @@ int main(int argc, char *argv[])
     chess_parseCustomVisitor visitor;
     SemanticAnalyzer* semanticAnalyzer = visitor.visitGame(tree);
 
-    std::cout << "Holix";
-    std::cout << *semanticAnalyzer ;
+    std::ostream* stream;
+    if(argc == 3)
+      stream = new std::ofstream(argv[2]);
+    else
+      stream = &std::cout;
+    *stream << *semanticAnalyzer ;
 
     //   std::cout << tree->toStringTree() << std::endl;
     //   return 0;
