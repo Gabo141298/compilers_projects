@@ -61,6 +61,9 @@ class Board
     /// Checks that if a check is written, the move actually attacks the king (it is a check)
     bool validateCheck(Piece* piece);
 
+    /// Gets the position of the enemy king
+    Coordinates getKingPosition();
+
   public:
   	/// Defines the board size. Really, it's not going to change
     const static unsigned char boardSize = 8;

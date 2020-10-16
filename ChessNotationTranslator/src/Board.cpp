@@ -331,10 +331,33 @@ std::ostream& operator<<(std::ostream &out, const Board &board)
 	return out;
 }
 
+Coordinates Board::getKingPosition()
+{
+	// Gets the symbol of the king of the opposite color
+	char kingSymbol = (manager.getTurn() == 'W') ? 'k' : 'K';
+
+	for ( short row = 0; row < 8; ++row)
+		for ( short col = 0; row < 8; ++row)
+			if ( this->squares[row][col]->getSymbol() == kingSymbol) 
+				return Coordinates(row,col);
+
+	// It should never get to this point
+	return Coordinates(0,0);
+}
+
 bool Board::validateCheck(Piece* piece)
 {
 	MoveTypes moves = piece->getPossibleMoves();
 
+	Coordinates kingPosition = getKingPosition();
+
+	// Check the regular capturing moves to see if this piece threatens the king
+	for ( auto iterator = moves.capturingMoves.begin(); iterator != moves.capturingMoves.end(); ++iterator)
+		// If the piece is attacking the square where the king is
+		if ( *iterator == kingPosition )
+			return true;
+
+	return false;
 }
 
 bool Board::isEnemy( Coordinates cell)
