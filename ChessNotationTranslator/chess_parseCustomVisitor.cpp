@@ -133,34 +133,34 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 
 void chess_parseCustomVisitor::printMovement(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
 {
-	// if(this->currentMovement % 2 == 0)
-	// 	gameStream << currentMovement%2 - 1 << ". ";
-	// if(moveType == MoveTypeSymbols::longCastle)
-	// {
-	// 	gameStream << "0-0-0 "; 
-	// 	return;
-	// }
-	// else if (moveType == MoveTypeSymbols::shortCastle)
-	// {
-	// 	gameStream << "0-0 ";
-	// 	return;
-	// }
+	if(this->currentMovement % 2 == 0)
+		semanticAnalyzer->gameStream << currentMovement%2 - 1 << ". ";
+	if(moveType == MoveTypeSymbols::longCastle)
+	{
+		semanticAnalyzer->gameStream << "0-0-0 "; 
+		return;
+	}
+	else if (moveType == MoveTypeSymbols::shortCastle)
+	{
+		semanticAnalyzer->gameStream << "0-0 ";
+		return;
+	}
 
-	// if(pieceSymbol != 'P')
-	// 	gameStream << pieceSymbol;
-	// if(ambiguity != '\0')
-	// 	gameStream << ambiguity;
-	// if(moveType == MoveTypeSymbols::capturing || moveType == MoveTypeSymbols::capturingPromotion)
-	// 	gameStream << 'x';
+	if(pieceSymbol != 'P')
+		semanticAnalyzer->gameStream << pieceSymbol;
+	if(ambiguity != '\0')
+		semanticAnalyzer->gameStream << ambiguity;
+	if(moveType == MoveTypeSymbols::capturing || moveType == MoveTypeSymbols::capturingPromotion)
+		semanticAnalyzer->gameStream << 'x';
 	
-	// gameStream << cell.row << cell.file
+	semanticAnalyzer->gameStream << cell.row << cell.file;
 
-	// if(moveType == MoveTypeSymbols::promotion || moveType == MoveTypeSymbols::capturingPromotion)
-	// {
-	// 	gameStream << "=" << promotionSymbol;
-	// }
+	if(moveType == MoveTypeSymbols::promotion || moveType == MoveTypeSymbols::capturingPromotion)
+	{
+		semanticAnalyzer->gameStream << "=" << promotionSymbol;
+	}
 
-	// gameStream << " ";
+	semanticAnalyzer->gameStream << " ";
 }
 
 

@@ -30,5 +30,5 @@ class SemanticAnalyzer
 	Board board;
 
 	std::stringstream gameStream;
-	friend std::ostream& operator<<(std::ostream& stream, const SemanticAnalyzer& analyzer);
+	friend std::ostream& operator<<(std::ostream& stream, SemanticAnalyzer& analyzer);
 };

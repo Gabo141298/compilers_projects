@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
     chess_parseCustomVisitor visitor;
     SemanticAnalyzer* semanticAnalyzer = visitor.visitGame(tree);
 
+    std::cout << "Holix";
     std::cout << *semanticAnalyzer ;
 
     //   std::cout << tree->toStringTree() << std::endl;
