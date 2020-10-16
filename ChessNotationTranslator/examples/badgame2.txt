@@ -1,0 +1,1 @@
+"Badder tournament", 2020.10.14, 0, "Duffus", "Ruffus", Peon e4, Dama e7, Alfil c4, Caballo c6, Reina h5, Alfil e7, Reina toma f7 mate, Ganan blancas
