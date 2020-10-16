@@ -41,10 +41,17 @@ class Board
   private: 
   	Piece* factory(char symbol, int row, int col);
 
+    /// Removes a piece from the board and deletes it from memory
     void deletePieceFromBoard(int row, int col);
 
     /// En passants only last one move. This method resets if after every turn
     void resetOpponentEnPassants();
+
+    /// Method to move a piece from one square of the board to another
+    void relocatePiece(Piece* piece, Coordinates cell, bool deletePiece = false);
+
+    /// Make the move, whether it's enPassant, commute, capture, promotion or castle
+    void makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType);
 
   public:
   	/// Defines the board size. Really, it's not going to change

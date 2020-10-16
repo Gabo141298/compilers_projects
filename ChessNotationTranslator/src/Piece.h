@@ -54,7 +54,7 @@ struct Coordinates
 
 enum MoveTypeSymbols
 {
-    commuting, capturing, enPassant, promotion, castle
+    commuting, capturing, enPassant, promotion, shortCastle, longCastle
 };
 
 class Piece
@@ -133,6 +133,9 @@ class Piece
 
     /// Returns the Coordinates struct of the piece
     inline Coordinates getPosition() const { return this->currentPosition; }
+
+    /// This is needed for the pawns
+    inline void resetJustMovedTwice() {}
 
 };
 
