@@ -126,45 +126,6 @@ void Board::deletePieceFromBoard(int row, int col)
     squares[row][col] = nullptr;
 }
 
-void Board::movePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
-{
-    bool validMove = false;
-
-    // Checks if the move made by the player was any of the commuting moves
-    for(unsigned int index = 0; index < validMoves.commutingMoves.size() && !validMove; ++index)
-    {
-        if(colPos == validMoves.commutingMoves[index].file && rowPos == validMoves.commutingMoves[index].row)
-        {
-            relocatePiece(selectedPiece, Coordinates(rowPos,colPos));
-            validMove = true;
-        }
-    }
-
-    // Checks if the move made was a capture to another piece
-    for(unsigned int index = 0; index < validMoves.capturingMoves.size() && !validMove; ++index)
-    {
-        if(colPos == validMoves.capturingMoves[index].file && rowPos == validMoves.capturingMoves[index].row)
-        {
-        	deletePieceFromBoard(rowPos, colPos);
-
-            // Makes the move from the last piece to the chosen cell
-            relocatePiece(selectedPiece, Coordinates(rowPos,colPos));
-            validMove = true;
-        }
-    }
-
-    // If the moved chosen was a valid one
-    if(validMove)
-    {
-        // The en passant rule only applies for one turn. So, it has to be cancelled after every move.
-        resetOpponentEnPassants();
-
-        // Change turns
-        manager.changeTurn();
-    }
-
-    manager.setGameState();
-}
 
 void Board::resetOpponentEnPassants()
 {
@@ -233,6 +194,11 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					{	
 						// We found the right piece. Now make the move
 						makeMove(*iterator, cell, moveType);
+
+						// If it was written that the move was a check, it is validated here
+						if ( checkState == CheckStates::check)
+							validateCheck(*iterator);
+
 						return true;
 					}
 			}
@@ -256,6 +222,11 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 
 							// We found the right piece. Now make the move
 							makeMove(*iterator, cell, moveType);
+
+							// If it was written that the move was a check, it is validated here
+							if ( checkState == CheckStates::check)
+								validateCheck(*iterator);
+
 							return true;
 						}
 					}
@@ -265,7 +236,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 	}
 
 	// No piece was found
-	return false;
+	return true;
 }
 
 void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, char promotionSymbol)
@@ -299,8 +270,17 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, c
 
         // Create the new piece in the 
         squares[row][file] = factory( newSymbol, row, file);
-
     }
+
+
+    // The en passant rule only applies for one turn. So, it has to be cancelled after every move.
+    resetOpponentEnPassants();
+
+    // Change turns
+    manager.changeTurn();
+
+    // Check if the game ended
+    manager.setGameState();
 }
 
 void Board::relocatePiece(Piece* piece, Coordinates cell, bool deletePiece)
@@ -349,6 +329,12 @@ std::ostream& operator<<(std::ostream &out, const Board &board)
 	}
 
 	return out;
+}
+
+bool Board::validateCheck(Piece* piece)
+{
+	MoveTypes moves = piece->getPossibleMoves();
+
 }
 
 bool Board::isEnemy( Coordinates cell)

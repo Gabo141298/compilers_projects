@@ -58,6 +58,9 @@ class Board
     /// Make the move, whether it's enPassant, commute, capture, promotion or castle
     void makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, char promotionSymbol = 'Q');
 
+    /// Checks that if a check is written, the move actually attacks the king (it is a check)
+    bool validateCheck(Piece* piece);
+
   public:
   	/// Defines the board size. Really, it's not going to change
     const static unsigned char boardSize = 8;
@@ -73,14 +76,6 @@ class Board
 
     /// Checks if the current player in turn corresponds with the color of the piece selected
     bool isRightTurn(Piece* selectedPiece);
-
-    /// It checks if the piece can be moved to the position given by rowPos and colPos.
-    /// If it can be moved, it will move the piece.
-    void movePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos);
-
-    /// It tells the piece to move the position given by rowPos, and colPos.
-    /// It also does changes to boardState to update the pieces positions.
-    void movePiece(Piece* selectedPiece, int rowPos, int colPos);
 
     /// Checks if the game ended. If it ended, then it creates the PGN file, as it was a valid game.
     void checkIfGameEnded();
