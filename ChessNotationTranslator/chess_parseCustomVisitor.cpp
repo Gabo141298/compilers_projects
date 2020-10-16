@@ -63,7 +63,7 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 	Coordinates cell;
 	char pieceSymbol;
 	MoveTypeSymbols moveType;
-	char ambiguity = '\0';
+	short ambiguity = '\0';
 	char promotionSymbol = 'Q';
 	CheckStates checkState;
 
@@ -95,8 +95,9 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 				moveType = MoveTypeSymbols::capturingPromotion;
 			else
 				moveType = MoveTypeSymbols::promotion;			
-			cell.row = context->square()->RANK()->getText()[0];
-			cell.file = context->square()->FILE()->getText()[0];
+			cell.row = context->square()->RANK()->getText()[0]-48;
+			cell.file = context->square()->FILE()->getText()[0]-97;
+			// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
 			if(context->in_position())
 				ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
 			promotionSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->promotion_piece()->children[0])->getSymbol()->getType()];
@@ -106,18 +107,19 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 			pieceSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->piece()->children[0])->getSymbol()->getType()];
 			// std::cout << pieceSymbol << std::endl;
 			moveType = MoveTypeSymbols::commuting;			
-			cell.row = context->square()->RANK()->getText()[0];
-			cell.file = context->square()->FILE()->getText()[0];
+			cell.row = context->square()->RANK()->getText()[0]-48;
+			cell.file = context->square()->FILE()->getText()[0]-97;
+			// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
 			if(context->in_position())
-				ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
+				ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0]: context->in_position()->FILE()->getText()[0];
 		} 
 		else if(auto context = dynamic_cast<chess_parseParser::CaptureContext*>(ctx->move()->children[0]))
 		{
 			pieceSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->piece()->children[0])->getSymbol()->getType()];
-			// std::cout << pieceSymbol << std::endl;
 			moveType = MoveTypeSymbols::capturing;			
-			cell.row = context->square()->RANK()->getText()[0];
-			cell.file = context->square()->FILE()->getText()[0];
+			cell.row = context->square()->RANK()->getText()[0]-48;
+			cell.file = context->square()->FILE()->getText()[0]-98;
+			// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
 			if(context->in_position())
 				ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
 		} 
@@ -133,8 +135,8 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 
 void chess_parseCustomVisitor::printMovement(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
 {
-	if(this->currentMovement % 2 == 0)
-		semanticAnalyzer->gameStream << currentMovement%2 - 1 << ". ";
+	if((this->currentMovement++ % 2) == 0)
+		semanticAnalyzer->gameStream << currentMovement/2 - 1 << ". ";
 	if(moveType == MoveTypeSymbols::longCastle)
 	{
 		semanticAnalyzer->gameStream << "0-0-0 "; 
@@ -152,8 +154,8 @@ void chess_parseCustomVisitor::printMovement(Coordinates cell, char pieceSymbol,
 		semanticAnalyzer->gameStream << ambiguity;
 	if(moveType == MoveTypeSymbols::capturing || moveType == MoveTypeSymbols::capturingPromotion)
 		semanticAnalyzer->gameStream << 'x';
-	
-	semanticAnalyzer->gameStream << cell.row << cell.file;
+	char fileChar = cell.file+97;
+	semanticAnalyzer->gameStream << std::string(&fileChar) << cell.row;
 
 	if(moveType == MoveTypeSymbols::promotion || moveType == MoveTypeSymbols::capturingPromotion)
 	{
