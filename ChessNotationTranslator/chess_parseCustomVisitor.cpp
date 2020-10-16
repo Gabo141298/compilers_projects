@@ -101,7 +101,7 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 					moveType = MoveTypeSymbols::promotion;			
 				cell.rank = context->square()->RANK()->getText()[0]-48;
 				cell.file = context->square()->FILE()->getText()[0]-97;
-				// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
+				std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.rank << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
 				if(context->in_position())
 					ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
 				promotionSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->promotion_piece()->children[0])->getSymbol()->getType()];
@@ -113,7 +113,7 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 				moveType = MoveTypeSymbols::commuting;			
 				cell.rank = context->square()->RANK()->getText()[0]-48;
 				cell.file = context->square()->FILE()->getText()[0]-97;
-				// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
+				std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.rank << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
 				if(context->in_position())
 					ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0]: context->in_position()->FILE()->getText()[0];
 			} 
@@ -122,8 +122,8 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 				pieceSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->piece()->children[0])->getSymbol()->getType()];
 				moveType = MoveTypeSymbols::capturing;			
 				cell.rank = context->square()->RANK()->getText()[0]-48;
-				cell.file = context->square()->FILE()->getText()[0]-98;
-				// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
+				cell.file = context->square()->FILE()->getText()[0]-97;
+				std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.rank << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
 				if(context->in_position())
 					ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
 			} 

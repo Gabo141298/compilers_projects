@@ -20,17 +20,17 @@ void Bishop::calculatePossibleMoves()
         short y = currentPosition.rank + yArray[direction];
 
         // While the cell is within boundaries and is free
-        while( x>=0 && x<8 && y>=0 && y<8 && isFree(x, y))
+        while( x>=0 && x<8 && y>=0 && y<8 && isFree(y, x))
         {
             // The move is valid, add it to possibleMoves
-            possibleMoves.commutingMoves.push_back( Coordinates(x, y) );
+            possibleMoves.commutingMoves.push_back( Coordinates(y, x) );
 
             // Move the bishop once more in the same direction
             x += xArray[direction]; y += yArray[direction];
         }
 
         // If the last cell wasn't free, but instead had an enemy
-        if( isEnemy(x,y) )
-            possibleMoves.capturingMoves.push_back( Coordinates(x, y) );
+        if( isEnemy(y, x) )
+            possibleMoves.capturingMoves.push_back( Coordinates(y, x) );
     }
 }

@@ -16,7 +16,7 @@ struct Coordinates
     short rank;
 
     // Conversion constructor
-    Coordinates(short file = 0, short rank = 0)
+    Coordinates(short rank = 0, short file = 0)
     : file { file }
     , rank { rank }
     {}
@@ -37,7 +37,7 @@ struct Coordinates
 
     friend std::ostream& operator<<(std::ostream &out, const Coordinates &coordinate)
     {
-        out << "File: " << char(coordinate.file + 97) << " Rank: " << abs(coordinate.rank-7)+1;
+        return out << "File: " << char(coordinate.file + 97) << " Rank: " << abs(coordinate.rank-8);
     }
 };
 

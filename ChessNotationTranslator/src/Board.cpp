@@ -11,7 +11,7 @@
 
 Piece* Board::factory(char symbol, int file, int rank)
 {
-	Coordinates position(rank,file);
+	Coordinates position(file,rank);
 	switch(symbol)
 	{
 		case 'B':
@@ -108,7 +108,7 @@ bool Board::isRightTurn(Piece* selectedPiece)
     return ( manager.getTurn() == 'W' );
 }
 
-void Board::deletePieceFromBoard(int file, int rank)
+void Board::deletePieceFromBoard(int rank, int file)
 {
 	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
 	
@@ -122,8 +122,8 @@ void Board::deletePieceFromBoard(int file, int rank)
 
 	}
 
-    delete squares[file][rank];
-    squares[file][rank] = nullptr;
+    delete squares[rank][file];
+    squares[rank][file] = nullptr;
 }
 
 
@@ -147,6 +147,8 @@ void Board::resetOpponentEnPassants()
 bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
 {
     printBoard();
+	cell.rank = abs(cell.rank-8);
+	std::cout << "[" << cell.rank << "," << cell.file << std::endl;
 
 	// Determines if I have to check the white or black pieces
 	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
@@ -162,8 +164,9 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 		// Method that determines the possible moves of the piece in the current turn
 		(*iterator)->calculatePossibleMoves();
 	
-		if ((*iterator)->getSymbol() == pieceSymbol)
+		if ( toupper((*iterator)->getSymbol()) == pieceSymbol)
 		{
+			// std::cout << "iff" << std::endl;
 			// Get the struct with all the moves in their own moveTypes vectors
 			MoveTypes& moves = (*iterator)->getPossibleMoves();
 
@@ -197,6 +200,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					break;
 			}
 
+			// std::cout << "Coordinates size:" << coordinates->size() << std::endl;
 			// We found a possible piece. check if it can move to the given cell
 			for (auto moveIterator = coordinates->begin(); moveIterator != coordinates->end(); ++moveIterator )
 			{
@@ -282,10 +286,10 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, c
 
         // In case the promotion was also a capture, we have to delete the previous piece
         if ( moveType == MoveTypeSymbols::capturingPromotion)
-        	deletePieceFromBoard(file, file);
+        	deletePieceFromBoard(rank, file);
 
         // Create the new piece in the 
-        squares[file][file] = factory( newSymbol, file, file);
+        squares[rank][file] = factory( newSymbol, rank, file);
     }
 
 
@@ -305,14 +309,16 @@ void Board::relocatePiece(Piece* piece, Coordinates cell, bool deletePiece)
 	short rank = piece->getRank();
 
 	// The piece is no longer in this position
-	squares[file][rank] = nullptr;
+	squares[rank][file] = nullptr;
+	// std::cout << "----------Borre la pieza--------" << file << ", "<< rank <<std::endl<<*this << "-----------------------" <<std::endl;
+	// std::cout << squares[rank][file]->getSymbol();
 
 	// This is when there was a capture, so the piece has to be removed
 	if (deletePiece)
-		deletePieceFromBoard( cell.getFile(), cell.getRank() );
+		deletePieceFromBoard( cell.getRank(), cell.getFile() );
 
 	// Now the board has the piece in the new position
-	squares[cell.getFile()][cell.getRank()] = piece;
+	squares[cell.getRank()][cell.getFile()] = piece;
 
 	// Call the method so that the piece knows its new place
 	piece->setPosition(cell);
