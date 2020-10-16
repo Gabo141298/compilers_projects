@@ -38,7 +38,7 @@ void King::calculatePossibleMoves()
     {
         // Short castle
         if ( isFree(rank, 5) && isFree(rank, 6))
-            possibleMoves.castle.push_back( Coordinates(currentPosition.rank, 5));
+            possibleMoves.castle.push_back( Coordinates(currentPosition.rank, 6));
 
         // Long castle
         if ( isFree(rank, 1) && isFree(rank, 2) && isFree(rank, 3))

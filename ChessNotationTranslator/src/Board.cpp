@@ -185,7 +185,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					break;
 
 				case MoveTypeSymbols::shortCastle:
-					cell = (manager.getTurn() == 'W') ? Coordinates(7,5) : Coordinates(0,5);
+					cell = (manager.getTurn() == 'W') ? Coordinates(7,6) : Coordinates(0,6);
 					coordinates = &moves.castle;
 					break;
 
@@ -195,15 +195,16 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					break;
 			}
 
+			int magicNumber = 95;
 
 			// We found a possible piece. check if it can move to the given cell
 			for (auto moveIterator = coordinates->begin(); moveIterator != coordinates->end(); ++moveIterator )
 			{
-				// std::cout << "Possible move: " << (*iterator)->getSymbol() << " from: " << (*iterator)->getPosition() << " to: " << *moveIterator << std::endl;
+				std::cout << "Possible move: " << (*iterator)->getSymbol() << " from: " << (*iterator)->getPosition() << " to: " << *moveIterator << std::endl;
 		
 				if ( *moveIterator == cell)
 				{
-					if (! ambiguity || ambiguity == (moveIterator->getFile() + 97) || ambiguity == moveIterator->getRank())
+					if (! ambiguity || ambiguity == (moveIterator->getFile() + magicNumber) || ambiguity == moveIterator->getRank())
 					{	
 						// We found the right piece. Now make the move
 						makeMove(*iterator, cell, moveType);
@@ -217,9 +218,9 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 
 						return true;
 					}
-					else if ( ambiguity)
+					else if ( ambiguity )
 					{
-						std::cout << "Oh no, ambiguity. Anyway, Im on: " << char(moveIterator->getFile() + 97) << " and " << moveIterator->getRank() + 28<< std::endl;
+						std::cout << "Oh no, ambiguity. Anyway, Im on: " << char(moveIterator->getFile() + magicNumber) << " and ambiguity was: " << ambiguity << std::endl;
 					}
 				}
 			}
@@ -236,7 +237,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					if ( *moveIterator == cell)
 					{
 						// There was no abiguity, or there was one and the move found was in the right position
-						if (!ambiguity || ambiguity == moveIterator->getFile() || ambiguity == moveIterator->getRank())
+						if (!ambiguity || ambiguity == moveIterator->getFile() + magicNumber || ambiguity == moveIterator->getRank())
 						{
 							// The move made was indeed enPassant, not a regular capture
 							moveType = MoveTypeSymbols::enPassant;
@@ -249,6 +250,10 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 								return validateCheck(*iterator);
 
 							return true;
+						}
+						else if ( ambiguity)
+						{
+							std::cout << "Oh no, ambiguity. Anyway, Im on: " << char(moveIterator->getFile() + magicNumber) << " and ambiguity was: " << ambiguity << std::endl;
 						}
 					}
 				}
@@ -294,6 +299,7 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, c
     }
     else if ( moveType == MoveTypeSymbols::shortCastle )
     {
+    	std::cout << "THE CASTLING CELL IS: " << cell << std::endl;
     	relocatePiece(piece, cell);
 
     	// If it is a white piece, move the rook at the bottom to the f file
@@ -329,7 +335,6 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, c
 
 void Board::relocatePiece(Piece* piece, Coordinates cell, bool deletePiece)
 {
-
 	short file = piece->getFile();
 	short rank = piece->getRank();
 
