@@ -18,9 +18,9 @@ void Knight::calculatePossibleMoves()
     	short newX = currentPosition.file + x[direction];
     	short newY = currentPosition.rank + y[direction];
 
-    	if ( isFree(newX, newY) ) 
-            possibleMoves.commutingMoves.push_back( Coordinates(newX, newY) );
-        else if ( isEnemy(newX, newY) )
-            possibleMoves.capturingMoves.push_back( Coordinates(newX, newY) );
+    	if ( isFree(newY, newX) ) 
+            possibleMoves.commutingMoves.push_back( Coordinates(newY, newX) );
+        else if ( isEnemy(newY, newX) )
+            possibleMoves.capturingMoves.push_back( Coordinates(newY, newX) );
     }
 }

@@ -6,7 +6,7 @@
 class King : public Piece
 {
   private: 
-    bool hasMoved = true;
+    bool hasMoved = false;
 
   public:
   	King(char symbol, Board* board, Coordinates position);

@@ -146,27 +146,24 @@ void Board::resetOpponentEnPassants()
 
 bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
 {
-    printBoard();
 	cell.rank = abs(cell.rank-8);
-	std::cout << "[" << cell.rank << "," << cell.file << std::endl;
 
 	// Determines if I have to check the white or black pieces
 	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
 
 	//char charFile = cell.file+97;
-	std::cout << "TURNO: " << manager.getTurn() << " Celda: " << cell <<  std::endl;
+	std::cout << "Turno " << manager.getTurnNumber() + 1 << " Celda: " << cell <<  std::endl;
 
 	// Goes piece by piece checking if it is the right one
 	for(auto iterator = pieces.begin(); iterator != pieces.end(); ++iterator)
 	{
-		std::cout << "Currently printing the piece: " << (*iterator)->getSymbol() << " in cell: " << (*iterator)->getPosition() << std::endl;
-
 		// Method that determines the possible moves of the piece in the current turn
 		(*iterator)->calculatePossibleMoves();
 	
 		if ( toupper((*iterator)->getSymbol()) == pieceSymbol)
 		{
-			// std::cout << "iff" << std::endl;
+			//std::cout << "Currently printing the piece: " << (*iterator)->getSymbol() << " in cell: " << (*iterator)->getPosition() << std::endl;
+
 			// Get the struct with all the moves in their own moveTypes vectors
 			MoveTypes& moves = (*iterator)->getPossibleMoves();
 
@@ -176,12 +173,10 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 			switch(moveType)
 			{
 				case MoveTypeSymbols::commuting:  
-					//std::cout << "A commuting move" << std::endl;
 					coordinates = &moves.commutingMoves; 
 					break;
 
 				case MoveTypeSymbols::capturing:  
-					std::cout << "A capturing move" << std::endl;
 					coordinates = &moves.capturingMoves; 
 					break;
 
@@ -190,7 +185,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					break;
 
 				case MoveTypeSymbols::shortCastle:
-					cell = (manager.getTurn() == 'W') ? Coordinates(7,6) : Coordinates(0,6);
+					cell = (manager.getTurn() == 'W') ? Coordinates(7,5) : Coordinates(0,5);
 					coordinates = &moves.castle;
 					break;
 
@@ -200,24 +195,33 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					break;
 			}
 
-			// std::cout << "Coordinates size:" << coordinates->size() << std::endl;
+
 			// We found a possible piece. check if it can move to the given cell
 			for (auto moveIterator = coordinates->begin(); moveIterator != coordinates->end(); ++moveIterator )
 			{
-				std::cout << "Possible move: " << (*iterator)->getSymbol() << " from: " << (*iterator)->getPosition() << " to: " << *moveIterator << std::endl;
+				// std::cout << "Possible move: " << (*iterator)->getSymbol() << " from: " << (*iterator)->getPosition() << " to: " << *moveIterator << std::endl;
 		
 				if ( *moveIterator == cell)
-					if (! ambiguity || ambiguity == moveIterator->getFile() || ambiguity == moveIterator->getRank())
+				{
+					if (! ambiguity || ambiguity == (moveIterator->getFile() + 97) || ambiguity == moveIterator->getRank())
 					{	
 						// We found the right piece. Now make the move
 						makeMove(*iterator, cell, moveType);
 
 						// If it was written that the move was a check, it is validated here
 						if ( checkState == CheckStates::check)
-							validateCheck(*iterator);
+						{
+							std::cout << "checking in case of check" << std::endl;
+							return validateCheck(*iterator);
+						}
 
 						return true;
 					}
+					else if ( ambiguity)
+					{
+						std::cout << "Oh no, ambiguity. Anyway, Im on: " << char(moveIterator->getFile() + 97) << " and " << moveIterator->getRank() + 28<< std::endl;
+					}
+				}
 			}
 
 			// The enPassant move is not explicitaly said, we must check it here if there was a pawn capture
@@ -242,7 +246,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 
 							// If it was written that the move was a check, it is validated here
 							if ( checkState == CheckStates::check)
-								validateCheck(*iterator);
+								return validateCheck(*iterator);
 
 							return true;
 						}
@@ -252,15 +256,13 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 		}
 	}
 
+	std::cout << "El movimiento " << pieceSymbol << ambiguity << char(cell.file + 97) << abs(cell.rank-8) << " no es válido" << std::endl;
 	// No piece was found
 	return false;
 }
 
 void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, char promotionSymbol)
 {
-
-	//std::cout << "PIECE: " << piece->getSymbol() << " CELL: " << cell.getFile() << cell.getRank() << std::endl;
-
 	// If the move was only moving a piece to a different square
 	if ( moveType == MoveTypeSymbols::commuting)
 	{
@@ -273,7 +275,6 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, c
 		// the true parameter is to let it know there was a capture
 		relocatePiece(piece, cell, true);
 	}
-    
     else if ( moveType == MoveTypeSymbols::promotion || moveType == MoveTypeSymbols::capturingPromotion)
     {
         // Delete the pawn from the board
@@ -291,7 +292,26 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, c
         // Create the new piece in the 
         squares[rank][file] = factory( newSymbol, rank, file);
     }
+    else if ( moveType == MoveTypeSymbols::shortCastle )
+    {
+    	relocatePiece(piece, cell);
 
+    	// If it is a white piece, move the rook at the bottom to the f file
+    	if ( isupper( piece->getSymbol()) )
+	    	relocatePiece( getSquare(7,7), Coordinates(7,5) );
+	    else
+	    	relocatePiece( getSquare(0,7), Coordinates(0,5) );
+    }
+    else if ( moveType == MoveTypeSymbols::longCastle )
+    {
+    	relocatePiece(piece, cell);
+
+    	// If it is a white piece, move the rook at the bottom to the d file
+    	if ( isupper( piece->getSymbol()) )
+	    	relocatePiece( getSquare(7,0), Coordinates(7,3) );
+	    else
+	    	relocatePiece( getSquare(0,0), Coordinates(0,3) );
+    }
 
     // The en passant rule only applies for one turn. So, it has to be cancelled after every move.
     resetOpponentEnPassants();
@@ -301,17 +321,20 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, c
 
     // Check if the game ended
     manager.setGameState();
+
+	// Prints the current state of the squares    
+    printBoard();
+
 }
 
 void Board::relocatePiece(Piece* piece, Coordinates cell, bool deletePiece)
 {
+
 	short file = piece->getFile();
 	short rank = piece->getRank();
 
 	// The piece is no longer in this position
 	squares[rank][file] = nullptr;
-	// std::cout << "----------Borre la pieza--------" << file << ", "<< rank <<std::endl<<*this << "-----------------------" <<std::endl;
-	// std::cout << squares[rank][file]->getSymbol();
 
 	// This is when there was a capture, so the piece has to be removed
 	if (deletePiece)
@@ -360,8 +383,8 @@ Coordinates Board::getKingPosition()
 
 	for ( short file = 0; file < 8; ++file)
 		for ( short rank = 0; file < 8; ++file)
-			if ( this->squares[file][rank]->getSymbol() == kingSymbol) 
-				return Coordinates(file,rank);
+			if ( this->squares[rank][file]->getSymbol() && this->squares[rank][file]->getSymbol() == kingSymbol) 
+				return Coordinates(rank,file);
 
 	// It should never get to this point
 	return Coordinates(0,0);
@@ -372,35 +395,16 @@ bool Board::validateCheck(Piece* piece)
 	MoveTypes moves = piece->getPossibleMoves();
 
 	Coordinates kingPosition = getKingPosition();
-
+	
 	// Check the regular capturing moves to see if this piece threatens the king
 	for ( auto iterator = moves.capturingMoves.begin(); iterator != moves.capturingMoves.end(); ++iterator)
 		// If the piece is attacking the square where the king is
 		if ( *iterator == kingPosition )
 			return true;
 
+	std::cout << "Error: se indicó jaque, pero el movimiento no atacaba al rey" << std::endl;
 	return false;
 }
-
-bool Board::isEnemy( Coordinates cell)
-{
-    // If it is out of boundaries or empty
-    if ( cell.isOutOfBoundaries() || getSquare(cell) == nullptr)
-        return false;
-
-    /*
-    Piece* piece = getSquare(cell);
-
-    // If the piece is black, check if the cell is upper case
-    if ( std::islower(piece->getSymbol() ) )
-        return std::isupper(getSquare(file,file)->getSymbol());
-
-    // Return true if the piece in the cell is the opposite rankor to this
-    return std::isupper(getSquare(file,file)->getSymbol()); */
-
-    return true;
-}
-
 
 bool Board::isUnderAttack(Coordinates cell)
 {
@@ -410,7 +414,7 @@ bool Board::isUnderAttack(Coordinates cell)
  		{
  			Piece* pieceToCheck = this->squares[file][rank];
  			if ( pieceToCheck )
- 				if ( isEnemy(cell) )
+ 				if ( /*isEnemy(cell)*/ true )
  				{
  					;
  				}
@@ -433,4 +437,6 @@ void Board::printBoard()
  		}
  		std::cout << std::endl;
 	}
-}
+
+	std::cout << std::endl;
+} 

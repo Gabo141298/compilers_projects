@@ -8,6 +8,8 @@ class ChessManager
     char turn = 'W';
     /// Stores the current state of the game. '-'  = still playing, 'W' = white won, 'B' = black won.
     char gameState;
+    /// Stores the number of moves
+    double turnNumber = 0.5;
 
 
   public:
@@ -22,9 +24,11 @@ class ChessManager
     /// Called if a capture was made. Resets the counter of moves of that player
     void resetMovesCounter();
     /// Changes the current turn, if it is white, make it black and viceversa
-    inline void changeTurn() { turn = (turn == 'W') ? 'B' : 'W'; }
+    inline void changeTurn() { turnNumber+=0.5; turn = (turn == 'W') ? 'B' : 'W'; }
     /// Returns the current turn of the game
     char getTurn();
+    /// Returns the turn number
+    inline double getTurnNumber() { return turnNumber; }
     /// Passes to the next turn.
     inline int operator++() { return (turn == 'W') ? 'B' : 'W'; }
 };

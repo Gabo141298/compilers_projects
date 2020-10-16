@@ -24,11 +24,24 @@ void King::calculatePossibleMoves()
     	short newY = currentPosition.rank + y[direction];
 
         // If the cell is free, add the move to commutingMoves
-    	if ( isFree(newX, newY) ) 
-            possibleMoves.commutingMoves.push_back( Coordinates(newX, newY) );
+    	if ( isFree(newY, newX) ) 
+            possibleMoves.commutingMoves.push_back( Coordinates(newY, newX) );
 
         // If the cell was occupied by an enemy, add the move to capturingMoves
-        else if ( isEnemy(newX, newY) )
-            possibleMoves.capturingMoves.push_back( Coordinates(newX, newY) );
+        else if ( isEnemy(newY, newX) )
+            possibleMoves.capturingMoves.push_back( Coordinates(newY, newX) );
+    }
+
+    short rank = currentPosition.rank; 
+    // For castling
+    if ( !hasMoved ) 
+    {
+        // Short castle
+        if ( isFree(rank, 5) && isFree(rank, 6))
+            possibleMoves.castle.push_back( Coordinates(currentPosition.rank, 5));
+
+        // Long castle
+        if ( isFree(rank, 1) && isFree(rank, 2) && isFree(rank, 3))
+            possibleMoves.castle.push_back( Coordinates(currentPosition.rank, 3));
     }
 }

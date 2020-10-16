@@ -18,7 +18,6 @@ bool Piece::isEnemy( short rank, short file)
     // If the piece is black, check if the cell is upper case
     if ( std::islower(this->symbol) )
     {
-        std::cout << board->getSquare(rank, file)->getSymbol();
         return std::isupper(board->getSquare(rank, file)->getSymbol());
     }
 
