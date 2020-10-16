@@ -56,7 +56,7 @@ class Board
     void relocatePiece(Piece* piece, Coordinates cell, bool deletePiece = false);
 
     /// Make the move, whether it's enPassant, commute, capture, promotion or castle
-    void makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType);
+    void makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, char promotionSymbol = 'Q');
 
   public:
   	/// Defines the board size. Really, it's not going to change

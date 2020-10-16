@@ -268,7 +268,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 	return false;
 }
 
-void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType)
+void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, char promotionSymbol)
 {
 	// If the move was only moving a piece to a different square
 	if ( moveType == MoveTypeSymbols::commuting)
@@ -282,19 +282,24 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType)
 		// the true parameter is to let it know there was a capture
 		relocatePiece(piece, cell, true);
 	}
-    // If the piece is a pawn, and it is in the last rank, a promotion move ocurred
-    if ( ( piece->getSymbol() == 'P' || piece->getSymbol() == 'p') )
+    
+    else if ( moveType == MoveTypeSymbols::promotion || moveType == MoveTypeSymbols::capturingPromotion)
     {
         // Delete the pawn from the board
         delete squares[piece->getPosition().row][piece->getPosition().file];
-        /*
 
-        // The new piece will be either a black or a white queen
-        char newSymbol = (rowPos) ? 'q' : 'Q';
+        short row = cell.getRow(); short file = cell.getFile();
 
-        // Creates the piece and assign it a Queen image
-        squares[rowPos][colPos] = piece = new Queen(newSymbol, this, piece->getPosition());
-        */
+        // Makes sure the piece is of the right color
+        char newSymbol = (manager.getTurn() == 'W') ? toupper(promotionSymbol) : tolower(promotionSymbol);
+
+        // In case the promotion was also a capture, we have to delete the previous piece
+        if ( moveType == MoveTypeSymbols::capturingPromotion)
+        	deletePieceFromBoard(row, file);
+
+        // Create the new piece in the 
+        squares[row][file] = factory( newSymbol, row, file);
+
     }
 }
 
