@@ -1,1 +1,1 @@
-"Bad Tournament", 2020.10.14, 0, "Checker", "Baddy", Peon e4, Peon e5 jaque, Alfil c4, Caballo c6, Reina h5, Alfil e7, Reina toma f7 mate, Ganan blancas
+"Bad Tournament", "Dummy Island", 2020.10.14, 0, "Checker", "Baddy", Peon e4, Peon e5 jaque, Alfil c4, Caballo c6, Reina h5, Alfil e7, Reina toma f7 mate, Ganan blancas
