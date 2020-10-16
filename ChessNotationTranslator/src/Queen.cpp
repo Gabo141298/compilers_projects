@@ -24,6 +24,10 @@ void Queen::calculatePossibleMoves()
         // While the cell is within boundaries and is free
         while( x>=0 && x<8 && y>=0 && y<8 && isFree(y, x))
         {
+            if(direction == 4)
+            {
+                std::cout << "Q moves" << x << ", " << y << std::endl;
+            }
         	// The move is valid, add it to possibleMoves
             possibleMoves.commutingMoves.push_back( Coordinates(y, x) );
 
@@ -33,6 +37,9 @@ void Queen::calculatePossibleMoves()
 
         // If the last cell wasn't free, but instead had an enemy
         if( isEnemy(y, x) )
+        {
+            std::cout << "Reina come" << y << x << std::endl;
             possibleMoves.capturingMoves.push_back( Coordinates(y, x) );
+        }
     }
 }

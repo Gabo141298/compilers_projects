@@ -44,10 +44,10 @@ class Board
 
 
   private: 
-  	Piece* factory(char symbol, int file, int rank);
+  	Piece* factory(char symbol, int rank, int file);
 
     /// Removes a piece from the board and deletes it from memory
-    void deletePieceFromBoard(int file, int rank);
+    void deletePieceFromBoard( int rank, int file);
 
     /// En passants only last one move. This method resets if after every turn
     void resetOpponentEnPassants();
@@ -75,10 +75,10 @@ class Board
   	friend std::ostream& operator<<(std::ostream &out, const Board& board);
 
     /// Get method for a piece in the board, given a row and a file
-    inline Piece* getSquare(int file, int rank) { return this->squares[file][rank]; }
+    inline Piece* getSquare( int rank, int file) { return this->squares[rank][file]; }
 
     /// Get method for a piece in the board, given a coordinate
-    inline Piece* getSquare(Coordinates cell) { return this->squares[cell.file][cell.rank]; }
+    inline Piece* getSquare(Coordinates cell) { return this->squares[cell.rank][cell.file]; }
 
     /// Checks if the current player in turn corresponds with the color of the piece selected
     bool isRightTurn(Piece* selectedPiece);
