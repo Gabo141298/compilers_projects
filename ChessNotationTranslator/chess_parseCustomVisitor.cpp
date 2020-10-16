@@ -26,10 +26,11 @@ endResult chess_parseCustomVisitor::getWinner(chess_parseParser::GameContext *ct
 void chess_parseCustomVisitor::fillHeader(chess_parseParser::GameContext *ctx)
 {
 	semanticAnalyzer->header.tournament = ctx->header()->ID(0)->getText();
+	semanticAnalyzer->header.site = ctx->header()->ID(1)->getText();
 	semanticAnalyzer->header.date = ctx->header()->DATE()->getText();
 	semanticAnalyzer->header.round = stoi(ctx->header()->NUMBER()->getText());
-	semanticAnalyzer->header.whitesPlayer = ctx->header()->ID(1)->getText();
-	semanticAnalyzer->header.blacksPlayer = ctx->header()->ID(2)->getText();
+	semanticAnalyzer->header.whitesPlayer = ctx->header()->ID(2)->getText();
+	semanticAnalyzer->header.blacksPlayer = ctx->header()->ID(3)->getText();
 	semanticAnalyzer->header.result = getWinner(ctx);
 }
 

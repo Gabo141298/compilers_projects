@@ -7,6 +7,7 @@
 std::ostream& operator<<(std::ostream& stream, const Header& header)
 {
 	stream << "[Event " << header.tournament << "]" << std::endl;
+	stream << "[Site " << header.site << "]" << std::endl;
 	stream << "[Date \"" << header.date << "\"]"<< std::endl;
 	stream << "[Round \"" << header.round << "\"]"<< std::endl;
 	stream << "[White " << header.whitesPlayer << "]"<< std::endl;
