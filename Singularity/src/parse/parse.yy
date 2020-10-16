@@ -130,7 +130,7 @@ SNode::Program* programBlock;
 %type <block> block
 %type <body> body
 %type <value> value boolean intvalue
-%type <expression> assignment expression condition func_call bool_cond
+%type <expression> assignment expression condition func_call bool_cond set_expressions
 %type <position> position 
 %type <statement> statement read print while while_counting answer if_statement otherwise
 %type <variableAssignment> set
@@ -175,9 +175,14 @@ statement: read { $$ = $1; }
             | func_call { $$ = new SNode::ExpressionStatement(*$1); }
             ;
 
-set : SET IDENTIFIER assignment 
-            { $$ = new SNode::VariableAssignment(*(new SNode::Identifier(*$2)), $3); delete $2; }
-            ;
+set : SET IDENTIFIER set_expressions 
+        { $$ = new SNode::VariableAssignment(*(new SNode::Identifier(*$2)), $3); delete $2; }
+        ;
+
+set_expressions: assignment { $$ = $1; }
+                | condition boolean_operator bool_cond { $$ = new SNode::BooleanOperator(*$1, $2, *$3); }
+                | boolean { $$ = $1; }
+                ;
 
 read: READ TO IDENTIFIER { $$ = new SNode::Read(*$3); delete $3; };
 
@@ -261,8 +266,7 @@ condition: expression comparison { $$ = new SNode::ComparisonOperator(*$1, $2->o
             | boolean { $$ = $1; }
             ;
 
-comparison: comp_operator expression
-            { $$ = new SNode::RightSideCompExpr($1, *$2); }
+comparison: comp_operator expression { $$ = new SNode::RightSideCompExpr($1, *$2); }
             ;
 
 comp_operator: LEQ { $$ = SNode::ComparisonOperation::leq; }
@@ -290,10 +294,22 @@ value:      FLOAT { $$ = new SNode::Double(atof($1->c_str())); delete $1; }
             | INTEGER { $$ = new SNode::Integer(atoll($1->c_str())); delete $1; }
             | IDENTIFIER { $$ = new SNode::Identifier(*$1); delete $1; }
             | STRING { $$ = new SNode::String(*$1); delete $1; }
-            | boolean { $$ = $1; }
             ;
 
-expression: IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS {  $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3); delete $1; }
+expression: IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS expression2 {  
+                if($5)
+                {
+                    $$ = new SNode::ArithmeticOperator(*(new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3)), $5->op, $5->exp);
+                    delete $1;
+                    delete $5;
+                }
+                else
+                {
+                    $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3); 
+                    delete $1;
+                }
+            }
+            //| IDENTIFIER arith_oper expression { $$ = new SNode::ArithmeticOperator(*(new SNode::Identifier(*$1)), $2, *$3); delete $1; }
             | value expression2 { 
                 if($2) 
                 {
@@ -305,7 +321,28 @@ expression: IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS {  $$ = new SNode::
                     $$ = $1;
                 }
             }
-            | func_call
+            | func_call expression2 { 
+                if($2) 
+                {
+                    $$ = new SNode::ArithmeticOperator(*$1, $2->op, $2->exp);
+                    delete $2;
+                }
+                else
+                {
+                    $$ = $1;
+                }
+            }
+            | OPEN_PARENTHESIS expression CLOSE_PARENTHESIS expression2 {
+                if($4) 
+                {
+                    $$ = new SNode::ArithmeticOperator(*$2, $4->op, $4->exp);
+                    delete $2;
+                }
+                else
+                {
+                    $$ = $2;
+                }
+            }
             ;
 
 expression2: %empty { $$ = nullptr; }
