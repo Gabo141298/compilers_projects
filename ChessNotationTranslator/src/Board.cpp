@@ -135,7 +135,7 @@ void Board::movePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
     {
         if(colPos == validMoves.commutingMoves[index].file && rowPos == validMoves.commutingMoves[index].row)
         {
-            movePiece(selectedPiece, rowPos, colPos);
+            relocatePiece(selectedPiece, Coordinates(rowPos,colPos));
             validMove = true;
         }
     }
@@ -148,7 +148,7 @@ void Board::movePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
         	deletePieceFromBoard(rowPos, colPos);
 
             // Makes the move from the last piece to the chosen cell
-            movePiece(selectedPiece, rowPos, colPos);
+            relocatePiece(selectedPiece, Coordinates(rowPos,colPos));
             validMove = true;
         }
     }
