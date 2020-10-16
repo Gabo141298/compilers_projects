@@ -110,15 +110,16 @@ bool Board::isRightTurn(Piece* selectedPiece)
 
 void Board::deletePieceFromBoard(int rank, int file)
 {
-	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
+	std::vector<Piece*>& pieces = (manager.getTurn() != 'W') ? this->whitePieces : this->blackPieces;
 	
 	for ( auto iterator = pieces.begin(); iterator != pieces.end(); ++iterator )
 	{
 		if ( (*iterator)->getFile() == file && (*iterator)->getRank() == rank)
-			if ( manager.getTurn() == 'W')
-				this->whitePieces.erase(iterator);
-			else
-				this->blackPieces.erase(iterator);
+		{
+			pieces.erase(iterator);
+			// std::cout << "tratando de borrar" << rank << "," << file /*<< (*iterator)->getPosition() */<< std::endl <<std::flush;//<< pieces->getPosition();
+			break;
+		}
 
 	}
 
@@ -152,7 +153,14 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
 
 	//char charFile = cell.file+97;
-	std::cout << "Turno " << manager.getTurnNumber() + 1 << " Celda: " << cell <<  std::endl;
+	
+
+	std::cout << "Turno " << static_cast<int>(manager.getTurnNumber() + 1);
+	if(static_cast<int>(manager.getTurnNumber()) != manager.getTurnNumber())	
+		std::cout << " Negras";
+	else 
+		std::cout << " Blancas";
+	std::cout<<  std::endl;
 
 	// Goes piece by piece checking if it is the right one
 	for(auto iterator = pieces.begin(); iterator != pieces.end(); ++iterator)
@@ -195,16 +203,16 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					break;
 			}
 
-			int magicNumber = 95;
+			int magicNumber = 97;
 
 			// We found a possible piece. check if it can move to the given cell
 			for (auto moveIterator = coordinates->begin(); moveIterator != coordinates->end(); ++moveIterator )
 			{
-				std::cout << "Possible move: " << (*iterator)->getSymbol() << " from: " << (*iterator)->getPosition() << " to: " << *moveIterator << std::endl;
+				// std::cout << "Possible move: " << (*iterator)->getSymbol() << " from: " << (*iterator)->getPosition() << " to: " << *moveIterator << std::endl;
 		
 				if ( *moveIterator == cell)
 				{
-					if (! ambiguity || ambiguity == (moveIterator->getFile() + magicNumber) || ambiguity == moveIterator->getRank())
+					if (! ambiguity || ambiguity-97 == (*iterator)->getFile() || atoi(&ambiguity) == (*iterator)->getRank())
 					{	
 						// We found the right piece. Now make the move
 						makeMove(*iterator, cell, moveType);
@@ -212,16 +220,16 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 						// If it was written that the move was a check, it is validated here
 						if ( checkState == CheckStates::check)
 						{
-							std::cout << "checking in case of check" << std::endl;
+							// std::cout << "checking in case of check" << std::endl;
 							return validateCheck(*iterator);
 						}
 
 						return true;
 					}
-					else if ( ambiguity )
-					{
-						std::cout << "Oh no, ambiguity. Anyway, Im on: " << char(moveIterator->getFile() + magicNumber) << " and ambiguity was: " << ambiguity << std::endl;
-					}
+					// else if ( ambiguity )
+					// {
+					// 	std::cout << "Oh no, ambiguity. Anyway, Im on: " << moveIterator->getFile() << " and ambiguity was: " << atoi(&ambiguity) << std::endl;
+					// }
 				}
 			}
 
@@ -237,7 +245,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					if ( *moveIterator == cell)
 					{
 						// There was no abiguity, or there was one and the move found was in the right position
-						if (!ambiguity || ambiguity == moveIterator->getFile() + magicNumber || ambiguity == moveIterator->getRank())
+						if (!ambiguity || ambiguity-97 == moveIterator->getFile()  || ambiguity == moveIterator->getRank())
 						{
 							// The move made was indeed enPassant, not a regular capture
 							moveType = MoveTypeSymbols::enPassant;
@@ -251,17 +259,17 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 
 							return true;
 						}
-						else if ( ambiguity)
-						{
-							std::cout << "Oh no, ambiguity. Anyway, Im on: " << char(moveIterator->getFile() + magicNumber) << " and ambiguity was: " << ambiguity << std::endl;
-						}
+						// else if ( ambiguity)
+						// {
+						// 	std::cout << "Oh no, ambiguity. Anyway, Im on: " << moveIterator->getFile() << " and ambiguity was: " << ambiguity-97 << std::endl;
+						// }
 					}
 				}
 			}
 		}
 	}
 
-	std::cout << "El movimiento " << pieceSymbol << ambiguity << char(cell.file + 97) << abs(cell.rank-8) << " no es válido" << std::endl;
+	std::cerr << "ERROR: El movimiento " << pieceSymbol << ambiguity << char(cell.file + 97) << abs(cell.rank-8) << " no es válido" << std::endl;
 	// No piece was found
 	return false;
 }
