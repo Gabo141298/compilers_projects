@@ -37,7 +37,7 @@ game: header play
 	  | header play GAME_END;
 
 // Syntax
-header		: ID DATE NUMBER ID ID;
+header		: ID ID DATE NUMBER ID ID;
 
 play		: move
 			| play move

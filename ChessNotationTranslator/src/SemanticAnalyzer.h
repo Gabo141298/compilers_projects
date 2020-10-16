@@ -13,6 +13,7 @@ enum endResult{Empate, GananBlancas, GananNegras, EnCurso};
 struct Header
 {
 	std::string tournament;
+	std::string site;
 	std::string date;
 	int round;
 	std::string whitesPlayer;
