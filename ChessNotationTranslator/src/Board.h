@@ -7,6 +7,11 @@
 #include <iostream>
 #include <list>
 
+enum CheckStates
+{
+    none, check, mate
+};
+
 class Board
 {
   private: 
@@ -88,7 +93,7 @@ class Board
 
     /// This is for the semantic analysis. It finds the piece that the player wanted to move by
     /// looking at what piece can move to the given cell. It receives the piece symbol
-    Piece* findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity = '\0');
+    Piece* findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity = '\0', char promotionSymbol = 'Q', CheckStates checkState = CheckStates::none);
 };
 
 #endif

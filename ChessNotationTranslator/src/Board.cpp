@@ -183,7 +183,7 @@ void Board::resetOpponentEnPassants()
 	}
 }
 
-Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity)
+Piece* Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
 {
 	// We don't care about the color right now, 
 	// Determines if I have to check the white or black pieces
