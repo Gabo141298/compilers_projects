@@ -110,16 +110,25 @@ class Piece
 
   	friend std::ostream& operator<<(std::ostream &out, const Piece &piece);
 
+    /*!
+    * @brief determine the moves that the piece can make and store them 
+    * in the appropiate MoveTypes and possibleMoves vectors
+    */
   	virtual void calculatePossibleMoves() = 0;
 
+    /// Returns the struct with all the possible moves this piece can make
     inline MoveTypes& getPossibleMoves() { return this->possibleMoves; }
 
   	/// Returns the symbol of the piece ( 'p', 'K', 'r', etc. )
     inline char getSymbol() const { return this->symbol; }
 
-    inline int getRow() const { return currentPosition.file; }
-    inline int getFile() const { return currentPosition.row; }
+    /// Returns the attribute row from the current position of the piece
+    inline int getRow() const { return currentPosition.row; }
 
+    /// Returns the attribute file from the current position of the piece
+    inline int getFile() const { return currentPosition.file; }
+
+    /// Changes the position from the piece to new Coordinates
     inline void setPosition(Coordinates newPosition) {currentPosition = newPosition; }
 
     /// Returns the Coordinates struct of the piece

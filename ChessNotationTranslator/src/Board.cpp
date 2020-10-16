@@ -108,30 +108,6 @@ bool Board::isRightTurn(Piece* selectedPiece)
     return ( manager.getTurn() == 'W' );
 }
 
-void Board::savePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
-{
-    // If the cell has a Piece, it keeps the pointer, else, it will have a nullptr.
-    selectedPiece = squares[rowPos][colPos];
-    if(selectedPiece)
-    {
-        // Checks if the piece selected corresponds with the current turn
-        if ( isRightTurn(selectedPiece) )
-        {
-            validMoves = selectedPiece->getPossibleMoves();
-            std::cerr << validMoves.commutingMoves.size() << '-' << validMoves.capturingMoves.size() << std::endl;
-
-            // If there are no possible moves, then the piece shouldn't be selected.
-            if(validMoves.commutingMoves.size() == 0 && validMoves.capturingMoves.size() == 0)
-                selectedPiece = nullptr;
-        }
-        // If the turn wasn't correct, the piece could not be selected.
-        else
-        {
-            selectedPiece = nullptr;
-        }
-    }
-}
-
 void Board::deletePieceFromBoard(int row, int col)
 {
 	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
@@ -192,20 +168,17 @@ void Board::movePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos)
 
 void Board::resetOpponentEnPassants()
 {
-	char opponentSymbol = (manager.getTurn() == 'W') ? 'P' : 'p';
+	// Get all the pieces from the opponent
+	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
 
-	// Initialize the board with the normal chess starting position
-	for (int row = 0; row < this->boardSize; ++row)
+	// Iterate through the opponent's pieces
+	for ( auto iterator = pieces.begin(); iterator != pieces.end(); ++iterator)
 	{
-		// All the other rows start with the same piece, either pawns or nothing
-		for (int col = 0; col < this->boardSize; ++col)
+		// Get the piece symbol in upper case and check if it is a pawn
+		if ( toupper( (*iterator)->getSymbol() ) == 'P') 
 		{
-			if(squares[row][col]->getSymbol() == opponentSymbol)
-			{
-				// set the justMovedTwiced to false
-				//squares[row][col]->getSquare->resetJustMovedTwice();
-				;
-			}			
+			// Set the justMovedTwice attribute to 0, so that the pawn cannot be taken en passant anymore
+			(*iterator)->resetJustMovedTwice(); 
 		}
 	}
 }
