@@ -13,10 +13,6 @@ void Pawn::calculatePossibleMoves()
     // If the pawn is black, it moves up, if it is white, it moves down.
     int direction = (this->symbol == 'P') ? -1 : 1;
     
-    // if(this->symbol =='p' && currentPosition.file ==4)
-    // {
-
-    // }
     // If this is the pawns first move, it can move twice front (if the cell is free)
     if ( isFirstMove() && isFree(currentPosition.rank+(2*direction), currentPosition.file))
     {

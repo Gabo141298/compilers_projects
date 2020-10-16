@@ -37,7 +37,7 @@ struct Coordinates
 
     friend std::ostream& operator<<(std::ostream &out, const Coordinates &coordinate)
     {
-        return out << "File: " << char(coordinate.file + 97) << " Rank: " << abs(coordinate.rank-8);
+        return out << "(," << char(coordinate.file + 97) << ")" << abs(coordinate.rank-8);
     }
 };
 

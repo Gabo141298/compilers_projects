@@ -11,7 +11,6 @@ std::ostream& operator<< (std::ostream &out, const Piece& piece)
 
 bool Piece::isEnemy( short rank, short file)
 {
-    std::cout <<  "Search enemy" << rank << file <<std::endl;
     // If it is out of boundaries
     if ( file < 0 || file > 7 || rank < 0 || rank > 7 || board->getSquare(rank, file) == nullptr)
         return false;
@@ -24,7 +23,7 @@ bool Piece::isEnemy( short rank, short file)
     }
 
     // Return true if the piece in the cell is the opposite color to this
-    return std::isupper(this->board->getSquare(rank, file)->getSymbol());
+    return std::islower(this->board->getSquare(rank, file)->getSymbol());
 }
 
 bool Piece::isFree( short rank, short file)
