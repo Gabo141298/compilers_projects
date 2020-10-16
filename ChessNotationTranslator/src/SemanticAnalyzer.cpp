@@ -34,6 +34,10 @@ std::ostream& operator<<(std::ostream& stream, const Header& header)
 
 std::ostream& operator<<(std::ostream& stream, const SemanticAnalyzer& analyzer)
 {
-	stream << analyzer.header << analyzer.board << std::endl;
+	stream << analyzer.header ;
+	std::string buf;
+	// while( analyzer.gameStream >> buf)
+	// 	stream << buf;
+	// stream << std::endl;
 	return stream;
 }
