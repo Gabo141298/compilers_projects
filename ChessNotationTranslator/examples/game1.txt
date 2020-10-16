@@ -1,1 +1,1 @@
-"Dummies Tournament", 2020.10.14, 0 ,"Duffus", "Ruffus", Peon e4, Peon e5, Alfil c4, Caballo c6, Reina h5, Alfil e7, Reina toma f7 mate, Ganan blancas
+"Dummies Tournament", "Dummy Island", 2020.10.14, 0 ,"Duffus", "Ruffus", Peon e4, Peon e5, Alfil c4, Caballo c6, Reina h5, Alfil e7, Reina toma f7 mate, Ganan blancas
