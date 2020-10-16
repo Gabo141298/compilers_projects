@@ -54,7 +54,7 @@ struct Coordinates
 
 enum MoveTypeSymbols
 {
-    commuting, capturing, enPassant, promotion, shortCastle, longCastle
+    commuting, capturing, enPassant, promotion, shortCastle, longCastle, capturingPromotion
 };
 
 class Piece

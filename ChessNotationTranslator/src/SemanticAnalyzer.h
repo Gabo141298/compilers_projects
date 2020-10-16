@@ -3,6 +3,7 @@
 #include "Board.h"
 
 #include <iostream>
+#include <sstream>
 #include <string>
 
 class chess_parseCustomVisitor;
@@ -28,5 +29,6 @@ class SemanticAnalyzer
 	Header header;
 	Board board;
 
+	std::stringstream gameStream;
 	friend std::ostream& operator<<(std::ostream& stream, const SemanticAnalyzer& analyzer);
 };

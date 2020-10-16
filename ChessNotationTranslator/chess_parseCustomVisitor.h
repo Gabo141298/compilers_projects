@@ -10,11 +10,13 @@ class chess_parseCustomVisitor  : public chess_parseBaseVisitor
 private:
 SemanticAnalyzer* semanticAnalyzer;
 const char pieceSymbols [10]= {'\0', '\0','N', 'K', 'B', 'R', 'P', '\0', '\0', 'Q'};
+size_t current_movement = 2;
 
 private:
 
 	endResult getWinner(chess_parseParser::GameContext *ctx);
 	void fillHeader(chess_parseParser::GameContext *ctx);
+	void printMovement(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity = '\0', char promotionSymbol = 'Q', CheckStates checkState = CheckStates::none);
 
 
 public:

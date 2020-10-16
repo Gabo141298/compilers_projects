@@ -63,29 +63,43 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 	Coordinates cell;
 	char pieceSymbol;
 	MoveTypeSymbols moveType;
-	char ambiguity;
+	char ambiguity = '\0';
+	char promotionSymbol = 'Q';
+	CheckStates checkState;
+
+	if(ctx->JAQUE())
+		checkState = CheckStates::check;
+	else if(ctx->MATE())
+		checkState = CheckStates::mate;
+	else
+		checkState = CheckStates::none;
+
 	if(ctx->move()->children[0]->getText() == "Enroque corto")
 	{
-		std::cout << "Enroque corto" << std::endl;
+		// std::cout << "Enroque corto" << std::endl;
 		pieceSymbol = 'K';
-		moveType = castle;
+		moveType = shortCastle;
 	}
 	else if(ctx->move()->children[0]->getText() == "Enroque largo")
 	{
-		std::cout << "Enroque largo" << std::endl;
+		// std::cout << "Enroque largo" << std::endl;
 		pieceSymbol = 'K';
-		moveType = castle;
+		moveType = longCastle;
 	}
 	else
 	{
 		if(auto context = dynamic_cast<chess_parseParser::PromotionContext*>(ctx->move()->children[0]))
 		{
 			pieceSymbol = 'P' ;
-			moveType = MoveTypeSymbols::promotion;			
+			if(context->CAPTURES())
+				moveType = MoveTypeSymbols::capturingPromotion;
+			else
+				moveType = MoveTypeSymbols::promotion;			
 			cell.row = context->square()->RANK()->getText()[0];
 			cell.file = context->square()->FILE()->getText()[0];
 			if(context->in_position())
 				ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
+			promotionSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->promotion_piece()->children[0])->getSymbol()->getType()];
 		} 
 		else if(auto context = dynamic_cast<chess_parseParser::CommuteContext*>(ctx->move()->children[0]))
 		{
@@ -107,10 +121,46 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 			if(context->in_position())
 				ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
 		} 
-
 	}
 
+	if( this->semanticAnalyzer->board.findPieceToMove(cell, pieceSymbol, moveType, ambiguity, promotionSymbol, checkState))
+		printMovement(cell, pieceSymbol, moveType, ambiguity, promotionSymbol, checkState);
+	else
+		exit(1);
+
 	return "Hola";
+}
+
+void chess_parseCustomVisitor::printMovement(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
+{
+	// if(this->currentMovement % 2 == 0)
+	// 	gameStream << currentMovement%2 - 1 << ". ";
+	// if(moveType == MoveTypeSymbols::longCastle)
+	// {
+	// 	gameStream << "0-0-0 "; 
+	// 	return;
+	// }
+	// else if (moveType == MoveTypeSymbols::shortCastle)
+	// {
+	// 	gameStream << "0-0 ";
+	// 	return;
+	// }
+
+	// if(pieceSymbol != 'P')
+	// 	gameStream << pieceSymbol;
+	// if(ambiguity != '\0')
+	// 	gameStream << ambiguity;
+	// if(moveType == MoveTypeSymbols::capturing || moveType == MoveTypeSymbols::capturingPromotion)
+	// 	gameStream << 'x';
+	
+	// gameStream << cell.row << cell.file
+
+	// if(moveType == MoveTypeSymbols::promotion || moveType == MoveTypeSymbols::capturingPromotion)
+	// {
+	// 	gameStream << "=" << promotionSymbol;
+	// }
+
+	// gameStream << " ";
 }
 
 
