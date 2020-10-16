@@ -9,9 +9,9 @@
 
 #include <cctype>
 
-Piece* Board::factory(char symbol, int row, int col)
+Piece* Board::factory(char symbol, int file, int rank)
 {
-	Coordinates position(row,col);
+	Coordinates position(file,rank);
 	switch(symbol)
 	{
 		case 'B':
@@ -40,61 +40,61 @@ Piece* Board::factory(char symbol, int row, int col)
 Board::Board()
 {
 	// Initialize the board with the normal chess starting position
-	for (int row = 0; row < this->boardSize; ++row)
+	for (int file = 0; file < this->boardSize; ++file)
 	{
-		// Sets the pieces for the first and last rows
+		// Sets the pieces for the first and last files
 		// Lower case means a black piece, upper case is a white piece
-		if (row == 0)
+		if (file == 0)
 		{
-			squares[0][0] = factory( 'r', row, 0); 
-			squares[0][1] = factory( 'n', row, 1); 
-			squares[0][2] = factory( 'b', row, 2); 
-			squares[0][3] = factory( 'q', row, 3); 
-			squares[0][4] = factory( 'k', row, 4); 
-			squares[0][5] = factory( 'b', row, 5); 
-			squares[0][6] = factory( 'n', row, 6); 
-			squares[0][7] = factory( 'r', row, 7); 
+			squares[0][0] = factory( 'r', file, 0); 
+			squares[0][1] = factory( 'n', file, 1); 
+			squares[0][2] = factory( 'b', file, 2); 
+			squares[0][3] = factory( 'q', file, 3); 
+			squares[0][4] = factory( 'k', file, 4); 
+			squares[0][5] = factory( 'b', file, 5); 
+			squares[0][6] = factory( 'n', file, 6); 
+			squares[0][7] = factory( 'r', file, 7); 
 
-			for (int col = 0; col < this->boardSize; ++col)
-				this->blackPieces.push_back(squares[row][col]);
+			for (int rank = 0; rank < this->boardSize; ++rank)
+				this->blackPieces.push_back(squares[file][rank]);
 		}
-		else if ( row == 7)
+		else if ( file == 7)
 		{
-			squares[7][0] = factory( 'R', row, 0); 
-			squares[7][1] = factory( 'N', row, 1); 
-			squares[7][2] = factory( 'B', row, 2); 
-			squares[7][3] = factory( 'Q', row, 3); 
-			squares[7][4] = factory( 'K', row, 4); 
-			squares[7][5] = factory( 'B', row, 5); 
-			squares[7][6] = factory( 'N', row, 6); 
-			squares[7][7] = factory( 'R', row, 7); 
+			squares[7][0] = factory( 'R', file, 0); 
+			squares[7][1] = factory( 'N', file, 1); 
+			squares[7][2] = factory( 'B', file, 2); 
+			squares[7][3] = factory( 'Q', file, 3); 
+			squares[7][4] = factory( 'K', file, 4); 
+			squares[7][5] = factory( 'B', file, 5); 
+			squares[7][6] = factory( 'N', file, 6); 
+			squares[7][7] = factory( 'R', file, 7); 
 
-			for (int col = 0; col < this->boardSize; ++col)
-				this->whitePieces.push_back(squares[row][col]);
+			for (int rank = 0; rank < this->boardSize; ++rank)
+				this->whitePieces.push_back(squares[file][rank]);
 		}
 		else 
 		{
-			// All the other rows start with the same piece, either pawns or nothing
-			for (int col = 0; col < this->boardSize; ++col)
+			// All the other files start with the same piece, either pawns or nothing
+			for (int rank = 0; rank < this->boardSize; ++rank)
 			{
-				Coordinates position(row, col);
+				Coordinates position(file, rank);
 
-				// The second row is full of black pawns
-				if (row == 1)
+				// The second file is full of black pawns
+				if (file == 1)
 				{
-					squares[row][col] = factory('p', row, col);
-					this->blackPieces.push_back(squares[row][col]);
+					squares[file][rank] = factory('p', file, rank);
+					this->blackPieces.push_back(squares[file][rank]);
 				}	
 
-				// The second to last row is full of white pawns
-				else if (row == 6)
+				// The second to last file is full of white pawns
+				else if (file == 6)
 				{
-					squares[row][col] = factory('P', row, col);
-					this->whitePieces.push_back(squares[row][col]);
+					squares[file][rank] = factory('P', file, rank);
+					this->whitePieces.push_back(squares[file][rank]);
 				}
-				// All the other rows have nothing
+				// All the other files have nothing
 				else
-					squares[row][col] = nullptr;
+					squares[file][rank] = nullptr;
 			}
 		}
 	}
@@ -108,13 +108,13 @@ bool Board::isRightTurn(Piece* selectedPiece)
     return ( manager.getTurn() == 'W' );
 }
 
-void Board::deletePieceFromBoard(int row, int col)
+void Board::deletePieceFromBoard(int file, int rank)
 {
 	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
 	
 	for ( auto iterator = pieces.begin(); iterator != pieces.end(); ++iterator )
 	{
-		if ( (*iterator)->getRow() == row && (*iterator)->getFile() == col)
+		if ( (*iterator)->getFile() == file && (*iterator)->getRank() == rank)
 			if ( manager.getTurn() == 'W')
 				this->whitePieces.erase(iterator);
 			else
@@ -122,8 +122,8 @@ void Board::deletePieceFromBoard(int row, int col)
 
 	}
 
-    delete squares[row][col];
-    squares[row][col] = nullptr;
+    delete squares[file][rank];
+    squares[file][rank] = nullptr;
 }
 
 
@@ -146,13 +146,18 @@ void Board::resetOpponentEnPassants()
 
 bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
 {
-	// We don't care about the color right now, 
+	// We don't care about the rankor right now, 
 	// Determines if I have to check the white or black pieces
 	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
 
 	// Goes piece by piece checking if it is the right one
 	for(auto iterator = this->whitePieces.begin(); iterator != this->whitePieces.end(); ++iterator)
 	{
+		// Method that determines the possible moves of the piece in the current turn
+		(*iterator)->calculatePossibleMoves();
+		
+		//std::cout << (*iterator)->getPossibleMoves().commutingMoves.size() << " HELLO THERE " << cell.getFile() << cell.getRank() << std::endl;
+		
 		if ((*iterator)->getSymbol() == pieceSymbol)
 		{
 			// Get the struct with all the moves in their own moveTypes vectors
@@ -190,7 +195,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 			for (auto moveIterator = coordinates->begin(); moveIterator != coordinates->end(); ++moveIterator )
 			{
 				if ( *moveIterator == cell)
-					if (! ambiguity || ambiguity == moveIterator->getRow() || ambiguity == moveIterator->getFile())
+					if (! ambiguity || ambiguity == moveIterator->getFile() || ambiguity == moveIterator->getRank())
 					{	
 						// We found the right piece. Now make the move
 						makeMove(*iterator, cell, moveType);
@@ -215,7 +220,7 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 					if ( *moveIterator == cell)
 					{
 						// There was no abiguity, or there was one and the move found was in the right position
-						if (!ambiguity || ambiguity == moveIterator->getRow() || ambiguity == moveIterator->getFile())
+						if (!ambiguity || ambiguity == moveIterator->getFile() || ambiguity == moveIterator->getRank())
 						{
 							// The move made was indeed enPassant, not a regular capture
 							moveType = MoveTypeSymbols::enPassant;
@@ -236,11 +241,13 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 	}
 
 	// No piece was found
-	return true;
+	return false;
 }
 
 void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, char promotionSymbol)
 {
+	std::cout << "PIECE: " << piece->getSymbol() << " CELL: " << cell.getFile() << cell.getRank() << std::endl;
+
 	// If the move was only moving a piece to a different square
 	if ( moveType == MoveTypeSymbols::commuting)
 	{
@@ -257,19 +264,19 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, c
     else if ( moveType == MoveTypeSymbols::promotion || moveType == MoveTypeSymbols::capturingPromotion)
     {
         // Delete the pawn from the board
-        delete squares[piece->getPosition().row][piece->getPosition().file];
+        delete squares[piece->getPosition().file][piece->getPosition().file];
 
-        short row = cell.getRow(); short file = cell.getFile();
+        short file = cell.getFile(); short rank = cell.getRank();
 
         // Makes sure the piece is of the right color
         char newSymbol = (manager.getTurn() == 'W') ? toupper(promotionSymbol) : tolower(promotionSymbol);
 
         // In case the promotion was also a capture, we have to delete the previous piece
         if ( moveType == MoveTypeSymbols::capturingPromotion)
-        	deletePieceFromBoard(row, file);
+        	deletePieceFromBoard(file, file);
 
         // Create the new piece in the 
-        squares[row][file] = factory( newSymbol, row, file);
+        squares[file][file] = factory( newSymbol, file, file);
     }
 
 
@@ -285,18 +292,18 @@ void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, c
 
 void Board::relocatePiece(Piece* piece, Coordinates cell, bool deletePiece)
 {
-	short row = piece->getRow();
 	short file = piece->getFile();
+	short rank = piece->getRank();
 
 	// The piece is no longer in this position
-	squares[row][file] = nullptr;
+	squares[file][rank] = nullptr;
 
 	// This is when there was a capture, so the piece has to be removed
 	if (deletePiece)
-		deletePieceFromBoard( cell.getRow(), cell.getFile() );
+		deletePieceFromBoard( cell.getFile(), cell.getRank() );
 
 	// Now the board has the piece in the new position
-	squares[cell.getRow()][cell.getFile()] = piece;
+	squares[cell.getFile()][cell.getRank()] = piece;
 
 	// Call the method so that the piece knows its new place
 	piece->setPosition(cell);
@@ -304,25 +311,25 @@ void Board::relocatePiece(Piece* piece, Coordinates cell, bool deletePiece)
 
 Board::~Board()
 {
-	for (int row = 0; row < boardSize; ++row)
+	for (int file = 0; file < boardSize; ++file)
 	{
-		for (int col = 0; col < boardSize; ++col)
+		for (int rank = 0; rank < boardSize; ++rank)
 		{
-			delete this->squares[row][col];
+			delete this->squares[file][rank];
 		}
 	}
 }
 
 std::ostream& operator<<(std::ostream &out, const Board &board)
 {
-	for(int row = 0; row < board.boardSize; ++row)
+	for(int file = 0; file < board.boardSize; ++file)
 	{
- 		for(int col = 0; col < board.boardSize; ++col)
+ 		for(int rank = 0; rank < board.boardSize; ++rank)
  		{
- 			if(board.squares[row][col] == nullptr)
+ 			if(board.squares[file][rank] == nullptr)
  				out << '_';
  			else
- 				out	 << *board.squares[row][col];
+ 				out	 << *board.squares[file][rank];
  			out << ' ';
  		}
  		out << std::endl;
@@ -333,13 +340,13 @@ std::ostream& operator<<(std::ostream &out, const Board &board)
 
 Coordinates Board::getKingPosition()
 {
-	// Gets the symbol of the king of the opposite color
+	// Gets the symbol of the king of the opposite rankor
 	char kingSymbol = (manager.getTurn() == 'W') ? 'k' : 'K';
 
-	for ( short row = 0; row < 8; ++row)
-		for ( short col = 0; row < 8; ++row)
-			if ( this->squares[row][col]->getSymbol() == kingSymbol) 
-				return Coordinates(row,col);
+	for ( short file = 0; file < 8; ++file)
+		for ( short rank = 0; file < 8; ++file)
+			if ( this->squares[file][rank]->getSymbol() == kingSymbol) 
+				return Coordinates(file,rank);
 
 	// It should never get to this point
 	return Coordinates(0,0);
@@ -371,10 +378,10 @@ bool Board::isEnemy( Coordinates cell)
 
     // If the piece is black, check if the cell is upper case
     if ( std::islower(piece->getSymbol() ) )
-        return std::isupper(getSquare(row,file)->getSymbol());
+        return std::isupper(getSquare(file,file)->getSymbol());
 
-    // Return true if the piece in the cell is the opposite color to this
-    return std::isupper(getSquare(row,file)->getSymbol()); */
+    // Return true if the piece in the cell is the opposite rankor to this
+    return std::isupper(getSquare(file,file)->getSymbol()); */
 
     return true;
 }
@@ -382,11 +389,11 @@ bool Board::isEnemy( Coordinates cell)
 
 bool Board::isUnderAttack(Coordinates cell)
 {
-	for ( int row = 0; row < boardSize; ++row)
+	for ( int file = 0; file < boardSize; ++file)
 	{
- 		for ( int col = 0; col < boardSize; ++col)
+ 		for ( int rank = 0; rank < boardSize; ++rank)
  		{
- 			Piece* pieceToCheck = this->squares[row][col];
+ 			Piece* pieceToCheck = this->squares[file][rank];
  			if ( pieceToCheck )
  				if ( isEnemy(cell) )
  				{
