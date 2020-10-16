@@ -61,75 +61,79 @@ antlrcpp::Any chess_parseCustomVisitor::visitHeader(chess_parseParser::HeaderCon
 antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext *ctx)  
 {
 	visitChildren(ctx);
-	Coordinates cell;
-	char pieceSymbol;
-	MoveTypeSymbols moveType;
-	short ambiguity = '\0';
-	char promotionSymbol = 'Q';
-	CheckStates checkState;
 
-	if(ctx->JAQUE())
-		checkState = CheckStates::check;
-	else if(ctx->MATE())
-		checkState = CheckStates::mate;
-	else
-		checkState = CheckStates::none;
+	if(this->noErrors)
+	{
+		Coordinates cell;
+		char pieceSymbol;
+		MoveTypeSymbols moveType;
+		short ambiguity = '\0';
+		char promotionSymbol = 'Q';
+		CheckStates checkState;
 
-	if(ctx->move()->children[0]->getText() == "Enroque corto")
-	{
-		// std::cout << "Enroque corto" << std::endl;
-		pieceSymbol = 'K';
-		moveType = shortCastle;
-	}
-	else if(ctx->move()->children[0]->getText() == "Enroque largo")
-	{
-		// std::cout << "Enroque largo" << std::endl;
-		pieceSymbol = 'K';
-		moveType = longCastle;
-	}
-	else
-	{
-		if(auto context = dynamic_cast<chess_parseParser::PromotionContext*>(ctx->move()->children[0]))
-		{
-			pieceSymbol = 'P' ;
-			if(context->CAPTURES())
-				moveType = MoveTypeSymbols::capturingPromotion;
-			else
-				moveType = MoveTypeSymbols::promotion;			
-			cell.row = context->square()->RANK()->getText()[0]-48;
-			cell.file = context->square()->FILE()->getText()[0]-97;
-			// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
-			if(context->in_position())
-				ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
-			promotionSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->promotion_piece()->children[0])->getSymbol()->getType()];
-		} 
-		else if(auto context = dynamic_cast<chess_parseParser::CommuteContext*>(ctx->move()->children[0]))
-		{
-			pieceSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->piece()->children[0])->getSymbol()->getType()];
-			// std::cout << pieceSymbol << std::endl;
-			moveType = MoveTypeSymbols::commuting;			
-			cell.row = context->square()->RANK()->getText()[0]-48;
-			cell.file = context->square()->FILE()->getText()[0]-97;
-			// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
-			if(context->in_position())
-				ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0]: context->in_position()->FILE()->getText()[0];
-		} 
-		else if(auto context = dynamic_cast<chess_parseParser::CaptureContext*>(ctx->move()->children[0]))
-		{
-			pieceSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->piece()->children[0])->getSymbol()->getType()];
-			moveType = MoveTypeSymbols::capturing;			
-			cell.row = context->square()->RANK()->getText()[0]-48;
-			cell.file = context->square()->FILE()->getText()[0]-98;
-			// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
-			if(context->in_position())
-				ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
-		} 
-	}
+		if(ctx->JAQUE())
+			checkState = CheckStates::check;
+		else if(ctx->MATE())
+			checkState = CheckStates::mate;
+		else
+			checkState = CheckStates::none;
 
-	if( this->semanticAnalyzer->board.findPieceToMove(cell, pieceSymbol, moveType, ambiguity, promotionSymbol, checkState))
-		printMovement(cell, pieceSymbol, moveType, ambiguity, promotionSymbol, checkState);
-	else
-		exit(1);
+		if(ctx->move()->children[0]->getText() == "Enroque corto")
+		{
+			// std::cout << "Enroque corto" << std::endl;
+			pieceSymbol = 'K';
+			moveType = shortCastle;
+		}
+		else if(ctx->move()->children[0]->getText() == "Enroque largo")
+		{
+			// std::cout << "Enroque largo" << std::endl;
+			pieceSymbol = 'K';
+			moveType = longCastle;
+		}
+		else
+		{
+			if(auto context = dynamic_cast<chess_parseParser::PromotionContext*>(ctx->move()->children[0]))
+			{
+				pieceSymbol = 'P' ;
+				if(context->CAPTURES())
+					moveType = MoveTypeSymbols::capturingPromotion;
+				else
+					moveType = MoveTypeSymbols::promotion;			
+				cell.row = context->square()->RANK()->getText()[0]-48;
+				cell.file = context->square()->FILE()->getText()[0]-97;
+				// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
+				if(context->in_position())
+					ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
+				promotionSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->promotion_piece()->children[0])->getSymbol()->getType()];
+			} 
+			else if(auto context = dynamic_cast<chess_parseParser::CommuteContext*>(ctx->move()->children[0]))
+			{
+				pieceSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->piece()->children[0])->getSymbol()->getType()];
+				// std::cout << pieceSymbol << std::endl;
+				moveType = MoveTypeSymbols::commuting;			
+				cell.row = context->square()->RANK()->getText()[0]-48;
+				cell.file = context->square()->FILE()->getText()[0]-97;
+				// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
+				if(context->in_position())
+					ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0]: context->in_position()->FILE()->getText()[0];
+			} 
+			else if(auto context = dynamic_cast<chess_parseParser::CaptureContext*>(ctx->move()->children[0]))
+			{
+				pieceSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->piece()->children[0])->getSymbol()->getType()];
+				moveType = MoveTypeSymbols::capturing;			
+				cell.row = context->square()->RANK()->getText()[0]-48;
+				cell.file = context->square()->FILE()->getText()[0]-98;
+				// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
+				if(context->in_position())
+					ambiguity = context->in_position()->RANK()? context->in_position()->RANK()->getText()[0] : context->in_position()->FILE()->getText()[0];
+			} 
+		}
+
+		if( this->semanticAnalyzer->board.findPieceToMove(cell, pieceSymbol, moveType, ambiguity, promotionSymbol, checkState))
+			printMovement(cell, pieceSymbol, moveType, ambiguity, promotionSymbol, checkState);
+		else
+			this->noErrors = false;
+	}
 
 	return "Hola";
 }
