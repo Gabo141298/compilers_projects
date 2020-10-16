@@ -99,7 +99,7 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 					moveType = MoveTypeSymbols::capturingPromotion;
 				else
 					moveType = MoveTypeSymbols::promotion;			
-				cell.row = context->square()->RANK()->getText()[0]-48;
+				cell.rank = context->square()->RANK()->getText()[0]-48;
 				cell.file = context->square()->FILE()->getText()[0]-97;
 				// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
 				if(context->in_position())
@@ -111,7 +111,7 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 				pieceSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->piece()->children[0])->getSymbol()->getType()];
 				// std::cout << pieceSymbol << std::endl;
 				moveType = MoveTypeSymbols::commuting;			
-				cell.row = context->square()->RANK()->getText()[0]-48;
+				cell.rank = context->square()->RANK()->getText()[0]-48;
 				cell.file = context->square()->FILE()->getText()[0]-97;
 				// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
 				if(context->in_position())
@@ -121,7 +121,7 @@ antlrcpp::Any chess_parseCustomVisitor::visitPlay(chess_parseParser::PlayContext
 			{
 				pieceSymbol = pieceSymbols[static_cast<antlr4::tree::TerminalNode *>(context->piece()->children[0])->getSymbol()->getType()];
 				moveType = MoveTypeSymbols::capturing;			
-				cell.row = context->square()->RANK()->getText()[0]-48;
+				cell.rank = context->square()->RANK()->getText()[0]-48;
 				cell.file = context->square()->FILE()->getText()[0]-98;
 				// std::cout << pieceSymbol << context->square()->RANK()->getText()[0] << cell.row << "|" << context->square()->FILE()->getText()[0]<< cell.file << std::endl;
 				if(context->in_position())
@@ -160,7 +160,7 @@ void chess_parseCustomVisitor::printMovement(Coordinates cell, char pieceSymbol,
 	if(moveType == MoveTypeSymbols::capturing || moveType == MoveTypeSymbols::capturingPromotion)
 		semanticAnalyzer->gameStream << 'x';
 	char fileChar = cell.file+97;
-	semanticAnalyzer->gameStream << std::string(&fileChar) << cell.row;
+	semanticAnalyzer->gameStream << std::string(&fileChar) << cell.rank;
 
 	if(moveType == MoveTypeSymbols::promotion || moveType == MoveTypeSymbols::capturingPromotion)
 	{

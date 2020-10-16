@@ -64,6 +64,9 @@ class Board
     /// Gets the position of the enemy king
     Coordinates getKingPosition();
 
+    /// For testing purposes mostly
+    void printBoard();
+
   public:
   	/// Defines the board size. Really, it's not going to change
     const static unsigned char boardSize = 8;

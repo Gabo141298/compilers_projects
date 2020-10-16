@@ -11,7 +11,7 @@
 
 Piece* Board::factory(char symbol, int file, int rank)
 {
-	Coordinates position(file,rank);
+	Coordinates position(rank,file);
 	switch(symbol)
 	{
 		case 'B':
@@ -146,18 +146,22 @@ void Board::resetOpponentEnPassants()
 
 bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity, char promotionSymbol, CheckStates checkState)
 {
-	// We don't care about the rankor right now, 
+    printBoard();
+
 	// Determines if I have to check the white or black pieces
 	std::vector<Piece*> pieces = (manager.getTurn() == 'W') ? this->whitePieces : this->blackPieces;
 
+	//char charFile = cell.file+97;
+	std::cout << "TURNO: " << manager.getTurn() << " Celda: " << cell <<  std::endl;
+
 	// Goes piece by piece checking if it is the right one
-	for(auto iterator = this->whitePieces.begin(); iterator != this->whitePieces.end(); ++iterator)
+	for(auto iterator = pieces.begin(); iterator != pieces.end(); ++iterator)
 	{
+		std::cout << "Currently printing the piece: " << (*iterator)->getSymbol() << " in cell: " << (*iterator)->getPosition() << std::endl;
+
 		// Method that determines the possible moves of the piece in the current turn
 		(*iterator)->calculatePossibleMoves();
-		
-		//std::cout << (*iterator)->getPossibleMoves().commutingMoves.size() << " HELLO THERE " << cell.getFile() << cell.getRank() << std::endl;
-		
+	
 		if ((*iterator)->getSymbol() == pieceSymbol)
 		{
 			// Get the struct with all the moves in their own moveTypes vectors
@@ -169,10 +173,12 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 			switch(moveType)
 			{
 				case MoveTypeSymbols::commuting:  
+					//std::cout << "A commuting move" << std::endl;
 					coordinates = &moves.commutingMoves; 
 					break;
 
 				case MoveTypeSymbols::capturing:  
+					std::cout << "A capturing move" << std::endl;
 					coordinates = &moves.capturingMoves; 
 					break;
 
@@ -194,6 +200,8 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 			// We found a possible piece. check if it can move to the given cell
 			for (auto moveIterator = coordinates->begin(); moveIterator != coordinates->end(); ++moveIterator )
 			{
+				std::cout << "Possible move: " << (*iterator)->getSymbol() << " from: " << (*iterator)->getPosition() << " to: " << *moveIterator << std::endl;
+		
 				if ( *moveIterator == cell)
 					if (! ambiguity || ambiguity == moveIterator->getFile() || ambiguity == moveIterator->getRank())
 					{	
@@ -246,7 +254,8 @@ bool Board::findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols 
 
 void Board::makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, char promotionSymbol)
 {
-	std::cout << "PIECE: " << piece->getSymbol() << " CELL: " << cell.getFile() << cell.getRank() << std::endl;
+
+	//std::cout << "PIECE: " << piece->getSymbol() << " CELL: " << cell.getFile() << cell.getRank() << std::endl;
 
 	// If the move was only moving a piece to a different square
 	if ( moveType == MoveTypeSymbols::commuting)
@@ -403,4 +412,19 @@ bool Board::isUnderAttack(Coordinates cell)
 	}
 
 	return false;
+}
+
+void Board::printBoard()
+{
+	for ( int file = 0; file < boardSize; ++file)
+	{
+ 		for ( int rank = 0; rank < boardSize; ++rank)
+ 		{
+ 			if ( squares[file][rank])
+ 				std::cout << squares[file][rank]->getSymbol() << " ";
+ 			else 
+ 				std::cout << "- ";
+ 		}
+ 		std::cout << std::endl;
+	}
 }

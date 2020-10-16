@@ -20,8 +20,8 @@ void King::calculatePossibleMoves()
     // Goes through the 8 possible directions
     for ( int direction = 0; direction < 8; ++direction)
     {
-    	short newX = currentPosition.row + x[direction];
-    	short newY = currentPosition.file + y[direction];
+    	short newX = currentPosition.file + x[direction];
+    	short newY = currentPosition.rank + y[direction];
 
         // If the cell is free, add the move to commutingMoves
     	if ( isFree(newX, newY) ) 

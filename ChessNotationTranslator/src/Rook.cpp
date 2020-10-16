@@ -18,8 +18,8 @@ void Rook::calculatePossibleMoves()
     for ( int direction = 0; direction < 4; ++direction)
     {
         // The new x and y to check are added the direction
-        short x = currentPosition.row + xArray[direction];
-        short y = currentPosition.file + yArray[direction];
+        short x = currentPosition.file + xArray[direction];
+        short y = currentPosition.rank + yArray[direction];
 
         // While the cell is within boundaries and is free
         while( x>=0 && x<8 && y>=0 && y<8 && isFree(x, y))

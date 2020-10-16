@@ -2,6 +2,7 @@
 #define PIECE_H
 
 #include <cctype>
+#include <cmath>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -33,6 +34,11 @@ struct Coordinates
     inline short getRank() { return this->rank; }
 
     inline short getFile() { return this->file; }
+
+    friend std::ostream& operator<<(std::ostream &out, const Coordinates &coordinate)
+    {
+        out << "File: " << char(coordinate.file + 97) << " Rank: " << abs(coordinate.rank-7)+1;
+    }
 };
 
 /** Struct that  stores 5 arrays,  each with different types
