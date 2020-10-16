@@ -9,26 +9,28 @@ std::ostream& operator<< (std::ostream &out, const Piece& piece)
     return out;
 }
 
-bool Piece::isEnemy( short row, short file)
+bool Piece::isEnemy( short rank, short file)
 {
     // If it is out of boundaries
-    if ( row < 0 || row > 7 || file < 0 || file > 7 || board->getSquare(row,file) == nullptr)
+    if ( file < 0 || file > 7 || rank < 0 || rank > 7 || board->getSquare(rank, file) == nullptr)
         return false;
 
     // If the piece is black, check if the cell is upper case
     if ( std::islower(this->symbol) )
-        return std::isupper(board->getSquare(row,file)->getSymbol());
+    {
+        return std::isupper(board->getSquare(rank, file)->getSymbol());
+    }
 
     // Return true if the piece in the cell is the opposite color to this
-    return std::isupper(this->board->getSquare(row,file)->getSymbol());
+    return std::islower(this->board->getSquare(rank, file)->getSymbol());
 }
 
-bool Piece::isFree( short row, short file)
+bool Piece::isFree( short rank, short file)
 {
     // If the cell is out of boundaries, it cannot be free
-	if ( row < 0 || row > 7 || file < 0 || file > 7)
+	if ( file < 0 || file > 7 || rank < 0 || rank > 7)
 		return false;
 
     // Return true if the cell is not occupied, 
-	return (this->board->getSquare(row,file)== nullptr);
+	return (this->board->getSquare(rank, file)== nullptr);
 }

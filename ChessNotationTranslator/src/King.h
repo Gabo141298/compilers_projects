@@ -5,6 +5,9 @@
 
 class King : public Piece
 {
+  private: 
+    bool hasMoved = false;
+
   public:
   	King(char symbol, Board* board, Coordinates position);
 
@@ -15,7 +18,9 @@ class King : public Piece
     *		  do moving to the upper left, upper right, lower left
     *		  and lower right, left, right, up and down
     */
-    MoveTypes getPossibleMoves() override;
+    void calculatePossibleMoves() override;
+
+    inline bool getHasMoved() { return hasMoved; }
 };
 
 #endif 

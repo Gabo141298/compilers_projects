@@ -5,6 +5,12 @@
 #include "Piece.h"
 
 #include <iostream>
+#include <list>
+
+enum CheckStates
+{
+    none, check, mate
+};
 
 class Board
 {
@@ -18,6 +24,19 @@ class Board
     /// Keeps the valid moves from the last selected piece.
     MoveTypes validMoves;
 
+    /// Keeps track of all the squares that are under attack by black
+    std::list<Coordinates> squaresAttackedByBlack; 
+
+    /// Keeps track of all the squares that are under attack by white
+    std::list<Coordinates> squaresAttackedByWhite; 
+
+    /// Stores the white pieces
+    std::vector<Piece*> whitePieces; 
+
+    /// Stores the black pieces
+    std::vector<Piece*> blackPieces;
+
+
   public: 
   	Board();
 
@@ -25,38 +44,57 @@ class Board
 
 
   private: 
-  	Piece* factory(char symbol, int row, int col);
+  	Piece* factory(char symbol, int rank, int file);
+
+    /// Removes a piece from the board and deletes it from memory
+    void deletePieceFromBoard( int rank, int file);
+
+    /// En passants only last one move. This method resets if after every turn
+    void resetOpponentEnPassants();
+
+    /// Method to move a piece from one square of the board to another
+    void relocatePiece(Piece* piece, Coordinates cell, bool deletePiece = false);
+
+    /// Make the move, whether it's enPassant, commute, capture, promotion or castle
+    void makeMove(Piece* piece, Coordinates cell, MoveTypeSymbols moveType, char promotionSymbol = 'Q');
+
+    /// Checks that if a check is written, the move actually attacks the king (it is a check)
+    bool validateCheck(Piece* piece);
+
+    /// Gets the position of the enemy king
+    Coordinates getKingPosition();
+
+    /// For testing purposes mostly
+    void printBoard();
 
   public:
-  	/// Defines the board size. Really, its not going to change
+  	/// Defines the board size. Really, it's not going to change
     const static unsigned char boardSize = 8;
     
     /// Overload of the print operator
   	friend std::ostream& operator<<(std::ostream &out, const Board& board);
 
-    /// Overload of the brackets
-    inline Piece* getSquare(int row, int col) { return this->squares[row][col]; }
+    /// Get method for a piece in the board, given a row and a file
+    inline Piece* getSquare( int rank, int file) { return this->squares[rank][file]; }
+
+    /// Get method for a piece in the board, given a coordinate
+    inline Piece* getSquare(Coordinates cell) { return this->squares[cell.rank][cell.file]; }
 
     /// Checks if the current player in turn corresponds with the color of the piece selected
     bool isRightTurn(Piece* selectedPiece);
 
-    /// It checks if the piece can be moved to the position given by rowPos and colPos.
-    /// If it can be moved, it will move the piece.
-    void movePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos);
-
-    /// It tells the piece to move the position given by rowPos, and colPos.
-    /// It also does changes to boardState to update the pieces positions.
-    void movePiece(Piece* selectedPiece, int rowPos, int colPos);
-
     /// Checks if the game ended. If it ended, then it creates the PGN file, as it was a valid game.
     void checkIfGameEnded();
 
-    /// En passants only last one move. This method resets if after every turn
-    void resetOpponentEnPassants();
+    /// Checks if a piece is an enemy, depending on a color. If 
+    bool isEnemy(Coordinates cell);
 
-      /// It assigns to selectedPiece the piece that is in the position given by rowPos and colPos.
-    void savePieceIfPossible(Piece* selectedPiece, int rowPos, int colPos);
+    /// Checks if any given square is being attacked by opponent pieces. Useful for king moves. 
+    bool isUnderAttack(Coordinates cell);
 
+    /// This is for the semantic analysis. It finds the piece that the player wanted to move by
+    /// looking at what piece can move to the given cell. It receives the piece symbol
+    bool findPieceToMove(Coordinates cell, char pieceSymbol, MoveTypeSymbols moveType, char ambiguity = '\0', char promotionSymbol = 'Q', CheckStates checkState = CheckStates::none);
 };
 
 #endif

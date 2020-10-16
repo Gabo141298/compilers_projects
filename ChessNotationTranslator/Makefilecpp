@@ -3,7 +3,7 @@ OUTPUT=output
 GENERATED=generated
 # runtime is where you downloaded and extracted https://www.antlr.org/download/antlr4-cpp-runtime-4.8-macos.zip
 RUNTIME=/runtime/Cpp/run/usr/local
-CCARGS=-c -I $(RUNTIME)/include/antlr4-runtime/ -I $(GENERATED) -std=c++11	
+CCARGS=-c -g -I $(RUNTIME)/include/antlr4-runtime/ -I $(GENERATED) -std=c++11	
 LDARGS=-g
 LIBS=$(RUNTIME)/lib/libantlr4-runtime.a
 JAVA=/usr/bin/java
@@ -17,18 +17,24 @@ ANTLRGEN=BaseListener Lexer Listener Parser
 OBJS=$(addsuffix .o,$(addprefix $(OUTPUT)/$(GRAMMAR),$(ANTLRGEN)))
 GSOURCES=$(addsuffix .cpp,$(addprefix $(GENERATED)/$(GRAMMAR),$(ANTLRGEN)))
 
+SRC_DIR := ./src
+OBJ_DIR := ./obj
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+
 .precious: $(GSOURCES)
 
 all: parser
 
-parser: dirs antlr4 main.cpp $(OBJS)
-	$(CC) $(CCARGS) main.cpp  -o $(OUTPUT)/parser.o 
-	$(CC) $(LDARGS) $(OUTPUT)/parser.o $(OBJS) $(LIBS) -o parser
+parser: dirs antlr4 main.cpp chess_parseCustomVisitor.cpp $(OBJS) $(OBJ_FILES)
+	$(CC) $(CCARGS) main.cpp -o $(OUTPUT)/parser.o 
+	$(CC) $(CCARGS) chess_parseCustomVisitor.cpp -o $(OUTPUT)/customVisitor.o 	
+	$(CC) $(LDARGS) $(OUTPUT)/parser.o $(OUTPUT)/customVisitor.o  $(OBJS) $(LIBS) $(OBJ_FILES) -o parser
 
 antlr4: $(GENERATED)/.generated;
- 
+
 $(GENERATED)/.generated: $(GRAMMAR).g4
-	$(ANTLR4) -Dlanguage=Cpp -o $(GENERATED) $(GRAMMAR).g4
+	$(ANTLR4) -Dlanguage=Cpp -visitor -o $(GENERATED) $(GRAMMAR).g4
 	@touch $(GENERATED)/.generated
 
 $(OUTPUT)/%.o : $(GENERATED)/%.cpp
@@ -36,5 +42,8 @@ $(OUTPUT)/%.o : $(GENERATED)/%.cpp
 
 $(GENERATED)/%.cpp: $(GENERATED)/.generated;
 
-dirs:; mkdir -p $(OUTPUT) $(GENERATED) 
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CC) $(CCARGS) -c -o $@ $<
+
+dirs:; mkdir -p $(OUTPUT) $(GENERATED) $(OBJ_DIR)
 clean:; rm -rf $(OUTPUT) $(GENERATED)

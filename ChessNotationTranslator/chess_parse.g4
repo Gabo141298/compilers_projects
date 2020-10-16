@@ -21,6 +21,8 @@ FILE 		: [a-hA-H] ;
 RANK 		: [1-8] ;
 CAPTURES 	: 'toma' ;
 PROMOTES_TO	: 'corona a';
+JAQUE 		: 'jaque';
+MATE		: 'mate';
 
 // Review
 //ID	 		: ([a-zA-Z_]+[a-zA-Z_0-9 ]+)?;
@@ -31,14 +33,17 @@ DATE		: NUMBER '.' NUMBER '.' NUMBER;
 ROUNDS		: NUMBER;
 
 
-game: header play;
+game: header play 
+	  | header play GAME_END;
 
 // Syntax
-header		: ID DATE NUMBER ID ID;
+header		: ID ID DATE NUMBER ID ID;
 
 play		: move
-			| play move;
-	 
+			| play move
+			| play move JAQUE
+			| play move MATE;
+
 move 		: commute | capture | promotion | SHORT_CASTLING | LONG_CASTLING;
 
 square 		: FILE RANK ;
@@ -50,6 +55,7 @@ in_position : IN RANK
 promotion 	: PAWN square PROMOTES_TO promotion_piece
 			| PAWN CAPTURES square PROMOTES_TO promotion_piece
 			| PAWN in_position CAPTURES square PROMOTES_TO promotion_piece
+			| PAWN in_position PROMOTES_TO promotion_piece
 			;
 
 commute 	: piece square 

@@ -15,7 +15,7 @@ class Queen : public Piece
     * @return an std::vector with all the moves that the queen can
     *		  do moving to left, right, up, down or in diags
     */
-    MoveTypes getPossibleMoves() override;
+    void calculatePossibleMoves() override;
 };
 
 #endif

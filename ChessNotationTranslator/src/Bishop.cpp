@@ -6,11 +6,8 @@ Bishop::Bishop(char symbol, Board* board, Coordinates position)
 
 }
 
-MoveTypes Bishop::getPossibleMoves()
+void Bishop::calculatePossibleMoves()
 {
-	// Store all the possible valid moves for the bishop
-    MoveTypes possibleMoves;
-
     // Stores the directions in which the bishop can move
     short xArray[] = { -1,1,1,-1 };
     short yArray[] = { -1,-1,1,1 };
@@ -18,25 +15,22 @@ MoveTypes Bishop::getPossibleMoves()
     // Loops through the 4 possible directions.
     for ( int direction = 0; direction < 4; ++direction)
     {
-    	// The new x and y to check are added the direction
-    	short x = currentPosition.row + xArray[direction];
-    	short y = currentPosition.file + yArray[direction];
+        // The new x and y to check are added the direction
+        short x = currentPosition.file + xArray[direction];
+        short y = currentPosition.rank + yArray[direction];
 
-    	// While the cell is within boundaries and is free
-    	while( x>=0 && x<8 && y>=0 && y<8 && isFree(x, y))
-    	{
-    		// The move is valid, add it to possibleMoves
-            possibleMoves.commutingMoves.push_back( Coordinates(x, y) );
+        // While the cell is within boundaries and is free
+        while( x>=0 && x<8 && y>=0 && y<8 && isFree(y, x))
+        {
+            // The move is valid, add it to possibleMoves
+            possibleMoves.commutingMoves.push_back( Coordinates(y, x) );
 
-    		// Move the bishop once more in the same direction
-    		x += xArray[direction]; y += yArray[direction];
-    	}
+            // Move the bishop once more in the same direction
+            x += xArray[direction]; y += yArray[direction];
+        }
 
-    	// If the last cell wasn't free, but instead had an enemy
-    	if( isEnemy(x,y) )
-            possibleMoves.capturingMoves.push_back( Coordinates(x, y) );
+        // If the last cell wasn't free, but instead had an enemy
+        if( isEnemy(y, x) )
+            possibleMoves.capturingMoves.push_back( Coordinates(y, x) );
     }
-
-    // Return all the possible valid moves the bishop could make
-    return possibleMoves;
 }

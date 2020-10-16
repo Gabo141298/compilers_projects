@@ -25,13 +25,15 @@ class Pawn : public Piece
     *          given pawn, and if so, adds them to the corresponding vectors.
     * @return a MoveTypes struct with all the valid moves that the pawn can do.
     */
-    MoveTypes getPossibleMoves();
+    void calculatePossibleMoves();
 
     /// Checks if the pawn is still in its starting position (meaning this is its first move).
     bool isFirstMove();
 
     /// Returns the value of the justMovedTwice 
     inline bool getJustMovedTwice() { return this->justMovedTwice; }
+
+    inline void resetJustMovedTwice() { this->justMovedTwice = false; }
 };
 
 #endif

@@ -11,10 +11,8 @@ King::King(char symbol, Board* board, Coordinates position)
 // The king can move vertically, horizontally and
 // diagonally in any direction, but only one square
 // at a time
-MoveTypes King::getPossibleMoves()
+void King::calculatePossibleMoves()
 {
-    MoveTypes possibleMoves;
-
     // The directions in which the king may go
     short x[] = { 1,1,0,-1,-1,-1,0,1 };
     short y[] = { 0,1,1,1,0,-1,-1,-1 };
@@ -22,17 +20,28 @@ MoveTypes King::getPossibleMoves()
     // Goes through the 8 possible directions
     for ( int direction = 0; direction < 8; ++direction)
     {
-    	short newX = currentPosition.row + x[direction];
-    	short newY = currentPosition.file + y[direction];
+    	short newX = currentPosition.file + x[direction];
+    	short newY = currentPosition.rank + y[direction];
 
         // If the cell is free, add the move to commutingMoves
-    	if ( isFree(newX, newY) ) 
-            possibleMoves.commutingMoves.push_back( Coordinates(newX, newY) );
+    	if ( isFree(newY, newX) ) 
+            possibleMoves.commutingMoves.push_back( Coordinates(newY, newX) );
 
         // If the cell was occupied by an enemy, add the move to capturingMoves
-        else if ( isEnemy(newX, newY) )
-            possibleMoves.capturingMoves.push_back( Coordinates(newX, newY) );
+        else if ( isEnemy(newY, newX) )
+            possibleMoves.capturingMoves.push_back( Coordinates(newY, newX) );
     }
 
-    return possibleMoves;
+    short rank = currentPosition.rank; 
+    // For castling
+    if ( !hasMoved ) 
+    {
+        // Short castle
+        if ( isFree(rank, 5) && isFree(rank, 6))
+            possibleMoves.castle.push_back( Coordinates(currentPosition.rank, 6));
+
+        // Long castle
+        if ( isFree(rank, 1) && isFree(rank, 2) && isFree(rank, 3))
+            possibleMoves.castle.push_back( Coordinates(currentPosition.rank, 3));
+    }
 }
