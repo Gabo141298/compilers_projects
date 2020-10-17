@@ -4,7 +4,10 @@
 #include <string>
 
 #include "parse/node.h"
+#include "parse/symbol_table.hh"
+
 extern SNode::Program* programBlock;
+extern SymbolTable symbolTable;
 
 int main(int argc, char** argv)
 {

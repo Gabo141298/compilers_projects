@@ -1,3 +1,6 @@
+#ifndef NODE_H
+#define NODE_H
+
 /**
  * Código basado en https://gnuu.org/2009/09/18/writing-your-own-toy-compiler/
  */
@@ -656,3 +659,5 @@ public:
     }
 };
 }
+
+#endif // NODE_H

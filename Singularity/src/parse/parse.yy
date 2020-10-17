@@ -6,6 +6,7 @@
 #define yylex driver.scanner_->yylex
 
 SNode::Program* programBlock;
+SymbolTable symbolTable;
 %}
 
 %code requires
@@ -17,6 +18,7 @@ SNode::Program* programBlock;
   #include "position.hh"
 
   #include "node.h"
+  #include "symbol_table.hh"
 }
 
 %code provides
