@@ -9,9 +9,17 @@
 
 namespace SNode
 {
+
+enum OperationType
+{
+    ARITHMETIC_OP = 0x100,
+    COMPARISON_OP = 0x200,
+    BOOLEAN_OP = 0x300
+};
+
 enum Operation
 {
-    addition,
+    addition = ARITHMETIC_OP,
     substraction,
     multiplication,
     division,
@@ -20,18 +28,17 @@ enum Operation
 
 enum ComparisonOperation
 {
-    leq,
+    leq = COMPARISON_OP,
     geq,
     greater,
     less,
     equals,
-    isNot,
-    module
+    isNot
 };
 
 enum BooleanOperation
 {
-    bAnd,
+    bAnd = BOOLEAN_OP,
     bOr,
     bXor
 };
@@ -48,27 +55,6 @@ typedef std::vector<Expression*> ExpressionList;
 typedef std::vector<Identifier*> VariableList;
 typedef std::vector<Function*> FunctionList;
 typedef std::vector<VariableAssignment*> GlobalList;
-
-struct RightSideArithExpr {
-    Operation op;
-    Expression& exp;
-    RightSideArithExpr(Operation op, Expression& exp) :
-        op(op), exp(exp) {}
-};
-
-struct RightSideCompExpr {
-    ComparisonOperation op;
-    Expression& exp;
-    RightSideCompExpr(ComparisonOperation op, Expression& exp) :
-        op(op), exp(exp) {}
-};
-
-struct RightSideBoolExpr {
-    BooleanOperation op;
-    Expression& exp;
-    RightSideBoolExpr(BooleanOperation op, Expression& exp) :
-        op(op), exp(exp) {}
-};
 
 class Node {
 public:
@@ -648,6 +634,25 @@ public:
             functions[index]->print(tabs + 1);
         for(size_t index = 0; index < globals.size(); ++index)
             globals[index]->print(tabs + 1);
+    }
+};
+
+class RightSideExpr {
+private:
+    int op;
+    Expression& exp;
+public:
+    RightSideExpr(int op, Expression& exp) :
+        op(op), exp(exp) {}
+    Expression* createOperation(Expression& left)
+    {
+        if(OperationType::ARITHMETIC_OP <= op && op < OperationType::COMPARISON_OP)
+            return new ArithmeticOperator(left, (Operation)op, exp);
+        else if(OperationType::COMPARISON_OP <= op && op < OperationType::BOOLEAN_OP)
+            return new ComparisonOperator(left, (ComparisonOperation)op, exp);
+        else if(op >= OperationType::BOOLEAN_OP)
+            return new BooleanOperator(left, (BooleanOperation)op, exp);
+        return nullptr;
     }
 };
 }
