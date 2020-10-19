@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <iostream>
+
 enum Datatype
 {
 	UNKNOWN,
@@ -14,6 +16,11 @@ enum Datatype
 	BOOLEAN,
 	FUNCTION
 };
+
+#ifndef PROCESS_VAL
+#define PROCESS_VAL(p) case(p): s = #p; break;
+#endif
+std::ostream& operator<<(std::ostream& out, Datatype value);
 
 class TableRow
 {

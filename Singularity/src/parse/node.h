@@ -10,6 +10,12 @@
 #include <vector>
 #include <llvm/IR/Value.h>
 
+#include "symbol_table.hh"
+
+#ifndef PROCESS_VAL
+#define PROCESS_VAL(p) case(p): s = #p; break;
+#endif
+
 namespace SNode
 {
 
@@ -29,6 +35,8 @@ enum Operation
     modulo
 };
 
+std::ostream& operator<<(std::ostream& out, Operation value);
+
 enum ComparisonOperation
 {
     leq = COMPARISON_OP,
@@ -39,12 +47,16 @@ enum ComparisonOperation
     isNot
 };
 
+std::ostream& operator<<(std::ostream& out, ComparisonOperation value);
+
 enum BooleanOperation
 {
     bAnd = BOOLEAN_OP,
     bOr,
     bXor
 };
+
+std::ostream& operator<<(std::ostream& out, BooleanOperation value);
 
 class CodeGenContext;
 class Statement;
@@ -73,6 +85,8 @@ protected:
 };
 
 class Expression : public Node {
+public:
+    virtual inline Datatype getExpressionType() const { return Datatype::UNKNOWN; }
 };
 
 class Statement : public Node {
@@ -91,6 +105,10 @@ public:
         printTabs(tabs);
         std::cout << "Integer: " << value << std::endl;
     }
+    inline Datatype getExpressionType() const override
+    {
+        return Datatype::INTEGER;
+    }
 };
 
 class Double : public Value {
@@ -102,6 +120,10 @@ public:
     {
         printTabs(tabs);
         std::cout << "Double: " << value << std::endl;
+    }
+    inline Datatype getExpressionType() const override
+    {
+        return Datatype::DOUBLE;
     }
 };
 
@@ -115,6 +137,10 @@ public:
         printTabs(tabs);
         std::cout << "String: " << value << std::endl;
     }
+    inline Datatype getExpressionType() const override
+    {
+        return Datatype::STRING;
+    }
 };
 
 class Identifier : public Value {
@@ -126,6 +152,11 @@ public:
     {
         printTabs(tabs);
         std::cout << "Identifier: " << name << std::endl;
+    }
+    inline Datatype getExpressionType() const override
+    {
+        // Lookup table to check if variable has a type.
+        return Datatype::UNKNOWN;
     }
 };
 
@@ -139,9 +170,13 @@ public:
         printTabs(tabs);
         std::cout << "Boolean: " << value << std::endl;
     }
+    inline Datatype getExpressionType() const override
+    {
+        return Datatype::BOOLEAN;
+    }
 };
 
-class Body : public Expression {
+class Body : public Node {
 public:
     StatementList statements;
     Body() {}
@@ -158,7 +193,7 @@ public:
     }
 };
 
-class Block : public Expression {
+class Block : public Node {
 public:
     Body& body;
     Block(Body& body) :
@@ -228,6 +263,11 @@ public:
                 parameters[index]->print(tabs + 1);
         }
     }
+    inline Datatype getExpressionType() const override
+    {
+        // Se puede inferir en algunos casos, ya veremos
+        return Datatype::UNKNOWN;
+    }
 };
 
 class Answer : public Statement {
@@ -284,6 +324,43 @@ public:
         printTabs(tabs + 1);
         std::cout << "RightExpression:" << std::endl;
         right.print(tabs + 1);
+    }
+    inline Datatype getExpressionType() const override
+    {
+        Datatype leftType = left.getExpressionType();
+        Datatype rightType = right.getExpressionType();
+
+        // If any of the expressions is boolean, throw an error
+        if(leftType == Datatype::BOOLEAN || rightType == Datatype::BOOLEAN)
+        {
+            std::cout << "Error: can't use a boolean expression for an arithmetic operation." << std::endl;
+        }
+        // If any of the expressions is a function, throw an error
+        else if(leftType == Datatype::FUNCTION || rightType == Datatype::FUNCTION)
+        {
+            std::cout << "Error: can't use a function name as an expression." << std::endl;
+        }
+        // If any of the expressions is a string, throw an error.
+        else if(leftType == Datatype::STRING || rightType == Datatype::STRING)
+        {
+            std::cout << "Error: can't use a string for an arithmetic expression." << std::endl;
+        }
+        // If any of the two expressions is unknown, then the resulting expression is unknown.
+        else if(leftType == Datatype::UNKNOWN || rightType == Datatype::UNKNOWN)
+        {
+            return Datatype::UNKNOWN;
+        }
+        // If any of the two expressions is a double, then the resulting expression is a double.
+        else if(leftType == Datatype::DOUBLE || rightType == Datatype::DOUBLE)
+        {
+            return Datatype::DOUBLE;
+        }
+        else
+        {
+            return Datatype::INTEGER;
+        }
+
+        return Datatype::UNKNOWN;
     }
 };
 
@@ -640,24 +717,8 @@ public:
     }
 };
 
-class RightSideExpr {
-private:
-    int op;
-    Expression& exp;
-public:
-    RightSideExpr(int op, Expression& exp) :
-        op(op), exp(exp) {}
-    Expression* createOperation(Expression& left)
-    {
-        if(OperationType::ARITHMETIC_OP <= op && op < OperationType::COMPARISON_OP)
-            return new ArithmeticOperator(left, (Operation)op, exp);
-        else if(OperationType::COMPARISON_OP <= op && op < OperationType::BOOLEAN_OP)
-            return new ComparisonOperator(left, (ComparisonOperation)op, exp);
-        else if(op >= OperationType::BOOLEAN_OP)
-            return new BooleanOperator(left, (BooleanOperation)op, exp);
-        return nullptr;
-    }
-};
+Expression* createOperation(Expression& left, int op, Expression& right);
+
 }
 
 #endif // NODE_H

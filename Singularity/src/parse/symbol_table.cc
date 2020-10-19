@@ -2,6 +2,20 @@
 
 #include "symbol_table.hh"
 
+std::ostream& operator<<(std::ostream& out, Datatype value){
+    const char* s = 0;
+    switch(value){
+        PROCESS_VAL(UNKNOWN)
+        PROCESS_VAL(INTEGER)
+        PROCESS_VAL(DOUBLE)
+        PROCESS_VAL(STRING)
+        PROCESS_VAL(BOOLEAN)
+        PROCESS_VAL(FUNCTION)
+    }
+
+    return out << s;
+}
+
 void TableRow::print()
 {
 	std::cout << "\t" << id << " " << type << std::endl;
@@ -38,6 +52,11 @@ void Subtable::print()
 {
 	std::cout << name << ":" << std::endl;
 	for(auto itr = content.begin(); itr != content.end(); ++itr)
+	{
+		itr->second->print();
+	}
+
+	for(auto itr = children.begin(); itr != children.end(); ++itr)
 	{
 		itr->second->print();
 	}

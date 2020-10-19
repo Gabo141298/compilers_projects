@@ -67,9 +67,7 @@ SymbolTable symbolTable;
     SNode::VariableList* variableList;
     SNode::If* ifStatement;
     SNode::ExpressionList* expressionList;
-    SNode::RightSideExpr* rsExpr;
     SNode::VariableAssignment* variableAssignment;
-    int integer;
 }
 
 %token TOK_EOF 0
@@ -124,11 +122,17 @@ SymbolTable symbolTable;
 %token TRUE
 %token FROM
 
+%left IS NOT
+%left AND OR XOR
+%left EQUALS GEQ LEQ GREATER LESS
+%left ADDITION SUBSTRACTION
+%left MULTIPLICATION DIVISION MODULO
+
 %type <program> program
 %type <block> block
 %type <body> body
 %type <value> value boolean intvalue
-%type <expression> assignment expression func_call
+%type <expression> assignment expression func_call term
 %type <position> position 
 %type <statement> statement read print while while_counting answer if_statement otherwise
 %type <variableAssignment> set
@@ -136,10 +140,8 @@ SymbolTable symbolTable;
 %type <dataStructure> data_structure
 %type <dataPosAssignment> pos_assignment
 %type <function> function
-%type <integer> operator
 %type <variableList> arguments
 %type <expressionList> parameters
-%type <rsExpr> expression2
 
 %%
 %start input;
@@ -242,83 +244,28 @@ value:      FLOAT { $$ = new SNode::Double(atof($1->c_str())); delete $1; }
             | boolean { $$ = $1; }
             ;
 
-expression: IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS expression2 {  
-                if($5)
-                {
-                    $$ = $5->createOperation(*(new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3)));
-                    delete $1;
-                    delete $5;
-                }
-                else
-                {
-                    $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3); 
-                    delete $1;
-                }
-            }
-            | value expression2 { 
-                if($2) 
-                {
-                    $$ = $2->createOperation(*$1);
-                    delete $2;
-                }
-                else
-                {
-                    $$ = $1;
-                }
-            }
-            | func_call expression2 { 
-                if($2) 
-                {
-                    $$ = $2->createOperation(*$1);
-                    delete $2;
-                }
-                else
-                {
-                    $$ = $1;
-                }
-            }
-            | OPEN_PARENTHESIS expression CLOSE_PARENTHESIS expression2 {
-                if($4) 
-                {
-                    $$ = $4->createOperation(*$2);
-                    delete $4;
-                }
-                else
-                {
-                    $$ = $2;
-                }
-            }
-            | NOT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS expression2 {
-                if($3)
-                {
-                    $$ = $5->createOperation(*(new SNode::NotOperator(*$3)));
-                    delete $5;
-                }
-                else
-                {
-                    $$ = new SNode::NotOperator(*$3);
-                }
-            }
+term:       value { $$ = $1; }
+            | func_call { $$ = $1; }
+            | OPEN_PARENTHESIS expression CLOSE_PARENTHESIS { $$ = $2; }
+            | IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS { $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3); delete $1; }
+            | NOT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS { $$ = new SNode::NotOperator(*$3); }
             ;
 
-expression2: %empty { $$ = nullptr; }
-            | operator expression { $$ = new SNode::RightSideExpr($1, *$2); }
-            ;
-
-operator:   ADDITION { $$ = SNode::Operation::addition; }
-            | SUBSTRACTION { $$ = SNode::Operation::substraction; }
-            | MULTIPLICATION { $$ = SNode::Operation::multiplication; }
-            | DIVISION { $$ = SNode::Operation::division; }
-            | MODULO { $$ = SNode::Operation::modulo; }
-            | LEQ { $$ = SNode::ComparisonOperation::leq; }
-            | GEQ { $$ = SNode::ComparisonOperation::geq; }
-            | GREATER { $$ = SNode::ComparisonOperation::greater; }
-            | LESS { $$ = SNode::ComparisonOperation::less; }
-            | EQUALS { $$ = SNode::ComparisonOperation::equals; }
-            | IS NOT { $$ = SNode::ComparisonOperation::isNot; }
-            | XOR { $$ = SNode::BooleanOperation::bXor; }
-            | OR { $$ = SNode::BooleanOperation::bOr; }
-            | AND { $$ = SNode::BooleanOperation::bAnd; }
+expression: term { $$ = $1; }
+            | expression ADDITION expression { $$ = SNode::createOperation(*$1, SNode::Operation::addition, *$3); }
+            | expression SUBSTRACTION expression { $$ = SNode::createOperation(*$1, SNode::Operation::substraction, *$3); }
+            | expression MULTIPLICATION expression { $$ = SNode::createOperation(*$1, SNode::Operation::multiplication, *$3); }
+            | expression DIVISION expression { $$ = SNode::createOperation(*$1, SNode::Operation::division, *$3); }
+            | expression MODULO expression { $$ = SNode::createOperation(*$1, SNode::Operation::modulo, *$3); }
+            | expression LEQ expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::leq, *$3); }
+            | expression GEQ expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::geq, *$3); }
+            | expression GREATER expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::greater, *$3); }
+            | expression LESS expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::less, *$3); }
+            | expression EQUALS expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::equals, *$3); }
+            | expression IS NOT expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::isNot, *$4); }
+            | expression XOR expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperation::bXor, *$3); }
+            | expression OR expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperation::bOr, *$3); }
+            | expression AND expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperation::bAnd, *$3); }
             ;
 
 func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2))); delete $2; }

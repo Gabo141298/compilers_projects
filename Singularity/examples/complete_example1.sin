@@ -2,6 +2,7 @@ set global to TRUE
 
 define function prime_number with arguments i, n
 begin
+	set num to 1 * 2 + 3
 	set isPrime to TRUE
 
 	if (n = 0 and global) or n = 1
