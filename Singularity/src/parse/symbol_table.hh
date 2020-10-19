@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <string>
+#include <unordered_map>
 
 enum Datatype
 {
@@ -10,7 +11,8 @@ enum Datatype
 	INTEGER,
 	DOUBLE,
 	STRING,
-	BOOLEAN
+	BOOLEAN,
+	FUNCTION
 };
 
 class TableRow
@@ -22,23 +24,41 @@ public:
 	TableRow(const std::string& id, Datatype type)
 		: id(id), type(type) {}
 	inline void setType(Datatype type) { this->type = type; }
+	void print();
 };
 
 class Subtable
 {
 private:
 	std::string name;
-	std::hash<TableRow> subtable;
-	Subtable* pointer;
+	std::unordered_map<std::string, TableRow*> content;
+	Subtable* parent;
+	std::unordered_map<std::string, Subtable*> children;
+public:
+	Subtable(std::string name, Subtable* parent = nullptr)
+		: name(name), parent(parent)
+	{
+	}
+	void insertRow(const std::string& id, Datatype type = UNKNOWN);
+	TableRow* search(const std::string& id);
+	inline Subtable* getParent() { return parent; }
+	Subtable* insertChild(const std::string& name, Subtable* parent);
+	void print();
 };
 
 class SymbolTable
 {
 private:
 	Subtable* currentSubtable;
-	std::hash<Subtable*> table;
 public:
-	SymbolTable() {}
+	SymbolTable()
+		: currentSubtable(new Subtable("global"))
+	{
+	}
+	void initializeScope(const std::string& name);
+	void finalizeScope();
+	void insertToCurrentSubtable(const std::string& id, Datatype type = UNKNOWN);
+	void print();
 };
 
 #endif // SYMBOL_TABLE_H

@@ -146,8 +146,14 @@ SymbolTable symbolTable;
 input: program { programBlock = $1; } ;
 
 program: %empty { $$ = new SNode::Program(); }
-            | program function { $1->functions.push_back($2); }
-            | program set { $1->globals.push_back($2); }
+            | program function { 
+                $1->functions.push_back($2); 
+                symbolTable.insertToCurrentSubtable($2->id.name, Datatype::FUNCTION);
+            }
+            | program set {
+                $1->globals.push_back($2); 
+                symbolTable.insertToCurrentSubtable($2->id.name, Datatype::UNKNOWN);
+            }
             ;
 
 block:  BEGIN_BLOCK
