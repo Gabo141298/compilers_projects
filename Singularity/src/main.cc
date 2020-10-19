@@ -22,5 +22,7 @@ int main(int argc, char** argv)
 
     programBlock->print();
 
+    symbolTable.print();
+
     return 0;
 }
