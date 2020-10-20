@@ -1,6 +1,7 @@
 # Add subdirectories
 
 add_subdirectory(parse)
+add_subdirectory(parse)
 
 # Add the binary and sources
 add_executable(

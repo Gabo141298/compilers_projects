@@ -1,4 +1,4 @@
-#include "node.h"
+#include "node.hh"
 
 std::ostream& SNode::operator<<(std::ostream& out, SNode::ArithmeticOperator value){
     const char* s = 0;
