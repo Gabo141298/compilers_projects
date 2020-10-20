@@ -25,7 +25,8 @@ void TableRow::print()
 
 void Subtable::insertRow(const std::string& id, Datatype type)
 {
-	content.insert(std::make_pair<const std::string&,TableRow*>(id, new TableRow(id, type)));
+	content[id] = new TableRow(id, type);
+	// content.insert(std::make_pair<const std::string&,TableRow*>(id, new TableRow(id, type)));
 }
 
 TableRow* Subtable::search(const std::string& id)
@@ -47,7 +48,8 @@ TableRow* Subtable::search(const std::string& id)
 
 Subtable* Subtable::insertChild(const std::string& name, Subtable* parent)
 {
-	return children.insert(std::make_pair<const std::string&, Subtable*>(name, new Subtable(name, parent))).first->second;
+	return children[name] = new Subtable(name, parent);
+	//children.insert(std::make_pair<const std::string&, Subtable*>(name, new Subtable(name, parent))).first->second;
 }
 
 void Subtable::print()
@@ -66,9 +68,7 @@ void Subtable::print()
 
 void SymbolTable::initializeScope(const std::string& name)
 {
-	Subtable* newSubtable = new Subtable(name, this->currentSubtable);
-	currentSubtable->insertChild(name, newSubtable);
-	currentSubtable = newSubtable;
+	currentSubtable = currentSubtable->insertChild(name, currentSubtable);
 }
 
 void SymbolTable::finalizeScope()

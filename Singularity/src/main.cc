@@ -22,6 +22,8 @@ int main(int argc, char** argv)
 
     programBlock->print();
 
+    programBlock->createSymbolTable(symbolTable);
+
     symbolTable.print();
 
     return 0;

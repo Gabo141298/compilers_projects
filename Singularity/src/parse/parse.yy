@@ -53,7 +53,6 @@ SymbolTable symbolTable;
 {
     SNode::Node* node;
     SNode::Block* block;
-    SNode::Body* body;
     SNode::Expression* expression;
     SNode::Statement* statement;
     SNode::Identifier* identifier;
@@ -129,8 +128,7 @@ SymbolTable symbolTable;
 %left MULTIPLICATION DIVISION MODULO
 
 %type <program> program
-%type <block> block
-%type <body> body
+%type <block> block body
 %type <value> value boolean intvalue
 %type <expression> assignment expression func_call term
 %type <position> position 
@@ -158,12 +156,10 @@ program: %empty { $$ = new SNode::Program(); }
             }
             ;
 
-block:  BEGIN_BLOCK
-        body
-        END_BLOCK { $$ = new SNode::Block(*$2); }
+block:  BEGIN_BLOCK body END_BLOCK { $$ = $2; }
         ;
 
-body:       statement { $$ = new SNode::Body(); $$->statements.push_back($<statement>1); }
+body:       statement { $$ = new SNode::Block(); $$->statements.push_back($<statement>1); }
             | body statement { $1->statements.push_back($<statement>2); }
             ;
 

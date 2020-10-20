@@ -6,11 +6,11 @@ set matr as matrix of size 3 by 3
 define function prime_number with arguments i, n
 begin
 	set num to 1 * 2 + 3
-	set isPrime to TRUE
+	set isPrime to true
 
 	if (n = 0 and global) or n = 1
 	begin
-		set isPrime to FALSE
+		set isPrime to false
 	end   
 	otherwise 
 	begin
@@ -18,7 +18,7 @@ begin
 		begin
 			if n % i = 0
 			begin
-				set isPrime to FALSE
+				set isPrime to false
 			end
 		end
 	end

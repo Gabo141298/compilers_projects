@@ -32,7 +32,9 @@ private:
 public:
 	TableRow(const std::string& id, Datatype type)
 		: id(id), type(type) {}
+	inline Datatype getType() { return this->type; }
 	inline void setType(Datatype type) { this->type = type; }
+	inline std::string getId() { return this->id; }
 	void print();
 };
 

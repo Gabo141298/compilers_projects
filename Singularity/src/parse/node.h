@@ -90,6 +90,8 @@ public:
 };
 
 class Statement : public Node {
+public:
+    virtual void createSymbolTable(SymbolTable&, std::string, size_t*) const { }
 };
 
 class Value : public Expression{
@@ -176,34 +178,27 @@ public:
     }
 };
 
-class Body : public Node {
+class Block : public Statement {
 public:
     StatementList statements;
-    Body() {}
-    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
-    void print(size_t tabs = 0) const override
-    {
-        printTabs(tabs);
-        std::cout << "Body:" << std::endl;
-
-        printTabs(tabs + 1);
-        std::cout << "Statements:" << std::endl;
-        for(size_t index = 0; index < statements.size(); ++index)
-            statements[index]->print(tabs + 1);
-    }
-};
-
-class Block : public Node {
-public:
-    Body& body;
-    Block(Body& body) :
-        body(body) { }
+    Block() { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
         std::cout << "Block: " << std::endl;
-        body.print(tabs + 1);
+        
+        printTabs(tabs + 1);
+        std::cout << "Statements:" << std::endl;
+        for(size_t index = 0; index < statements.size(); ++index)
+            statements[index]->print(tabs + 1);
+    }
+    void createSymbolTable(SymbolTable& table, std::string name, size_t* subtableCounter) const override
+    {
+        for(auto itr = statements.begin(); itr != statements.end(); ++itr)
+        {
+            (*itr)->createSymbolTable(table, name, subtableCounter);
+        }
     }
 };
 
@@ -236,6 +231,22 @@ public:
         }
 
         block.print(tabs + 1);
+    }
+
+    void createSymbolTable(SymbolTable& table) const
+    {
+        table.initializeScope(id.name);
+
+        for(auto itr = arguments.begin(); itr != arguments.end(); ++itr)
+        {
+            // Difficult to infer the datatype of the arguments, although maybe not impossible.
+            table.insertToCurrentSubtable((*itr)->name, Datatype::UNKNOWN);
+        }
+
+        size_t* subtableCounter = new size_t(0);
+        block.createSymbolTable(table, id.name, subtableCounter);
+        delete subtableCounter;
+        table.finalizeScope();
     }
 };
 
@@ -471,7 +482,7 @@ public:
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
-        std::cout << "NotOperator:" << std::endl;
+        std::cout << "NotOperation:" << std::endl;
 
         printTabs(tabs + 1);
         std::cout << "Expression:" << std::endl;
@@ -513,6 +524,10 @@ public:
         printTabs(tabs + 1);
         std::cout << "Expression:" << std::endl;
         assignmentExpr->print(tabs + 1);
+    }
+    void createSymbolTable(SymbolTable& table, std::string, size_t*) const override
+    {
+        table.insertToCurrentSubtable(id.name, assignmentExpr->getExpressionType());
     }
 };
 
@@ -716,6 +731,11 @@ public:
         std::cout << "Read: " << std::endl;
         identifier.print(tabs + 1);
     }
+    void createSymbolTable(SymbolTable& table, std::string, size_t*) const override
+    {
+        // Can't infer datatype that is read from an input.
+        table.insertToCurrentSubtable(identifier.name, Datatype::UNKNOWN);
+    }
 };
 
 class Print : public Statement {
@@ -749,10 +769,34 @@ public:
         std::cout << "Condition:" << std::endl;
         condition.print(tabs + 1);
 
+        block.print(tabs + 1);
+
         if (otherwise)
-            otherwise->print(tabs + 1);
+            otherwise->print(tabs);
 
         block.print(tabs + 1);
+    }
+
+    void createSymbolTable(SymbolTable& table, std::string name, size_t* subtableCounter) const override
+    {
+        Datatype conditionType = condition.getExpressionType();
+        if( conditionType == Datatype::BOOLEAN || conditionType == Datatype::UNKNOWN )
+        {
+            std::string newName = name + "_" + std::to_string( (*subtableCounter)++);
+            table.initializeScope(newName);
+
+            size_t* newSubtableCounter = new size_t(0);
+            block.createSymbolTable(table, newName, newSubtableCounter);
+            delete newSubtableCounter;
+            table.finalizeScope();
+
+            if(otherwise)
+                otherwise->createSymbolTable(table, name, subtableCounter);
+        }
+        else
+        {
+            std::cout << "Error: if needs a boolean expression as its condition." << std::endl;
+        }
     }
 };
 
@@ -768,7 +812,11 @@ public:
         std::cout << "Otherwise if: " << std::endl;
 
         if_statement.print(tabs + 1);
-    }   
+    }
+    void createSymbolTable(SymbolTable& table, std::string name, size_t* subtableCounter) const override
+    {
+        if_statement.createSymbolTable(table, name, subtableCounter);
+    }
 };
 
 class Otherwise : public Statement {
@@ -783,6 +831,17 @@ public:
         std::cout << "Otherwise: " << std::endl;
 
         block.print(tabs + 1);
+    }
+
+    void createSymbolTable(SymbolTable& table, std::string name, size_t* subtableCounter) const override
+    {
+        name += "_" + std::to_string( (*subtableCounter)++);
+        table.initializeScope(name);
+
+        size_t* newSubtableCounter = new size_t(0);
+        block.createSymbolTable(table, name, newSubtableCounter);
+        delete newSubtableCounter;
+        table.finalizeScope();
     }
 };
 
@@ -803,6 +862,24 @@ public:
         condition.print(tabs + 1);
 
         block.print(tabs + 1);
+    }
+    void createSymbolTable(SymbolTable& table, std::string name, size_t* subtableCounter) const override
+    {
+        Datatype conditionType = condition.getExpressionType();
+        if( conditionType == Datatype::BOOLEAN || conditionType == Datatype::UNKNOWN )
+        {
+            name += "_" + std::to_string( (*subtableCounter)++);
+            table.initializeScope(name);
+
+            size_t* newSubtableCounter = new size_t(0);
+            block.createSymbolTable(table, name, newSubtableCounter);
+            delete newSubtableCounter;
+            table.finalizeScope();
+        }
+        else
+        {
+            std::cout << "Error: while needs a boolean expression as its condition." << std::endl;
+        }
     }
 };
 
@@ -834,6 +911,29 @@ public:
 
         block.print(tabs + 1);
     }
+
+    void createSymbolTable(SymbolTable& table, std::string name, size_t* subtableCounter) const override
+    {
+        Datatype beginType = beginValue.getExpressionType();
+        Datatype endType = endValue.getExpressionType();
+        if( (beginType == Datatype::INTEGER || beginType == Datatype::UNKNOWN) 
+            && (endType == Datatype::INTEGER || endType == Datatype::UNKNOWN) )
+        {
+            name += "_" + std::to_string( (*subtableCounter)++);
+            table.initializeScope(name);
+
+            table.insertToCurrentSubtable(counter.name, Datatype::INTEGER);
+
+            size_t* newSubtableCounter = new size_t(0);
+            block.createSymbolTable(table, name, newSubtableCounter);
+            delete newSubtableCounter;
+            table.finalizeScope();
+        }
+        else
+        {
+            std::cout << "Error: range of values in while counting must be defined by integers." << std::endl;
+        }
+    }
 };
 
 class Program : public Node {
@@ -850,6 +950,11 @@ public:
             functions[index]->print(tabs + 1);
         for(size_t index = 0; index < globals.size(); ++index)
             globals[index]->print(tabs + 1);
+    }
+    void createSymbolTable(SymbolTable& table) const
+    {
+        for(auto itr = functions.begin(); itr != functions.end(); ++itr)
+            (*itr)->createSymbolTable(table);
     }
 };
 
