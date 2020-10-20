@@ -1,5 +1,5 @@
 set global to true
-set expr to 1 + 2 * 3 - 4
+set expr to (1 + 2) * (3.5 - 4)
 set arr as list
 set matr as matrix of size 3 by 3
 

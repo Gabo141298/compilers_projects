@@ -332,7 +332,7 @@ public:
 
         // If any of the expressions is boolean, throw an error
         if(leftType == Datatype::BOOLEAN || rightType == Datatype::BOOLEAN)
-            std::cout << "Error: can't use a boolean expression as an arithmetic operation." << std::endl;
+            std::cout << "Error: can't use a boolean expression as an arithmetic expression." << std::endl;
         // If any of the expressions is a function, throw an error
         else if(leftType == Datatype::FUNCTION || rightType == Datatype::FUNCTION)
             std::cout << "Error: can't use a function name as an arithmetic expression." << std::endl;
