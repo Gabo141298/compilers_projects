@@ -14,7 +14,9 @@ enum Datatype
 	DOUBLE,
 	STRING,
 	BOOLEAN,
-	FUNCTION
+	FUNCTION,
+	LIST,
+	MATRIX
 };
 
 #ifndef PROCESS_VAL

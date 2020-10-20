@@ -325,40 +325,34 @@ public:
         std::cout << "RightExpression:" << std::endl;
         right.print(tabs + 1);
     }
-    inline Datatype getExpressionType() const override
+    Datatype getExpressionType() const override
     {
         Datatype leftType = left.getExpressionType();
         Datatype rightType = right.getExpressionType();
 
         // If any of the expressions is boolean, throw an error
         if(leftType == Datatype::BOOLEAN || rightType == Datatype::BOOLEAN)
-        {
-            std::cout << "Error: can't use a boolean expression for an arithmetic operation." << std::endl;
-        }
+            std::cout << "Error: can't use a boolean expression as an arithmetic operation." << std::endl;
         // If any of the expressions is a function, throw an error
         else if(leftType == Datatype::FUNCTION || rightType == Datatype::FUNCTION)
-        {
-            std::cout << "Error: can't use a function name as an expression." << std::endl;
-        }
+            std::cout << "Error: can't use a function name as an arithmetic expression." << std::endl;
+        // If any of the expressions is a list name, throw an error
+        else if(leftType == Datatype::LIST || rightType == Datatype::LIST)
+            std::cout << "Error: can't use a list name as an arithmetic expression." << std::endl;
+        // If any of the expressions is a matrix name, throw an error
+        else if(leftType == Datatype::MATRIX || rightType == Datatype::MATRIX)
+            std::cout << "Error: can't use a matrix name as an arithmetic expression." << std::endl;
         // If any of the expressions is a string, throw an error.
         else if(leftType == Datatype::STRING || rightType == Datatype::STRING)
-        {
-            std::cout << "Error: can't use a string for an arithmetic expression." << std::endl;
-        }
+            std::cout << "Error: can't use a string as an arithmetic expression." << std::endl;
         // If any of the two expressions is unknown, then the resulting expression is unknown.
         else if(leftType == Datatype::UNKNOWN || rightType == Datatype::UNKNOWN)
-        {
             return Datatype::UNKNOWN;
-        }
         // If any of the two expressions is a double, then the resulting expression is a double.
         else if(leftType == Datatype::DOUBLE || rightType == Datatype::DOUBLE)
-        {
             return Datatype::DOUBLE;
-        }
         else
-        {
             return Datatype::INTEGER;
-        }
 
         return Datatype::UNKNOWN;
     }
@@ -385,6 +379,36 @@ public:
         std::cout << "RightExpression:" << std::endl;
         right.print(tabs + 1);
     }
+    Datatype getExpressionType() const override
+    {
+        Datatype leftType = left.getExpressionType();
+        Datatype rightType = right.getExpressionType();
+
+        // If any of the expressions is boolean, throw an error
+        if(leftType == Datatype::BOOLEAN || rightType == Datatype::BOOLEAN)
+            std::cout << "Error: can't use a boolean expression to compare." << std::endl;
+        // If any of the expressions is a function, throw an error
+        else if(leftType == Datatype::FUNCTION || rightType == Datatype::FUNCTION)
+            std::cout << "Error: can't use a function name as an expression." << std::endl;
+        // If any of the expressions is a list name, throw an error
+        else if(leftType == Datatype::LIST || rightType == Datatype::LIST)
+            std::cout << "Error: can't use a list name as an expression." << std::endl;
+        // If any of the expressions is a matrix name, throw an error
+        else if(leftType == Datatype::MATRIX || rightType == Datatype::MATRIX)
+            std::cout << "Error: can't use a matrix name as an expression." << std::endl;
+        // If any of the two expressions is unknown, then the resulting expression is unknown.
+        else if(leftType == Datatype::UNKNOWN || rightType == Datatype::UNKNOWN)
+            return Datatype::UNKNOWN;
+        else if(leftType == Datatype::STRING && rightType == Datatype::STRING)
+            return Datatype::BOOLEAN;
+        // If any of the expressions is a string, throw an error.
+        else if(leftType == Datatype::STRING || rightType == Datatype::STRING)
+            std::cout << "Error: can't compare a string with a numeric expression" << std::endl;
+        else
+            return Datatype::BOOLEAN;
+
+        return Datatype::UNKNOWN;
+    }
 };
 
 class BooleanOperator : public Expression {
@@ -408,6 +432,34 @@ public:
         std::cout << "RightExpression:" << std::endl;
         right.print(tabs + 1);
     }
+    Datatype getExpressionType() const override
+    {
+        Datatype leftType = left.getExpressionType();
+        Datatype rightType = right.getExpressionType();
+
+        // If any of the expressions is a function, throw an error
+        if(leftType == Datatype::FUNCTION || rightType == Datatype::FUNCTION)
+            std::cout << "Error: can't use a function name as a boolean expression." << std::endl;
+        // If any of the expressions is a list name, throw an error
+        else if(leftType == Datatype::LIST || rightType == Datatype::LIST)
+            std::cout << "Error: can't use a list name as a boolean expression." << std::endl;
+        // If any of the expressions is a matrix name, throw an error
+        else if(leftType == Datatype::MATRIX || rightType == Datatype::MATRIX)
+            std::cout << "Error: can't use a matrix name as a boolean expression." << std::endl;
+        // If any of the expressions is a string, throw an error.
+        else if(leftType == Datatype::STRING || rightType == Datatype::STRING)
+            std::cout << "Error: can't use a string as a boolean expression." << std::endl;
+        else if(leftType == Datatype::DOUBLE || rightType == Datatype::DOUBLE 
+            || leftType == Datatype::INTEGER || rightType == Datatype::INTEGER)
+            std::cout << "Error: can't use a numeric value as a boolean expression." << std::endl;
+        // If any of the two expressions is unknown, then the resulting expression is unknown.
+        else if(leftType == Datatype::UNKNOWN || rightType == Datatype::UNKNOWN)
+            return Datatype::UNKNOWN;
+        else
+            return Datatype::BOOLEAN;
+
+        return Datatype::UNKNOWN;
+    }
 };
 
 class NotOperator : public Expression {
@@ -424,6 +476,23 @@ public:
         printTabs(tabs + 1);
         std::cout << "Expression:" << std::endl;
         expression.print(tabs + 1);
+    }
+    Datatype getExpressionType() const override
+    {
+        Datatype type = expression.getExpressionType();
+        switch(type)
+        {
+            case Datatype::UNKNOWN: return Datatype::UNKNOWN;
+            case Datatype::BOOLEAN: return Datatype::BOOLEAN;
+            case Datatype::INTEGER: std::cout << "Error: can't use an integer as a boolean expression." << std::endl; break;
+            case Datatype::DOUBLE: std::cout << "Error: can't use a double as a boolean expression." << std::endl; break;
+            case Datatype::STRING: std::cout << "Error: can't use a string as a boolean expression." << std::endl; break;
+            case Datatype::FUNCTION: std::cout << "Error: can't use a function name as a boolean expression." << std::endl; break;
+            case Datatype::LIST: std::cout << "Error: can't use a list name as a boolean expression." << std::endl; break;
+            case Datatype::MATRIX: std::cout << "Error: can't use a matrix name as a boolean expression." << std::endl; break;
+            default: break;
+        }
+        return Datatype::UNKNOWN;
     }
 };
 
@@ -451,6 +520,8 @@ class DataStructure : public Expression {
 };
 
 class Position : public Expression {
+public:
+    virtual inline bool validPosition() { return false; }
 };
 
 class PositionAccess : public Expression {
@@ -469,7 +540,12 @@ public:
 
         position.print(tabs + 1);
     }
-
+    inline Datatype getExpressionType() const override
+    {
+        if(!position.validPosition())
+            std::cout << "Error: invalid position" << std::endl;
+        return Datatype::UNKNOWN;
+    }
 };
 
 class ListPosition : public Position {
@@ -486,6 +562,23 @@ public:
         printTabs(tabs + 1);
         std::cout << "Position:" << std::endl;
         position.print(tabs + 1);
+    }
+    bool validPosition()
+    {
+        Datatype type = position.getExpressionType();
+        switch(type)
+        {
+            case Datatype::UNKNOWN:
+            case Datatype::INTEGER: return true;
+            case Datatype::BOOLEAN: std::cout << "Error: can't use a boolean to index a list." << std::endl; break;;
+            case Datatype::DOUBLE: std::cout << "Error: can't use a double to index a list." << std::endl; break;
+            case Datatype::STRING: std::cout << "Error: can't use a string to index a list." << std::endl; break;
+            case Datatype::FUNCTION: std::cout << "Error: can't use an function name to index a list." << std::endl; break;
+            case Datatype::LIST: std::cout << "Error: can't use an list name to index a list." << std::endl; break;
+            case Datatype::MATRIX: std::cout << "Error: can't use an matrix name to index a list." << std::endl; break;
+            default: break;
+        }
+        return false;
     }
 };
 
@@ -509,19 +602,54 @@ public:
         std::cout << "Col:" << std::endl;
         col.print(tabs + 1);
     }
+    bool validPosition()
+    {
+        Datatype rowType = row.getExpressionType();
+        Datatype colType = col.getExpressionType();
+
+        std::string typeError;
+
+        // If any of the expressions is boolean, throw an error
+        if(rowType == Datatype::BOOLEAN || colType == Datatype::BOOLEAN)
+            typeError = "boolean";
+        // If any of the expressions is a function, throw an error
+        else if(rowType == Datatype::FUNCTION || colType == Datatype::FUNCTION)
+            typeError = "function name";
+        // If any of the expressions is a list name, throw an error
+        else if(rowType == Datatype::LIST || colType == Datatype::LIST)
+            typeError = "list name";
+        // If any of the expressions is a matrix name, throw an error
+        else if(rowType == Datatype::MATRIX || colType == Datatype::MATRIX)
+            typeError = "matrix name";
+        // If any of the expressions is a string, throw an error.
+        else if(rowType == Datatype::STRING || colType == Datatype::STRING)
+            typeError = "string";
+        // If any of the two expressions is a double, throw an error.
+        else if(rowType == Datatype::DOUBLE || colType == Datatype::DOUBLE)
+            typeError = "double";
+        // If any of the two expressions is unknown, then assume it's valid.
+        else
+            return true;
+
+        std::cout << "Error: can't index a matrix with a " << typeError << "." << std::endl;
+        return false;
+    }
 };
 
-class DataPositionAssignment : public Expression {
+class DataPositionAssignment : public Statement {
 public:
+    Identifier& id;
     Position& position;
     Expression& expression;
-    DataPositionAssignment(Position& position, Expression& expression) : 
-        position(position), expression(expression) { }
+    DataPositionAssignment(Identifier& id, Position& position, Expression& expression) : 
+        id(id), position(position), expression(expression) { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
         std::cout << "DataPositionAssignment: " << std::endl;
+
+        id.print(tabs + 1);
 
         printTabs(tabs + 1);
         std::cout << "Position:" << std::endl;
@@ -542,6 +670,10 @@ public:
     {
         printTabs(tabs);
         std::cout << "List" << std::endl;
+    }
+    inline Datatype getExpressionType() const override
+    {
+        return Datatype::LIST;
     }
 };
 
@@ -565,6 +697,10 @@ public:
         printTabs(tabs + 1);
         std::cout << "Col:" << std::endl;
         col->print(tabs + 1);
+    }
+    inline Datatype getExpressionType() const override
+    {
+        return Datatype::MATRIX;
     }
 };
 

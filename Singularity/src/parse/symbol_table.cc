@@ -11,6 +11,8 @@ std::ostream& operator<<(std::ostream& out, Datatype value){
         PROCESS_VAL(STRING)
         PROCESS_VAL(BOOLEAN)
         PROCESS_VAL(FUNCTION)
+       	PROCESS_VAL(LIST)
+       	PROCESS_VAL(MATRIX)
     }
 
     return out << s;

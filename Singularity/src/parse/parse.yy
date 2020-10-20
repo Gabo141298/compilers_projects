@@ -138,7 +138,7 @@ SymbolTable symbolTable;
 %type <variableAssignment> set
 %type <ifStatement> if_condition
 %type <dataStructure> data_structure
-%type <dataPosAssignment> pos_assignment
+%type <dataPosAssignment> data_pos_set
 %type <function> function
 %type <variableList> arguments
 %type <expressionList> parameters
@@ -154,7 +154,7 @@ program: %empty { $$ = new SNode::Program(); }
             }
             | program set {
                 $1->globals.push_back($2); 
-                symbolTable.insertToCurrentSubtable($2->id.name, Datatype::UNKNOWN);
+                symbolTable.insertToCurrentSubtable($2->id.name, $2->assignmentExpr->getExpressionType());
             }
             ;
 
@@ -169,6 +169,7 @@ body:       statement { $$ = new SNode::Body(); $$->statements.push_back($<state
 
 statement: read { $$ = $1; }
             | set { $$ = $1; }
+            | data_pos_set { $$ = $1; }
             | print { $$ = $1; }
             | if_condition { $$ = $1; }
             | while { $$ = $1; }
@@ -181,11 +182,14 @@ set : SET IDENTIFIER assignment
         { $$ = new SNode::VariableAssignment(*(new SNode::Identifier(*$2)), $3); delete $2; }
         ;
 
+data_pos_set: SET IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS TO expression
+                { $$ = new SNode::DataPositionAssignment(*(new SNode::Identifier(*$2)), *$4, *$7); delete $2; }
+                ;
+
 read: READ TO IDENTIFIER { $$ = new SNode::Read(*$3); delete $3; };
 
 assignment: TO expression { $$ = $2; } 
             | AS data_structure { $$ = $2; }
-            | pos_assignment { $$ = $1; } 
             ;
 
 print: PRINT expression { $$ = new SNode::Print(*$2); }; 
@@ -201,10 +205,6 @@ arguments: IDENTIFIER { $$ = new SNode::VariableList(); $$->push_back(new SNode:
 
 parameters: expression { $$ = new SNode::ExpressionList(); $$->push_back($1); }
             | parameters COMMA expression { $1->push_back($3);  };
-
-pos_assignment: OPEN_BRACKETS position CLOSE_BRACKETS TO expression
-            { $$ = new SNode::DataPositionAssignment(*$2, *$5); }
-            ; 
 
 position: expression { $$ = new SNode::ListPosition(*$1); }
             | expression COMMA expression { $$ = new SNode::MatrixPosition(*$1, *$3); };
