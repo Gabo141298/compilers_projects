@@ -23,10 +23,45 @@ void TableRow::print()
 	std::cout << "\t" << id << " " << type << std::endl;
 }
 
-void Subtable::insertRow(const std::string& id, Datatype type)
+TableRow* Subtable::createRow(const std::string& id, Datatype type, size_t optional1, size_t optional2)
 {
-	content[id] = new TableRow(id, type);
-	// content.insert(std::make_pair<const std::string&,TableRow*>(id, new TableRow(id, type)));
+	switch(type)
+	{
+		case Datatype::INTEGER:
+		case Datatype::DOUBLE:
+		case Datatype::STRING:
+		case Datatype::BOOLEAN:
+		case Datatype::UNKNOWN:
+		case Datatype::LIST:
+			return new TableRow(id, type);
+			break;
+		case Datatype::FUNCTION:
+			return new FunctionTableRow(id, type, optional1);
+		case Datatype::MATRIX:
+			return new MatrixTableRow(id, type, optional1, optional2);
+		default:
+			break;
+	}
+	return nullptr;
+}
+
+TableRow* Subtable::insertRow(const std::string& id, Datatype type, size_t optional1, size_t optional2)
+{
+	try
+	{
+		auto itr = content.find(id);
+		if(itr != content.end())
+			delete itr->second;
+		return content[id] = createRow(id, type, optional1, optional2);
+	}
+	catch(const std::out_of_range&)
+	{
+		TableRow* row = parent->insertRow(id, type, optional1, optional2);
+		if(row)
+			return row;
+		else
+			return content[id] = createRow(id, type, optional1, optional2);
+	}
 }
 
 TableRow* Subtable::search(const std::string& id)
@@ -41,7 +76,7 @@ TableRow* Subtable::search(const std::string& id)
 		if(parent)
 			row = parent->search(id);
 		else
-			return nullptr;
+			row = nullptr;
 	}
 	return row;
 }
@@ -77,9 +112,9 @@ void SymbolTable::finalizeScope()
 		currentSubtable = currentSubtable->getParent();
 }
 
-void SymbolTable::insertToCurrentSubtable(const std::string& id, Datatype type)
+void SymbolTable::insertToCurrentSubtable(const std::string& id, Datatype type, size_t optional1, size_t optional2)
 {
-	currentSubtable->insertRow(id, type);
+	currentSubtable->insertRow(id, type, optional1, optional2);
 }
 
 void SymbolTable::print()

@@ -38,6 +38,52 @@ public:
 	void print();
 };
 
+class FunctionTableRow : public TableRow
+{
+private:
+	size_t arguments;
+	Datatype returnType = Datatype::UNKNOWN;
+public:
+	FunctionTableRow(const std::string& id, Datatype type, size_t arguments = 0)
+		: TableRow(id, type)
+		, arguments(arguments)
+	{
+	}
+	inline size_t getArgumentCount() { return this->arguments; }
+	inline Datatype getReturnType() { return this->returnType; }
+	inline void setReturnType(Datatype type) { this->returnType = type; }
+};
+
+class ListTableRow : public TableRow
+{
+private:
+	Datatype contentType = Datatype::UNKNOWN;
+public:
+	inline Datatype getContentType() { return this->contentType; }
+	inline void setContentType(Datatype type) { this->contentType = type; }
+};
+
+class MatrixTableRow : public TableRow
+{
+private:
+	Datatype contentType = Datatype::UNKNOWN;
+	size_t row;
+	size_t col;
+public:
+	MatrixTableRow(const std::string& id, Datatype type, size_t row = 0, size_t col = 0)
+		: TableRow(id, type)
+		, row(row)
+		, col(col)
+	{
+	}
+	inline Datatype getContentType() { return this->contentType; }
+	inline void setContentType(Datatype type) { this->contentType = type; }
+	inline size_t getRow() { return this->row; }
+	inline void setRow(size_t row) { this->row = row; }
+	inline size_t getCol() { return this->col; }
+	inline void setCol(size_t col) { this->col = col; }
+};
+
 class Subtable
 {
 private:
@@ -50,7 +96,8 @@ public:
 		: name(name), parent(parent)
 	{
 	}
-	void insertRow(const std::string& id, Datatype type = UNKNOWN);
+	TableRow* createRow(const std::string& id, Datatype type, size_t optional1 = 0, size_t optional2 = 0);
+	TableRow* insertRow(const std::string& id, Datatype type = UNKNOWN, size_t optional1 = 0, size_t optional2 = 0);
 	TableRow* search(const std::string& id);
 	inline Subtable* getParent() { return parent; }
 	Subtable* insertChild(const std::string& name, Subtable* parent);
@@ -68,7 +115,7 @@ public:
 	}
 	void initializeScope(const std::string& name);
 	void finalizeScope();
-	void insertToCurrentSubtable(const std::string& id, Datatype type = UNKNOWN);
+	void insertToCurrentSubtable(const std::string& id, Datatype type = UNKNOWN, size_t optional1 = 0, size_t optional2 = 0);
 	void print();
 };
 
