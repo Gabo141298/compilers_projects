@@ -248,24 +248,24 @@ term:       value { $$ = $1; }
             | func_call { $$ = $1; }
             | OPEN_PARENTHESIS expression CLOSE_PARENTHESIS { $$ = $2; }
             | IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS { $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3); delete $1; }
-            | NOT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS { $$ = new SNode::NotOperator(*$3); }
+            | NOT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS { $$ = new SNode::NotOperation(*$3); }
             ;
 
 expression: term { $$ = $1; }
-            | expression ADDITION expression { $$ = SNode::createOperation(*$1, SNode::Operation::addition, *$3); }
-            | expression SUBSTRACTION expression { $$ = SNode::createOperation(*$1, SNode::Operation::substraction, *$3); }
-            | expression MULTIPLICATION expression { $$ = SNode::createOperation(*$1, SNode::Operation::multiplication, *$3); }
-            | expression DIVISION expression { $$ = SNode::createOperation(*$1, SNode::Operation::division, *$3); }
-            | expression MODULO expression { $$ = SNode::createOperation(*$1, SNode::Operation::modulo, *$3); }
-            | expression LEQ expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::leq, *$3); }
-            | expression GEQ expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::geq, *$3); }
-            | expression GREATER expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::greater, *$3); }
-            | expression LESS expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::less, *$3); }
-            | expression EQUALS expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::equals, *$3); }
-            | expression IS NOT expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperation::isNot, *$4); }
-            | expression XOR expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperation::bXor, *$3); }
-            | expression OR expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperation::bOr, *$3); }
-            | expression AND expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperation::bAnd, *$3); }
+            | expression ADDITION expression { $$ = SNode::createOperation(*$1, SNode::ArithmeticOperator::addition, *$3); }
+            | expression SUBSTRACTION expression { $$ = SNode::createOperation(*$1, SNode::ArithmeticOperator::substraction, *$3); }
+            | expression MULTIPLICATION expression { $$ = SNode::createOperation(*$1, SNode::ArithmeticOperator::multiplication, *$3); }
+            | expression DIVISION expression { $$ = SNode::createOperation(*$1, SNode::ArithmeticOperator::division, *$3); }
+            | expression MODULO expression { $$ = SNode::createOperation(*$1, SNode::ArithmeticOperator::modulo, *$3); }
+            | expression LEQ expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperator::leq, *$3); }
+            | expression GEQ expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperator::geq, *$3); }
+            | expression GREATER expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperator::greater, *$3); }
+            | expression LESS expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperator::less, *$3); }
+            | expression EQUALS expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperator::equals, *$3); }
+            | expression IS NOT expression { $$ = SNode::createOperation(*$1, SNode::ComparisonOperator::isNot, *$4); }
+            | expression XOR expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperator::bXor, *$3); }
+            | expression OR expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperator::bOr, *$3); }
+            | expression AND expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperator::bAnd, *$3); }
             ;
 
 func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2))); delete $2; }

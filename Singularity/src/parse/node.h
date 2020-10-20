@@ -26,7 +26,7 @@ enum OperationType
     BOOLEAN_OP = 0x300
 };
 
-enum Operation
+enum ArithmeticOperator
 {
     addition = ARITHMETIC_OP,
     substraction,
@@ -35,9 +35,9 @@ enum Operation
     modulo
 };
 
-std::ostream& operator<<(std::ostream& out, Operation value);
+std::ostream& operator<<(std::ostream& out, ArithmeticOperator value);
 
-enum ComparisonOperation
+enum ComparisonOperator
 {
     leq = COMPARISON_OP,
     geq,
@@ -47,16 +47,16 @@ enum ComparisonOperation
     isNot
 };
 
-std::ostream& operator<<(std::ostream& out, ComparisonOperation value);
+std::ostream& operator<<(std::ostream& out, ComparisonOperator value);
 
-enum BooleanOperation
+enum BooleanOperator
 {
     bAnd = BOOLEAN_OP,
     bOr,
     bXor
 };
 
-std::ostream& operator<<(std::ostream& out, BooleanOperation value);
+std::ostream& operator<<(std::ostream& out, BooleanOperator value);
 
 class CodeGenContext;
 class Statement;
@@ -304,18 +304,18 @@ public:
     }
 };
 
-class ArithmeticOperator : public Expression {
+class ArithmeticOperation : public Expression {
 public:
     Expression& left;
-    Operation op;
+    ArithmeticOperator op;
     Expression& right;
-    ArithmeticOperator(Expression& left, Operation op, Expression& right) :
+    ArithmeticOperation(Expression& left, ArithmeticOperator op, Expression& right) :
         left(left), op(op), right(right) { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
-        std::cout << "ArithmeticOperator: op - " << op << std::endl;
+        std::cout << "ArithmeticOperation: op - " << op << std::endl;
 
         printTabs(tabs + 1);
         std::cout << "LeftExpression:" << std::endl;
@@ -358,18 +358,18 @@ public:
     }
 };
 
-class ComparisonOperator : public Expression {
+class ComparisonOperation : public Expression {
 public:
     Expression& left;
-    ComparisonOperation op;
+    ComparisonOperator op;
     Expression& right;
-    ComparisonOperator(Expression& left, ComparisonOperation op, Expression& right) :
+    ComparisonOperation(Expression& left, ComparisonOperator op, Expression& right) :
         left(left), op(op), right(right) { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
-        std::cout << "ComparisonOperator: op - " << op << std::endl;
+        std::cout << "ComparisonOperation: op - " << op << std::endl;
 
         printTabs(tabs + 1);
         std::cout << "LeftExpression:" << std::endl;
@@ -411,18 +411,18 @@ public:
     }
 };
 
-class BooleanOperator : public Expression {
+class BooleanOperation : public Expression {
 public:
     Expression& left;
-    BooleanOperation op;
+    BooleanOperator op;
     Expression& right;
-    BooleanOperator(Expression& left, BooleanOperation op, Expression& right) :
+    BooleanOperation(Expression& left, BooleanOperator op, Expression& right) :
         left(left), op(op), right(right) { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
-        std::cout << "BooleanOperator: op - " << op << std::endl;
+        std::cout << "BooleanOperation: op - " << op << std::endl;
 
         printTabs(tabs + 1);
         std::cout << "LeftExpression:" << std::endl;
@@ -462,10 +462,10 @@ public:
     }
 };
 
-class NotOperator : public Expression {
+class NotOperation : public Expression {
 public:
     Expression& expression;
-    NotOperator(Expression& expression) :
+    NotOperation(Expression& expression) :
         expression(expression) { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override

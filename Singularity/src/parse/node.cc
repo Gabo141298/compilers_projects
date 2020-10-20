@@ -1,6 +1,6 @@
 #include "node.h"
 
-std::ostream& SNode::operator<<(std::ostream& out, SNode::Operation value){
+std::ostream& SNode::operator<<(std::ostream& out, SNode::ArithmeticOperator value){
     const char* s = 0;
     switch(value){
         PROCESS_VAL(addition)
@@ -13,7 +13,7 @@ std::ostream& SNode::operator<<(std::ostream& out, SNode::Operation value){
     return out << s;
 }
 
-std::ostream& SNode::operator<<(std::ostream& out, SNode::ComparisonOperation value){
+std::ostream& SNode::operator<<(std::ostream& out, SNode::ComparisonOperator value){
     const char* s = 0;
     switch(value){
         PROCESS_VAL(leq)
@@ -27,7 +27,7 @@ std::ostream& SNode::operator<<(std::ostream& out, SNode::ComparisonOperation va
     return out << s;
 }
 
-std::ostream& SNode::operator<<(std::ostream& out, SNode::BooleanOperation value){
+std::ostream& SNode::operator<<(std::ostream& out, SNode::BooleanOperator value){
     const char* s = 0;
     switch(value){
         PROCESS_VAL(bAnd)
@@ -41,10 +41,10 @@ std::ostream& SNode::operator<<(std::ostream& out, SNode::BooleanOperation value
 SNode::Expression* SNode::createOperation(SNode::Expression& left, int op, SNode::Expression& right)
 {
     if(SNode::OperationType::ARITHMETIC_OP <= op && op < SNode::OperationType::COMPARISON_OP)
-        return new ArithmeticOperator(left, (SNode::Operation)op, right);
+        return new ArithmeticOperation(left, (SNode::ArithmeticOperator)op, right);
     else if(SNode::OperationType::COMPARISON_OP <= op && op < SNode::OperationType::BOOLEAN_OP)
-        return new ComparisonOperator(left, (SNode::ComparisonOperation)op, right);
+        return new ComparisonOperation(left, (SNode::ComparisonOperator)op, right);
     else if(op >= SNode::OperationType::BOOLEAN_OP)
-        return new BooleanOperator(left, (SNode::BooleanOperation)op, right);
+        return new BooleanOperation(left, (SNode::BooleanOperator)op, right);
     return nullptr;
 }
