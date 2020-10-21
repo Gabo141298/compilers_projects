@@ -17,7 +17,7 @@ SymbolTable symbolTable;
   #include "location.hh"
   #include "position.hh"
 
-  #include "node.h"
+  #include "../node/node_headers.hh"
   #include "symbol_table.hh"
 }
 

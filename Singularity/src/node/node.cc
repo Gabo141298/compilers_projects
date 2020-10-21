@@ -1,3 +1,6 @@
+#include "ArithmeticOperation.hh"
+#include "BooleanOperation.hh"
+#include "ComparisonOperation.hh"
 #include "node.hh"
 
 std::ostream& SNode::operator<<(std::ostream& out, SNode::ArithmeticOperator value){

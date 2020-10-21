@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "parse/node.h"
+#include "node/node_headers.hh"
 #include "parse/symbol_table.hh"
 
 extern SNode::Program* programBlock;
