@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     parse::Driver driver;
     if(argc < 2)
     {
-    	std::cout << "Ponga el archivo, no haga el ridi" << std::endl;
+    	std::cout << "Please specify the file with the source code" << std::endl;
     	return 1;
     }
     std::string filename(argv[1]);

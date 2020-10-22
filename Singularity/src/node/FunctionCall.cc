@@ -22,4 +22,28 @@ void FunctionCall::print(size_t tabs) const
     }
 }
 
+Datatype FunctionCall::getExpressionType() const
+{
+    TableRow* row = this->symbolTable.searchCurrentSubtable(this->id.name);
+
+    // Checks if the symbol was not declared
+    if (!row)
+        throw SingularityException::UNDECLARED_VARIABLE;
+    // Checks that that symbols is a function and not a variable
+    else if (row->getType() != FUNCTION)
+        throw SingularityException::VAR_CALLED_AS_FUNCTN;
+    // Checks that the amount of parameters matches the argument count
+    else 
+    {
+        FunctionTableRow* tableRow = reinterpret_cast<FunctionTableRow*>(&(*row) );
+
+        if (tableRow->getArgumentCount() != parameters.size())
+            throw SingularityException::INVALID_ARG_COUNT;   
+    }
+
+
+    // Se puede inferir en algunos casos, ya veremos
+    return Datatype::UNKNOWN;
+}
+
 }

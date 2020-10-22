@@ -147,7 +147,7 @@ input: program { programBlock = $1; } ;
 program: %empty { $$ = new SNode::Program(); }
             | program function { 
                 $1->functions.push_back($2); 
-                symbolTable.insertToCurrentSubtable($2->id.name, Datatype::FUNCTION);
+                symbolTable.insertToCurrentSubtable($2->id.name, Datatype::FUNCTION, $2->arguments.size());
             }
             | program set {
                 $1->globals.push_back($2); 
@@ -263,9 +263,9 @@ expression: term { $$ = $1; }
             | expression AND expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperator::bAnd, *$3); }
             ;
 
-func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2,symbolTable))); delete $2; }
+func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2,symbolTable)), symbolTable); delete $2; }
             | CALL IDENTIFIER WITH PARAMETERS OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS
-            { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2,symbolTable)), *$6); delete $2; }
+            { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2,symbolTable)), symbolTable, *$6); delete $2; }
             ;
 
 answer: ANSWER expression

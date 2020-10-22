@@ -57,6 +57,12 @@ void handleException(SingularityException exception)
         case COMP_EXPR_STRING_NUM:
             std::cout << "Error: can't compare a string with a numeric expression" << std::endl;
             break;
+        case VAR_CALLED_AS_FUNCTN:
+            std::cout << "Error: a symbol of variable type cannot be invoked as a function" << std::endl;
+            break;
+        case INVALID_ARG_COUNT:
+            std::cout << "Error: method called with invalid amount of arguments" << std::endl;
+            break;
         default:
             break;
     }
