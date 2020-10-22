@@ -26,16 +26,16 @@ Datatype ComparisonOperation::getExpressionType() const
 
     // If any of the expressions is boolean, throw an error
     if(leftType == Datatype::BOOLEAN || rightType == Datatype::BOOLEAN)
-        std::cout << "Error: can't use a boolean expression to compare." << std::endl;
+        throw SingularityException::COMP_EXPR_BOOL_USE;
     // If any of the expressions is a function, throw an error
     else if(leftType == Datatype::FUNCTION || rightType == Datatype::FUNCTION)
-        std::cout << "Error: can't use a function name as an expression." << std::endl;
+        throw SingularityException::COMP_EXPR_FUNCTION_USE;
     // If any of the expressions is a list name, throw an error
     else if(leftType == Datatype::LIST || rightType == Datatype::LIST)
-        std::cout << "Error: can't use a list name as an expression." << std::endl;
+        throw SingularityException::COMP_EXPR_LIST_USE;
     // If any of the expressions is a matrix name, throw an error
     else if(leftType == Datatype::MATRIX || rightType == Datatype::MATRIX)
-        std::cout << "Error: can't use a matrix name as an expression." << std::endl;
+        throw SingularityException::COMP_EXPR_MATRIX_USE;
     // If any of the two expressions is unknown, then the resulting expression is unknown.
     else if(leftType == Datatype::UNKNOWN || rightType == Datatype::UNKNOWN)
         return Datatype::UNKNOWN;
@@ -43,7 +43,7 @@ Datatype ComparisonOperation::getExpressionType() const
         return Datatype::BOOLEAN;
     // If any of the expressions is a string, throw an error.
     else if(leftType == Datatype::STRING || rightType == Datatype::STRING)
-        std::cout << "Error: can't compare a string with a numeric expression" << std::endl;
+        throw SingularityException::COMP_EXPR_STRING_NUM;
     else
         return Datatype::BOOLEAN;
 

@@ -26,19 +26,19 @@ Datatype BooleanOperation::getExpressionType() const
 
     // If any of the expressions is a function, throw an error
     if(leftType == Datatype::FUNCTION || rightType == Datatype::FUNCTION)
-        std::cout << "Error: can't use a function name as a boolean expression." << std::endl;
+        throw SingularityException::BOOL_EXPR_FUNCTION_USE;
     // If any of the expressions is a list name, throw an error
     else if(leftType == Datatype::LIST || rightType == Datatype::LIST)
-        std::cout << "Error: can't use a list name as a boolean expression." << std::endl;
+        throw SingularityException::BOOL_EXPR_LIST_USE;
     // If any of the expressions is a matrix name, throw an error
     else if(leftType == Datatype::MATRIX || rightType == Datatype::MATRIX)
-        std::cout << "Error: can't use a matrix name as a boolean expression." << std::endl;
+        throw SingularityException::BOOL_EXPR_MATRIX_USE;
     // If any of the expressions is a string, throw an error.
     else if(leftType == Datatype::STRING || rightType == Datatype::STRING)
-        std::cout << "Error: can't use a string as a boolean expression." << std::endl;
+        throw SingularityException::BOOL_EXPR_STRING_USE;
     else if(leftType == Datatype::DOUBLE || rightType == Datatype::DOUBLE 
         || leftType == Datatype::INTEGER || rightType == Datatype::INTEGER)
-        std::cout << "Error: can't use a numeric value as a boolean expression." << std::endl;
+        throw SingularityException::BOOL_EXPR_NUM_USE;
     // If any of the two expressions is unknown, then the resulting expression is unknown.
     else if(leftType == Datatype::UNKNOWN || rightType == Datatype::UNKNOWN)
         return Datatype::UNKNOWN;

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+#include "exceptions/exceptions.hh"
 #include "node/node_headers.hh"
 #include "parse/symbol_table.hh"
 
@@ -20,11 +21,17 @@ int main(int argc, char** argv)
     std::string filename(argv[1]);
     driver.parse_file(filename);
 
-    programBlock->print();
+    // programBlock->print();
 
-    programBlock->createSymbolTable(symbolTable);
-
-    symbolTable.print();
-
+    try
+    {
+        programBlock->createSymbolTable(symbolTable);
+        symbolTable.print();
+    }
+    catch(SingularityException exception)
+    {
+        handleException(exception);
+    }
+    
     return 0;
 }

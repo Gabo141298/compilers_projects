@@ -10,6 +10,7 @@
 #include <vector>
 #include <llvm/IR/Value.h>
 
+#include "../exceptions/exceptions.hh"
 #include "../parse/symbol_table.hh"
 
 #ifndef PROCESS_VAL
@@ -160,7 +161,8 @@ public:
     {
 	TableRow* row = symbolTable.searchCurrentSubtable(this->name);
 	if (row == nullptr){
-		std::cout << "The symbol " << name << " is not declared. " << std::endl;
+		std::cout << "The symbol " << name << " is not declared." << std::endl;
+        throw SingularityException::UNDECLARED_VARIABLE;
 		return Datatype::UNKNOWN;
 	}
 	

@@ -2,6 +2,7 @@
 
 add_subdirectory(parse)
 add_subdirectory(node)
+add_subdirectory(exceptions)
 
 # Add the binary and sources
 add_executable(
@@ -9,4 +10,4 @@ add_executable(
   main.cc
 )
 
-target_link_libraries(../../parser parse node)
+target_link_libraries(../../parser parse node exceptions)
