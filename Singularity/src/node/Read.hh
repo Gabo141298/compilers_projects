@@ -9,8 +9,9 @@ namespace SNode
 class Read : public Statement {
 public:
     Identifier& identifier;
-    Read(const std::string& identifier) :
-        identifier(*(new SNode::Identifier(identifier))) { }
+
+    Read( Identifier& identifier) :
+        identifier(identifier) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     void createSymbolTable(SymbolTable& table, std::string, size_t*) const override;

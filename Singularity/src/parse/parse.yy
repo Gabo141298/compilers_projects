@@ -174,14 +174,14 @@ statement: read { $$ = $1; }
             ;
 
 set : SET IDENTIFIER assignment 
-        { $$ = new SNode::VariableAssignment(*(new SNode::Identifier(*$2)), $3); delete $2; }
+        { $$ = new SNode::VariableAssignment(*(new SNode::Identifier(*$2, symbolTable)), $3); delete $2; }
         ;
 
 data_pos_set: SET IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS TO expression
-                { $$ = new SNode::DataPositionAssignment(*(new SNode::Identifier(*$2)), *$4, *$7); delete $2; }
+                { $$ = new SNode::DataPositionAssignment(*(new SNode::Identifier(*$2,symbolTable)), *$4, *$7); delete $2; }
                 ;
 
-read: READ TO IDENTIFIER { $$ = new SNode::Read(*$3); delete $3; };
+read: READ TO IDENTIFIER { $$ = new SNode::Read(*new SNode::Identifier(*$3, symbolTable)); delete $3; };
 
 assignment: TO expression { $$ = $2; } 
             | AS data_structure { $$ = $2; }
@@ -190,13 +190,13 @@ assignment: TO expression { $$ = $2; }
 print: PRINT expression { $$ = new SNode::Print(*$2); }; 
 
 function: DEFINE FUNCTION IDENTIFIER block
-            { $$ = new SNode::Function(*(new SNode::Identifier(*$3)), *$4); delete $3; }
+            { $$ = new SNode::Function(*(new SNode::Identifier(*$3,symbolTable)), *$4); delete $3; }
             | DEFINE FUNCTION IDENTIFIER WITH ARGUMENTS arguments block
-            { $$ = new SNode::Function(*(new SNode::Identifier(*$3)), *$6, *$7); delete $3; }
+            { $$ = new SNode::Function(*(new SNode::Identifier(*$3,symbolTable)), *$6, *$7); delete $3; }
             ;
 
-arguments: IDENTIFIER { $$ = new SNode::VariableList(); $$->push_back(new SNode::Identifier(*$1)); delete $1; }
-            | arguments COMMA IDENTIFIER { $1->push_back(new SNode::Identifier(*$3)); delete $3; };
+arguments: IDENTIFIER { $$ = new SNode::VariableList(); $$->push_back(new SNode::Identifier(*$1,symbolTable)); delete $1; }
+            | arguments COMMA IDENTIFIER { $1->push_back(new SNode::Identifier(*$3,symbolTable)); delete $3; };
 
 parameters: expression { $$ = new SNode::ExpressionList(); $$->push_back($1); }
             | parameters COMMA expression { $1->push_back($3);  };
@@ -222,19 +222,19 @@ otherwise: if_condition { $$ = new SNode::OtherwiseIf(*$1); }
 while: WHILE expression block { $$ = new SNode::While(*$2, *$3); };;
 
 while_counting: WHILE IDENTIFIER COUNTING FROM expression TO expression block
-                { $$ = new SNode::WhileCounting(*(new SNode::Identifier(*$2)), *$5, *$7, *$8); delete $2; };
+                { $$ = new SNode::WhileCounting(*(new SNode::Identifier(*$2,symbolTable)), *$5, *$7, *$8); delete $2; };
 
 boolean: TRUE { $$ = new SNode::Boolean(true); }
             | FALSE { $$ = new SNode::Boolean(false); }
             ;
 
 intvalue:  INTEGER { $$ = new SNode::Integer(atoll($1->c_str())); delete $1; }
-            | IDENTIFIER { $$ = new SNode::Identifier(*$1); delete $1; }
+            | IDENTIFIER { $$ = new SNode::Identifier(*$1,symbolTable); delete $1; }
             ;
 
 value:      FLOAT { $$ = new SNode::Double(atof($1->c_str())); delete $1; }
             | INTEGER { $$ = new SNode::Integer(atoll($1->c_str())); delete $1; }
-            | IDENTIFIER { $$ = new SNode::Identifier(*$1); delete $1; }
+            | IDENTIFIER { $$ = new SNode::Identifier(*$1,symbolTable); delete $1; }
             | STRING { $$ = new SNode::String(*$1); delete $1; }
             | boolean { $$ = $1; }
             ;
@@ -242,7 +242,7 @@ value:      FLOAT { $$ = new SNode::Double(atof($1->c_str())); delete $1; }
 term:       value { $$ = $1; }
             | func_call { $$ = $1; }
             | OPEN_PARENTHESIS expression CLOSE_PARENTHESIS { $$ = $2; }
-            | IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS { $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1)), *$3); delete $1; }
+            | IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS { $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1,symbolTable)), *$3); delete $1; }
             | NOT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS { $$ = new SNode::NotOperation(*$3); }
             ;
 
@@ -263,9 +263,9 @@ expression: term { $$ = $1; }
             | expression AND expression { $$ = SNode::createOperation(*$1, SNode::BooleanOperator::bAnd, *$3); }
             ;
 
-func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2))); delete $2; }
+func_call: CALL IDENTIFIER { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2,symbolTable))); delete $2; }
             | CALL IDENTIFIER WITH PARAMETERS OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS
-            { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2)), *$6); delete $2; }
+            { $$ = new SNode::FunctionCall(*(new SNode::Identifier(*$2,symbolTable)), *$6); delete $2; }
             ;
 
 answer: ANSWER expression

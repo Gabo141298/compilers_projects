@@ -117,6 +117,7 @@ public:
 	void finalizeScope();
 	void insertToCurrentSubtable(const std::string& id, Datatype type = UNKNOWN, size_t optional1 = 0, size_t optional2 = 0);
 	void print();
+	inline TableRow* searchCurrentSubtable(const std::string& id) {return this->currentSubtable->search(id);}
 };
 
 #endif // SYMBOL_TABLE_H

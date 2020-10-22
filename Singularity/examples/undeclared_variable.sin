@@ -1,0 +1,6 @@
+
+define function start
+begin
+   set myvariable to a + b
+   print(myvariable)
+end

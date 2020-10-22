@@ -148,7 +148,8 @@ public:
 class Identifier : public Value {
 public:
     std::string name;
-    Identifier(const std::string& name) : name(name) { }
+    SymbolTable& symbolTable;
+    Identifier(const std::string& name, SymbolTable& symbolTable) : name(name), symbolTable(symbolTable)  { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
@@ -157,8 +158,13 @@ public:
     }
     inline Datatype getExpressionType() const override
     {
-        // Lookup table to check if variable has a type.
-        return Datatype::UNKNOWN;
+	TableRow* row = symbolTable.searchCurrentSubtable(this->name);
+	if (row == nullptr){
+		std::cout << "The symbol " << name << " is not declared. " << std::endl;
+		return Datatype::UNKNOWN;
+	}
+	
+	return row->getType();	
     }
 };
 
