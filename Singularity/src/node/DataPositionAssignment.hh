@@ -13,7 +13,7 @@ public:
     Position& position;
     Expression& expression;
     DataPositionAssignment(Identifier& id, Position& position, Expression& expression) : 
-        id(id), position(position), expression(expression) { }
+        Statement(NodeTypes::DataPositionAssignment), id(id), position(position), expression(expression) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
 };

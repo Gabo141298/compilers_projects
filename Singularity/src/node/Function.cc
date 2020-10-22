@@ -33,13 +33,18 @@ void Function::createSymbolTable(SymbolTable& table) const
     for(auto itr = arguments.begin(); itr != arguments.end(); ++itr)
     {
         // Difficult to infer the datatype of the arguments, although maybe not impossible.
-        table.insertToCurrentSubtable((*itr)->name, Datatype::UNKNOWN);
+        table.insertToCurrentSubtable((*itr)->name, Datatype::UNKNOWN);        
     }
 
+    bool hasCondition = false;
     size_t* subtableCounter = new size_t(0);
     block.createSymbolTable(table, id.name, subtableCounter);
     delete subtableCounter;
     table.finalizeScope();
+
+    if(block.hasInfiniteRecursion(id.name))
+        throw SingularityException::INFINITE_RECURSION;
+
 }
 
 }

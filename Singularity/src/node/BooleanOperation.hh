@@ -12,7 +12,7 @@ public:
     BooleanOperator op;
     Expression& right;
     BooleanOperation(Expression& left, BooleanOperator op, Expression& right) :
-        left(left), op(op), right(right) { }
+        Expression(NodeTypes::BooleanOperation), left(left), op(op), right(right) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     Datatype getExpressionType() const override;

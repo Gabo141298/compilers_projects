@@ -11,7 +11,7 @@ class Otherwise : public Statement {
 public:
     Block& block;
     Otherwise(Block& block) :  
-         block(block) { }
+        Statement( NodeTypes::Otherwise), block(block) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
 

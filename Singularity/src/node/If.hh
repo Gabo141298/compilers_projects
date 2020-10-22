@@ -13,7 +13,7 @@ public:
     Block& block;
     Statement* otherwise;
     If(Expression& condition, Block& block, Statement* otherwise = nullptr) :
-        condition(condition), block(block), otherwise(otherwise) { }
+        Statement(NodeTypes::If), condition(condition), block(block), otherwise(otherwise) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
 

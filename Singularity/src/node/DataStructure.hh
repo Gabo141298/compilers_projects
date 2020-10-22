@@ -7,12 +7,16 @@ namespace SNode
 {
 
 class DataStructure : public Expression {
+    public:
+    DataStructure(NodeTypes type = NodeTypes::DataStructure)
+        : Expression(type)
+    {}
 };
 
 class List : public DataStructure {
 public:
     std::vector<Value> values;
-    List() {}
+    List() : DataStructure(NodeTypes::List) {}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     inline Datatype getExpressionType() const override
@@ -27,7 +31,7 @@ public:
     Value* col;
     std::vector<std::vector<Value>> matrix;
     Matrix(Value* row, Value* col) :
-        row(row), col(col) { }
+        DataStructure(NodeTypes::Matrix), row(row), col(col) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     inline Datatype getExpressionType() const override

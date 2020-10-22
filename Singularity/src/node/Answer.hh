@@ -10,7 +10,7 @@ class Answer : public Statement {
 public:
     Expression& returnExpression;
     Answer(Expression& returnExpression) :
-        returnExpression(returnExpression) {}
+        Statement(NodeTypes::Answer), returnExpression(returnExpression) {}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     void createSymbolTable(SymbolTable& table, std::string name, size_t* subtableCounter) const;

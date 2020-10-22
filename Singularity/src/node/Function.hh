@@ -13,10 +13,10 @@ public:
     VariableList arguments;
     Block& block;
     Function(const Identifier& id, Block& block) :
-        id(id), block(block) { }
+        Node(NodeTypes::Function), id(id), block(block) { }
     Function(const Identifier& id, 
             const VariableList& arguments, Block& block) :
-        id(id), arguments(arguments), block(block) { }
+        Node(NodeTypes::Function), id(id), arguments(arguments), block(block){ }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
 

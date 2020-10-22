@@ -57,6 +57,16 @@ enum BooleanOperator
     bXor
 };
 
+enum class NodeTypes
+{
+    Node, Expression, ArithmeticOperation, BooleanOperation, ComparisonOperation,
+    DataStructure, List, Matrix, FunctionCall, NotOperation, Position,
+    ListPosition, MatrixPosition, PositionAccesss, Value, Boolean,
+    Double, Identifier, Integer, String, Function, Program, Statement,
+    Answer, Block, DataPositionAssignment, ExpressionStatement, If,
+    Otherwise, Otherwiseif, Print, Read, VariableAssignment, While, WhileCounting
+};
+
 std::ostream& operator<<(std::ostream& out, BooleanOperator value);
 
 class CodeGenContext;
@@ -77,7 +87,10 @@ public:
     virtual ~Node() {}
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     virtual void print(size_t tabs) const { (void)tabs; }
+    Node(NodeTypes type = NodeTypes::Node) : nodeType(type){};
+    inline NodeTypes getType() {return this->nodeType;}
 protected:
+    NodeTypes nodeType = NodeTypes::Node;
     void printTabs(size_t tabs = 0) const
     {
         for(size_t index = 0; index < tabs; ++index)
@@ -87,21 +100,40 @@ protected:
 
 class Expression : public Node {
 public:
+    Expression(NodeTypes type = NodeTypes::Expression)
+        : Node(type)
+    {        
+    }
+
     virtual inline Datatype getExpressionType() const { return Datatype::UNKNOWN; }
 };
 
 class Statement : public Node {
 public:
+    Statement(NodeTypes type = NodeTypes::Statement)
+        : Node(type)
+    {        
+    }
     virtual void createSymbolTable(SymbolTable&, std::string, size_t*) const { }
 };
 
 class Value : public Expression{
+public:
+    Value(NodeTypes type = NodeTypes::Value)
+        : Expression(type)
+    {        
+    }
 };
 
 class Integer : public Value {
 public:
     long long value;
-    Integer(long long value) : value(value) { }
+    Integer(long long value) 
+    : Value(NodeTypes::Integer ) 
+    , value(value)     
+    {        
+    }
+
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
@@ -117,7 +149,7 @@ public:
 class Double : public Value {
 public:
     double value;
-    Double(double value) : value(value) { }
+    Double(double value) : Value(NodeTypes::Double ), value(value) { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
@@ -133,7 +165,7 @@ public:
 class String : public Value {
 public:
     std::string value;
-    String(const std::string& value) : value(value) { }
+    String(const std::string& value) : Value(NodeTypes::String), value(value) { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
@@ -150,7 +182,7 @@ class Identifier : public Value {
 public:
     std::string name;
     SymbolTable& symbolTable;
-    Identifier(const std::string& name, SymbolTable& symbolTable) : name(name), symbolTable(symbolTable)  { }
+    Identifier(const std::string& name, SymbolTable& symbolTable) : Value(NodeTypes::Identifier), name(name), symbolTable(symbolTable)  { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
@@ -173,7 +205,7 @@ public:
 class Boolean : public Value {
 public:
     bool value;
-    Boolean(bool value) : value(value) { }
+    Boolean(bool value) : Value(NodeTypes:: Boolean), value(value) { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {
@@ -189,8 +221,7 @@ public:
 class ExpressionStatement : public Statement {
 public:
     Expression& expression;
-    ExpressionStatement(Expression& expression) : 
-        expression(expression) { }
+    ExpressionStatement(Expression& expression) :Statement(NodeTypes::ExpressionStatement), expression(expression) { }
     // virtual llvm::Value* codeGen(CodeGenContext& context) { }
     void print(size_t tabs = 0) const override
     {

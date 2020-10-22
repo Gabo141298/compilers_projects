@@ -63,6 +63,9 @@ void handleException(SingularityException exception)
         case INVALID_ARG_COUNT:
             std::cout << "Error: method called with invalid amount of arguments" << std::endl;
             break;
+        case INFINITE_RECURSION:
+            std::cout << "Error: Infinite recursion detected" << std::endl;
+            break;
         default:
             break;
     }

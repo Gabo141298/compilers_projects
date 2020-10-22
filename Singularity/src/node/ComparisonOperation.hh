@@ -12,7 +12,7 @@ public:
     ComparisonOperator op;
     Expression& right;
     ComparisonOperation(Expression& left, ComparisonOperator op, Expression& right) :
-        left(left), op(op), right(right) { }
+        Expression(NodeTypes::ComparisonOperation), left(left), op(op), right(right) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     Datatype getExpressionType() const override;

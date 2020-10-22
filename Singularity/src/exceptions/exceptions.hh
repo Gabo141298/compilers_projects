@@ -21,7 +21,8 @@ enum SingularityException
     COMP_EXPR_MATRIX_USE,
     COMP_EXPR_STRING_NUM,
     VAR_CALLED_AS_FUNCTN,
-    INVALID_ARG_COUNT
+    INVALID_ARG_COUNT,
+    INFINITE_RECURSION
 };
 
 void handleException(SingularityException exception);

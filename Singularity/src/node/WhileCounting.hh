@@ -14,7 +14,7 @@ public:
     Expression& endValue;
     Block& block;
     WhileCounting(Identifier& counter, Expression& beginValue, Expression& endValue, Block& block) :
-        counter(counter), beginValue(beginValue), endValue(endValue), block(block) { }
+        Statement(NodeTypes::WhileCounting), counter(counter), beginValue(beginValue), endValue(endValue), block(block) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
 

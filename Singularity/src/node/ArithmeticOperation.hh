@@ -12,7 +12,7 @@ public:
     ArithmeticOperator op;
     Expression& right;
     ArithmeticOperation(Expression& left, ArithmeticOperator op, Expression& right) :
-        left(left), op(op), right(right) { }
+        Expression(NodeTypes::ArithmeticOperation ), left(left), op(op), right(right) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     Datatype getExpressionType() const override;

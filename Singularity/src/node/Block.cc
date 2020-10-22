@@ -1,7 +1,7 @@
 #include "Block.hh"
 
 #include "node.hh"
-
+#include "node_headers.hh"
 namespace SNode
 {
 
@@ -22,6 +22,29 @@ void Block::createSymbolTable(SymbolTable& table, std::string name, size_t* subt
     {
         (*itr)->createSymbolTable(table, name, subtableCounter);
     }
+}
+
+bool Block::hasInfiniteRecursion(std::string name)
+{
+    bool hasRecursion = false;
+    bool hasCondition = false;
+    for(auto itr = statements.begin(); itr != statements.end(); ++itr)
+    {
+        if( (*itr)->getType() == NodeTypes::While || (*itr)->getType() == NodeTypes::If || (*itr)->getType() == NodeTypes::WhileCounting)
+        {
+            hasCondition = true;            
+        }
+        else if((*itr)->getType() == NodeTypes::ExpressionStatement)
+        {
+            if(reinterpret_cast<ExpressionStatement*>((*itr))->expression.getType() == NodeTypes::FunctionCall)
+            {
+                if(reinterpret_cast<FunctionCall*>((*itr))->id.name == name )
+                    hasRecursion = true;
+            }
+        }
+    }
+
+    return hasRecursion && !hasCondition;
 }
 
 }
