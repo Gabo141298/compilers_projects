@@ -159,14 +159,14 @@ public:
     }
     inline Datatype getExpressionType() const override
     {
-	TableRow* row = symbolTable.searchCurrentSubtable(this->name);
-	if (row == nullptr){
-		std::cout << "The symbol " << name << " is not declared." << std::endl;
-        throw SingularityException::UNDECLARED_VARIABLE;
-		return Datatype::UNKNOWN;
-	}
-	
-	return row->getType();	
+    	TableRow* row = symbolTable.searchCurrentSubtable(this->name);
+    	if (row == nullptr){
+    		std::cout << "The symbol " << name << " is not declared." << std::endl;
+            throw SingularityException::UNDECLARED_VARIABLE;
+    		return Datatype::UNKNOWN;
+    	}
+    	
+    	return row->getType();	
     }
 };
 

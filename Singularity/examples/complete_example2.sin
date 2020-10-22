@@ -5,7 +5,7 @@ begin
 	begin
 		if listNumber  < minor
 		begin
-			print n
+			print minor
 		end
 	end
 
@@ -19,7 +19,7 @@ begin
 	begin
 		if listNumber > biggest
 		begin
-			print n
+			print biggest
 		end
 	end
 
