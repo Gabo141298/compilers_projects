@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* Function::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* Function::codeGen(CodeGenContext&) { return nullptr; }
 void Function::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -36,14 +36,13 @@ void Function::createSymbolTable(SymbolTable& table) const
         table.insertToCurrentSubtable((*itr)->name, Datatype::UNKNOWN);        
     }
 
-    bool hasCondition = false;
     size_t* subtableCounter = new size_t(0);
     block.createSymbolTable(table, id.name, subtableCounter);
     delete subtableCounter;
     table.finalizeScope();
 
     if(block.hasInfiniteRecursion(id.name))
-        throw SingularityException::INFINITE_RECURSION;
+        throw SingularityException(ExceptionType::INFINITE_RECURSION, "Infinite recursion in " + id.name);
 
 }
 

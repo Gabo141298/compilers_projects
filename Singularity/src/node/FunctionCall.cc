@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* FunctionCall::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* FunctionCall::codeGen(CodeGenContext&) { return nullptr; }
 void FunctionCall::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -28,17 +28,17 @@ Datatype FunctionCall::getExpressionType() const
 
     // Checks if the symbol was not declared
     if (!row)
-        throw SingularityException::UNDECLARED_VARIABLE;
+        throw SingularityException(ExceptionType::UNDECLARED_VARIABLE, id.name + " was not declared.");
     // Checks that that symbols is a function and not a variable
     else if (row->getType() != FUNCTION)
-        throw SingularityException::VAR_CALLED_AS_FUNCTN;
+        throw SingularityException(ExceptionType::VAR_CALLED_AS_FUNCTN, id.name + " is not a function.");
     // Checks that the amount of parameters matches the argument count
     else 
     {
         FunctionTableRow* tableRow = reinterpret_cast<FunctionTableRow*>(&(*row) );
 
         if (tableRow->getArgumentCount() != parameters.size())
-            throw SingularityException::INVALID_ARG_COUNT;   
+            throw SingularityException(ExceptionType::INVALID_ARG_COUNT);   
     }
 
 

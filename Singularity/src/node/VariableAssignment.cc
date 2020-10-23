@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* VariableAssignment::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* VariableAssignment::codeGen(CodeGenContext&) { return nullptr; }
 void VariableAssignment::print(size_t tabs) const
 {
     printTabs(tabs);

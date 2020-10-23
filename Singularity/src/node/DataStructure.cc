@@ -5,14 +5,14 @@
 namespace SNode
 {
 
-llvm::Value* List::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* List::codeGen(CodeGenContext&) { return nullptr; }
 void List::print(size_t tabs) const
 {
     printTabs(tabs);
     std::cout << "List" << std::endl;
 }
 
-llvm::Value* Matrix::codeGen(CodeGenContext& context) { }
+llvm::Value* Matrix::codeGen(CodeGenContext&) { return nullptr; }
 void Matrix::print(size_t tabs) const
 {
     printTabs(tabs);

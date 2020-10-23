@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* Print::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* Print::codeGen(CodeGenContext&) { return nullptr; }
 void Print::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -13,9 +13,9 @@ void Print::print(size_t tabs) const
     expression.print(tabs + 1);
 }
 
-void Print::createSymbolTable(SymbolTable& table, std::string name, size_t* subtableCounter) const
+void Print::createSymbolTable(SymbolTable&, std::string, size_t*) const
 {
-	// getExpressionTye will manage the exception in case the symbol is not defined
+	// getExpressionType will manage the exception in case the symbol is not defined
     this->expression.getExpressionType();
     	
 }

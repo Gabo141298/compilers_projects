@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* Otherwise::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* Otherwise::codeGen(CodeGenContext&) { return nullptr; }
 void Otherwise::print(size_t tabs) const
 {
     printTabs(tabs);

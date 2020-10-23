@@ -9,7 +9,7 @@ namespace SNode
 class Position : public Expression {
 public:
     Position(NodeTypes type = NodeTypes::Position): Expression(type) {}
-    virtual inline bool validPosition() { return false; }
+    virtual inline void checkPosition() { }
 };
 
 class ListPosition : public Position {
@@ -19,7 +19,7 @@ public:
         Position(NodeTypes::ListPosition), position(position) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
-    bool validPosition();
+    void checkPosition();
 };
 
 class MatrixPosition : public Position {
@@ -30,7 +30,7 @@ public:
         Position(NodeTypes::MatrixPosition), row(row), col(col) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
-    bool validPosition();
+    void checkPosition();
 };
 
 }

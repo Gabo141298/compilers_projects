@@ -1,0 +1,7 @@
+define function start
+begin
+    if 2
+    begin
+        print "Hola"
+    end
+end

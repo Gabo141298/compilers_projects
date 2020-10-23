@@ -85,7 +85,7 @@ typedef std::vector<VariableAssignment*> GlobalList;
 class Node {
 public:
     virtual ~Node() {}
-    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
+    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
     virtual void print(size_t tabs) const { (void)tabs; }
     Node(NodeTypes type = NodeTypes::Node) : nodeType(type){};
     inline NodeTypes getType() {return this->nodeType;}
@@ -134,7 +134,7 @@ public:
     {        
     }
 
-    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
+    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -150,7 +150,7 @@ class Double : public Value {
 public:
     double value;
     Double(double value) : Value(NodeTypes::Double ), value(value) { }
-    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
+    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -166,7 +166,7 @@ class String : public Value {
 public:
     std::string value;
     String(const std::string& value) : Value(NodeTypes::String), value(value) { }
-    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
+    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -183,7 +183,7 @@ public:
     std::string name;
     SymbolTable& symbolTable;
     Identifier(const std::string& name, SymbolTable& symbolTable) : Value(NodeTypes::Identifier), name(name), symbolTable(symbolTable)  { }
-    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
+    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -193,8 +193,7 @@ public:
     {
     	TableRow* row = symbolTable.searchCurrentSubtable(this->name);
     	if (row == nullptr){
-    		std::cout << "The symbol " << name << " is not declared." << std::endl;
-            throw SingularityException::UNDECLARED_VARIABLE;
+            throw SingularityException(ExceptionType::UNDECLARED_VARIABLE, name + " was not declared.");
     		return Datatype::UNKNOWN;
     	}
     	
@@ -206,7 +205,7 @@ class Boolean : public Value {
 public:
     bool value;
     Boolean(bool value) : Value(NodeTypes:: Boolean), value(value) { }
-    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
+    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -222,7 +221,7 @@ class ExpressionStatement : public Statement {
 public:
     Expression& expression;
     ExpressionStatement(Expression& expression) :Statement(NodeTypes::ExpressionStatement), expression(expression) { }
-    // virtual llvm::Value* codeGen(CodeGenContext& context) { }
+    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);

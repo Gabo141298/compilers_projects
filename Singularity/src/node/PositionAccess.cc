@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* PositionAccess::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* PositionAccess::codeGen(CodeGenContext&) { return nullptr; }
 void PositionAccess::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -17,8 +17,8 @@ void PositionAccess::print(size_t tabs) const
 }
 Datatype PositionAccess::getExpressionType() const
 {
-    if(!position.validPosition())
-        std::cout << "Error: invalid position" << std::endl;
+    // checkPosition throws an exception if there's a problem.
+    position.checkPosition();
     return Datatype::UNKNOWN;
 }
 

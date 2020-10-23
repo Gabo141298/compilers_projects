@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* ListPosition::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* ListPosition::codeGen(CodeGenContext&) { return nullptr; }
 void ListPosition::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -15,25 +15,24 @@ void ListPosition::print(size_t tabs) const
     std::cout << "Position:" << std::endl;
     position.print(tabs + 1);
 }
-bool ListPosition::validPosition()
+void ListPosition::checkPosition()
 {
     Datatype type = position.getExpressionType();
     switch(type)
     {
         case Datatype::UNKNOWN:
-        case Datatype::INTEGER: return true;
-        case Datatype::BOOLEAN: std::cout << "Error: can't use a boolean to index a list." << std::endl; break;;
-        case Datatype::DOUBLE: std::cout << "Error: can't use a double to index a list." << std::endl; break;
-        case Datatype::STRING: std::cout << "Error: can't use a string to index a list." << std::endl; break;
-        case Datatype::FUNCTION: std::cout << "Error: can't use an function name to index a list." << std::endl; break;
-        case Datatype::LIST: std::cout << "Error: can't use an list name to index a list." << std::endl; break;
-        case Datatype::MATRIX: std::cout << "Error: can't use an matrix name to index a list." << std::endl; break;
+        case Datatype::INTEGER: return ;
+        case Datatype::BOOLEAN: throw SingularityException(ExceptionType::LIST_POSITION_BOOLEAN);
+        case Datatype::DOUBLE: throw SingularityException(ExceptionType::LIST_POSITION_DOUBLE);
+        case Datatype::STRING: throw SingularityException(ExceptionType::LIST_POSITION_STRING);
+        case Datatype::FUNCTION: throw SingularityException(ExceptionType::LIST_POSITION_FUNCTION);
+        case Datatype::LIST: throw SingularityException(ExceptionType::LIST_POSITION_LIST);
+        case Datatype::MATRIX: throw SingularityException(ExceptionType::LIST_POSITION_MATRIX);
         default: break;
     }
-    return false;
 }
 
-llvm::Value* MatrixPosition::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* MatrixPosition::codeGen(CodeGenContext&) { return nullptr; }
 void MatrixPosition::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -47,37 +46,29 @@ void MatrixPosition::print(size_t tabs) const
     std::cout << "Col:" << std::endl;
     col.print(tabs + 1);
 }
-bool MatrixPosition::validPosition()
+void MatrixPosition::checkPosition()
 {
     Datatype rowType = row.getExpressionType();
     Datatype colType = col.getExpressionType();
 
-    std::string typeError;
-
     // If any of the expressions is boolean, throw an error
     if(rowType == Datatype::BOOLEAN || colType == Datatype::BOOLEAN)
-        typeError = "boolean";
+        throw SingularityException(ExceptionType::MATRIX_POSITION_BOOLEAN);
     // If any of the expressions is a function, throw an error
     else if(rowType == Datatype::FUNCTION || colType == Datatype::FUNCTION)
-        typeError = "function name";
+        throw SingularityException(ExceptionType::MATRIX_POSITION_FUNCTION);
     // If any of the expressions is a list name, throw an error
     else if(rowType == Datatype::LIST || colType == Datatype::LIST)
-        typeError = "list name";
+        throw SingularityException(ExceptionType::MATRIX_POSITION_LIST);
     // If any of the expressions is a matrix name, throw an error
     else if(rowType == Datatype::MATRIX || colType == Datatype::MATRIX)
-        typeError = "matrix name";
+        throw SingularityException(ExceptionType::MATRIX_POSITION_MATRIX);
     // If any of the expressions is a string, throw an error.
     else if(rowType == Datatype::STRING || colType == Datatype::STRING)
-        typeError = "string";
+        throw SingularityException(ExceptionType::MATRIX_POSITION_STRING);
     // If any of the two expressions is a double, throw an error.
     else if(rowType == Datatype::DOUBLE || colType == Datatype::DOUBLE)
-        typeError = "double";
-    // If any of the two expressions is unknown, then assume it's valid.
-    else
-        return true;
-
-    std::cout << "Error: can't index a matrix with a " << typeError << "." << std::endl;
-    return false;
+        throw SingularityException(ExceptionType::MATRIX_POSITION_DOUBLE);
 }
 
 }

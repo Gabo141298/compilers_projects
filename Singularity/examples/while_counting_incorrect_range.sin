@@ -1,0 +1,7 @@
+define function start
+begin
+    while i counting from 1 to true
+    begin
+        print "Hola"
+    end
+end

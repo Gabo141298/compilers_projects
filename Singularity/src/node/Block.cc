@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* Block::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* Block::codeGen(CodeGenContext&) { return nullptr; }
 void Block::print(size_t tabs) const
 {
     printTabs(tabs);

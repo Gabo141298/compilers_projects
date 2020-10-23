@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* If::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* If::codeGen(CodeGenContext&) { return nullptr; }
 void If::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -41,7 +41,7 @@ void If::createSymbolTable(SymbolTable& table, std::string name, size_t* subtabl
     }
     else
     {
-        std::cout << "Error: if needs a boolean expression as its condition." << std::endl;
+        throw SingularityException(ExceptionType::IF_CONDITION);
     }
 }
 

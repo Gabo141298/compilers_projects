@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* NotOperation::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* NotOperation::codeGen(CodeGenContext&) { return nullptr; }
 void NotOperation::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -22,12 +22,12 @@ Datatype NotOperation::getExpressionType() const
     {
         case Datatype::UNKNOWN: return Datatype::UNKNOWN;
         case Datatype::BOOLEAN: return Datatype::BOOLEAN;
-        case Datatype::INTEGER: std::cout << "Error: can't use an integer as a boolean expression." << std::endl; break;
-        case Datatype::DOUBLE: std::cout << "Error: can't use a double as a boolean expression." << std::endl; break;
-        case Datatype::STRING: std::cout << "Error: can't use a string as a boolean expression." << std::endl; break;
-        case Datatype::FUNCTION: std::cout << "Error: can't use a function name as a boolean expression." << std::endl; break;
-        case Datatype::LIST: std::cout << "Error: can't use a list name as a boolean expression." << std::endl; break;
-        case Datatype::MATRIX: std::cout << "Error: can't use a matrix name as a boolean expression." << std::endl; break;
+        case Datatype::INTEGER: throw SingularityException(ExceptionType::NOT_EXPR_INTEGER);
+        case Datatype::DOUBLE: throw SingularityException(ExceptionType::NOT_EXPR_DOUBLE);
+        case Datatype::STRING: throw SingularityException(ExceptionType::NOT_EXPR_STRING);
+        case Datatype::FUNCTION: throw SingularityException(ExceptionType::NOT_EXPR_FUNCTION);
+        case Datatype::LIST: throw SingularityException(ExceptionType::NOT_EXPR_LIST);
+        case Datatype::MATRIX: throw SingularityException(ExceptionType::NOT_EXPR_MATRIX);
         default: break;
     }
     return Datatype::UNKNOWN;

@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* DataPositionAssignment::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* DataPositionAssignment::codeGen(CodeGenContext&) { return nullptr; }
 void DataPositionAssignment::print(size_t tabs) const
 {
     printTabs(tabs);

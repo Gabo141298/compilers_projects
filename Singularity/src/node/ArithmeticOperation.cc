@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* ArithmeticOperation::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* ArithmeticOperation::codeGen(CodeGenContext&) { return nullptr; }
 void ArithmeticOperation::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -26,19 +26,19 @@ Datatype ArithmeticOperation::getExpressionType() const
 
     // If any of the expressions is boolean, throw an error
     if(leftType == Datatype::BOOLEAN || rightType == Datatype::BOOLEAN)
-        throw SingularityException::ARITH_EXPR_BOOLEAN_USE;
+        throw SingularityException(ExceptionType::ARITH_EXPR_BOOLEAN_USE);
     // If any of the expressions is a function, throw an error
     else if(leftType == Datatype::FUNCTION || rightType == Datatype::FUNCTION)
-        throw SingularityException::ARITH_EXPR_FUNCTION_USE;
+        throw SingularityException(ExceptionType::ARITH_EXPR_FUNCTION_USE);
     // If any of the expressions is a list name, throw an error
     else if(leftType == Datatype::LIST || rightType == Datatype::LIST)
-        throw SingularityException::ARITH_EXPR_LIST_USE;
+        throw SingularityException(ExceptionType::ARITH_EXPR_LIST_USE);
     // If any of the expressions is a matrix name, throw an error
     else if(leftType == Datatype::MATRIX || rightType == Datatype::MATRIX)
-        throw SingularityException::ARITH_EXPR_MATRIX_USE;
+        throw SingularityException(ExceptionType::ARITH_EXPR_MATRIX_USE);
     // If any of the expressions is a string, throw an error.
     else if(leftType == Datatype::STRING || rightType == Datatype::STRING)
-        throw SingularityException::ARITH_EXPR_STRING_USE;
+        throw SingularityException(ExceptionType::ARITH_EXPR_STRING_USE);
     // If any of the two expressions is unknown, then the resulting expression is unknown.
     else if(leftType == Datatype::UNKNOWN || rightType == Datatype::UNKNOWN)
         return Datatype::UNKNOWN;

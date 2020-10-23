@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* WhileCounting::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* WhileCounting::codeGen(CodeGenContext&) { return nullptr; }
 void WhileCounting::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -45,7 +45,7 @@ void WhileCounting::createSymbolTable(SymbolTable& table, std::string name, size
     }
     else
     {
-        std::cout << "Error: range of values in while counting must be defined by integers." << std::endl;
+        throw SingularityException(ExceptionType::WHILE_COUNTING_RANGE);
     }
 }
 

@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-llvm::Value* While::codeGen(CodeGenContext& context) { return nullptr; }
+llvm::Value* While::codeGen(CodeGenContext&) { return nullptr; }
 void While::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -32,7 +32,7 @@ void While::createSymbolTable(SymbolTable& table, std::string name, size_t* subt
     }
     else
     {
-        std::cout << "Error: while needs a boolean expression as its condition." << std::endl;
+        throw SingularityException(ExceptionType::WHILE_CONDITION);
     }
 }
 
