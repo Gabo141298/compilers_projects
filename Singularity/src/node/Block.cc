@@ -38,7 +38,7 @@ bool Block::hasInfiniteRecursion(std::string name)
         {
             if(reinterpret_cast<ExpressionStatement*>((*itr))->expression.getType() == NodeTypes::FunctionCall)
             {
-                if(reinterpret_cast<FunctionCall*>((*itr))->id.name == name )
+                if(reinterpret_cast<FunctionCall*>(&reinterpret_cast<ExpressionStatement*>(*itr)->expression)->id.name == name )
                     hasRecursion = true;
             }
         }
