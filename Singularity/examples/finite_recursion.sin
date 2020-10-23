@@ -1,0 +1,20 @@
+define function fibonacci with arguments i, nextTerm, n
+begin
+	if n = 0
+	begin
+		answer nextTerm + i
+	end
+	otherwise
+	begin
+		set temp to nextTerm
+		set nextTerm to i + nextTerm
+		set i to temp
+		call fibonacci with parameters (i, nextTerm, n-1)
+	end
+end
+
+define function main 
+begin
+	print "Starting an finite recursion"
+	call fibonacci with parameters (1, 1, 10)
+end

@@ -1,0 +1,13 @@
+define function fibonacci_forever with arguments i, n
+begin
+	set nextTerm to i + n
+	set i to n 
+	set n to nextTerm
+	call fibonacci_forever with parameters (i, n)
+end
+
+define function main 
+begin
+	print "Starting an infinite recursion"
+	call fibonacci_forever with parameters (1, 1)
+end
