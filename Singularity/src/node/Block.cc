@@ -24,26 +24,73 @@ void Block::createSymbolTable(SymbolTable& table, std::string name, size_t* subt
     }
 }
 
+bool hasRecursionInExpression(std::vector<std::string>& calls, std::string& name )
+{
+    bool hasRecursion = false;
+    for(std::string foundName : calls)
+    {
+        if(foundName == name)
+        {
+            hasRecursion = true;
+            break;
+        }
+    }
+    return hasRecursion;
+}
+
 bool Block::hasInfiniteRecursion(std::string name)
 {
     bool hasRecursion = false;
     bool hasCondition = false;
     for(auto itr = statements.begin(); itr != statements.end(); ++itr)
     {
-        if( (*itr)->getType() == NodeTypes::While || (*itr)->getType() == NodeTypes::If || (*itr)->getType() == NodeTypes::WhileCounting)
+        switch ((*itr)->getType())
         {
-            hasCondition = true;            
+        case NodeTypes::While:
+        case NodeTypes::If:
+        case NodeTypes::WhileCounting:
+            hasCondition = true;
+            break;
+        case NodeTypes::ExpressionStatement:
+        {
+            std::vector<std::string> calls = reinterpret_cast<ExpressionStatement*>((*itr))->expression.getFunctionCalls();
+            hasRecursion = hasRecursionInExpression(calls, name) ? true : hasRecursion;
+            break;
         }
-        else if((*itr)->getType() == NodeTypes::ExpressionStatement)
+        case NodeTypes::Answer:
         {
-            if(reinterpret_cast<ExpressionStatement*>((*itr))->expression.getType() == NodeTypes::FunctionCall)
-            {
-                if(reinterpret_cast<FunctionCall*>(&reinterpret_cast<ExpressionStatement*>(*itr)->expression)->id.name == name )
-                    hasRecursion = true;
-            }
+            std::vector<std::string> calls = reinterpret_cast<Answer*>((*itr))->returnExpression.getFunctionCalls();
+            hasRecursion = hasRecursionInExpression(calls, name) ? true : hasRecursion;
+            break;                        
+        }
+        case NodeTypes::Print:
+        {
+            std::vector<std::string> calls = reinterpret_cast<Print*>((*itr))->expression.getFunctionCalls();
+            hasRecursion = hasRecursionInExpression(calls, name) ? true : hasRecursion;
+            break;                        
+        }
+        case NodeTypes::VariableAssignment:
+        {
+            std::vector<std::string> calls = reinterpret_cast<VariableAssignment*>((*itr))->assignmentExpr->getFunctionCalls();
+            hasRecursion = hasRecursionInExpression(calls, name) ? true : hasRecursion;
+            break;                        
+        }
+        case NodeTypes::DataPositionAssignment:
+        {
+            std::vector<std::string> calls = reinterpret_cast<DataPositionAssignment*>((*itr))->expression.getFunctionCalls();
+            hasRecursion = hasRecursionInExpression(calls, name) ? true : hasRecursion;
+            break;                        
+        }
+        case NodeTypes::Block:
+        {                
+            hasRecursion = reinterpret_cast<Block*>((*itr))->hasInfiniteRecursion(name) ? true : hasRecursion;
+        }
+        default:
+            break;
         }
     }
 
+    // std::cout << hasRecursion << hasCondition << name << std::endl;
     return hasRecursion && !hasCondition;
 }
 

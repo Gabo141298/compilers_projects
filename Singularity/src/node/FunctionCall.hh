@@ -18,6 +18,8 @@ public:
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     Datatype getExpressionType() const override;
+    std::vector<std::string> getFunctionCalls() override;
+
 };
 
 }

@@ -46,4 +46,11 @@ Datatype FunctionCall::getExpressionType() const
     return Datatype::UNKNOWN;
 }
 
+std::vector<std::string> FunctionCall::getFunctionCalls()
+{
+    std::vector<std::string> calls;
+    calls.push_back(std::string(this->id.name.c_str()));
+    return  calls;
+}
+
 }

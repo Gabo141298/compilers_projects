@@ -54,4 +54,13 @@ Datatype ComparisonOperation::getExpressionType() const
     return Datatype::UNKNOWN;
 }
 
+std::vector<std::string> ComparisonOperation::getFunctionCalls()
+{
+    std::vector<std::string> leftVector = this->left.getFunctionCalls();
+    std::vector<std::string> rightVector = this->right.getFunctionCalls();
+    
+    leftVector.insert(leftVector.end(),rightVector.begin(), rightVector.end());
+    return leftVector;    
+}
+
 }

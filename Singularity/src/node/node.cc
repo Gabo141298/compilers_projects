@@ -51,3 +51,8 @@ SNode::Expression* SNode::createOperation(SNode::Expression& left, int op, SNode
         return new BooleanOperation(left, (SNode::BooleanOperator)op, right);
     return nullptr;
 }
+
+std::vector<std::string> SNode::Expression::getFunctionCalls()
+{
+    return std::vector<std::string>();
+}

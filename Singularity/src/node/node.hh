@@ -106,6 +106,8 @@ public:
     }
 
     virtual inline Datatype getExpressionType() const { return Datatype::UNKNOWN; }
+    virtual std::vector<std::string> getFunctionCalls();
+
 };
 
 class Statement : public Node {
