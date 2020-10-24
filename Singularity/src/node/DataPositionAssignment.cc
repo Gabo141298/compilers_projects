@@ -22,4 +22,13 @@ void DataPositionAssignment::print(size_t tabs) const
     expression.print(tabs + 1);
 }
 
+void DataPositionAssignment::createSymbolTable(SymbolTable&, std::string, size_t*) const
+{
+    // Checks if expression has undeclared variables or invalid operators for any of its operations.
+    expression.getExpressionType();
+
+    // Checks if its position values are integers or unknown values.
+    position.checkPosition();
+}
+
 }

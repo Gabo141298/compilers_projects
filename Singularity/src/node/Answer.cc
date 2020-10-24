@@ -26,7 +26,7 @@ void Answer::createSymbolTable(SymbolTable& table, std::string name, size_t*) co
     if (row)
     {
     	// Asign the datatype to the return symbol in the table
-    	row->setType(datatype);
+    	reinterpret_cast<FunctionTableRow*>(row)->setReturnType(datatype);
     }
     
 }
