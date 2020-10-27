@@ -1,0 +1,5 @@
+define function start
+begin
+    set a as matrix of size 3 by 3
+    set a[1] to 2
+end

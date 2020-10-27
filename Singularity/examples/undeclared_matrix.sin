@@ -1,0 +1,4 @@
+define function start
+begin
+    set a[1,2] to 2
+end

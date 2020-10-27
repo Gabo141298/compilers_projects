@@ -22,8 +22,15 @@ void DataPositionAssignment::print(size_t tabs) const
     expression.print(tabs + 1);
 }
 
-void DataPositionAssignment::createSymbolTable(SymbolTable&, std::string, size_t*) const
+void DataPositionAssignment::createSymbolTable(SymbolTable& symbolTable, std::string, size_t*) const
 {
+    NodeTypes positionType = position.getType();
+    Datatype idType = id.getExpressionType();
+    if(positionType == NodeTypes::MatrixPosition && idType != Datatype::MATRIX)
+        throw SingularityException(ExceptionType::MATR_INDEX_EXCP, id.name + " is not a matrix.");
+    else if(positionType == NodeTypes::ListPosition && idType != Datatype::LIST)
+        throw SingularityException(ExceptionType::LIST_INDEX_EXCP, id.name + " is not a list.");
+    
     // Checks if expression has undeclared variables or invalid operators for any of its operations.
     expression.getExpressionType();
 

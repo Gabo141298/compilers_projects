@@ -242,7 +242,7 @@ value:      FLOAT { $$ = new SNode::Double(atof($1->c_str())); delete $1; }
 term:       value { $$ = $1; }
             | func_call { $$ = $1; }
             | OPEN_PARENTHESIS expression CLOSE_PARENTHESIS { $$ = $2; }
-            | IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS { $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1,symbolTable)), *$3); delete $1; }
+            | IDENTIFIER OPEN_BRACKETS position CLOSE_BRACKETS { $$ = new SNode::PositionAccess( *(new SNode::Identifier(*$1,symbolTable)), *$3, symbolTable); delete $1; }
             | NOT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS { $$ = new SNode::NotOperation(*$3); }
             ;
 

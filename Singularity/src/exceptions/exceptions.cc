@@ -131,6 +131,12 @@ void handleException(SingularityException exception)
         case WHILE_COUNTING_RANGE:
             errorMessage = "Error: range of values in while counting must be defined by integers.";
             break;
+        case MATR_INDEX_EXCP:
+            errorMessage = "Error: trying to index as a matrix something that isn't a matrix.";
+            break;
+        case LIST_INDEX_EXCP:
+            errorMessage = "Error: trying to index as a list something that isn't a list.";
+            break;
         default:
             break;
     }

@@ -59,7 +59,11 @@ enum ExceptionType
     // Error in conditions
     WHILE_CONDITION,
     IF_CONDITION,
-    WHILE_COUNTING_RANGE
+    WHILE_COUNTING_RANGE,
+
+    // Error indexing a data structure
+    MATR_INDEX_EXCP,
+    LIST_INDEX_EXCP
 };
 
 struct SingularityException

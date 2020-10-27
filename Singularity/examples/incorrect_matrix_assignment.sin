@@ -1,0 +1,5 @@
+define function start
+begin
+    set a as list
+    set a[1,2] to 2
+end
