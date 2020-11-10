@@ -12,6 +12,7 @@
 
 #include "../exceptions/exceptions.hh"
 #include "../parse/symbol_table.hh"
+#include "../parse/codegen.hh"
 
 #ifndef PROCESS_VAL
 #define PROCESS_VAL(p) case(p): s = #p; break;
@@ -136,7 +137,7 @@ public:
     {        
     }
 
-    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
+    virtual llvm::Value* codeGen(CodeGenContext&);
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
