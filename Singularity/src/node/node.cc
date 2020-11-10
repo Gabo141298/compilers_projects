@@ -57,7 +57,9 @@ std::vector<std::string> SNode::Expression::getFunctionCalls()
     return std::vector<std::string>();
 }
 
-llvm::Value* SNode::Integer::codeGen(CodeGenContext& context)
+using namespace llvm;
+
+Value* SNode::Integer::codeGen(CodeGenContext& context)
 {
-    return nullptr;
+    return ConstantInt::get(Type::getInt64Ty(context.context), this->value);
 }

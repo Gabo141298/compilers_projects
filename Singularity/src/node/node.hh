@@ -10,6 +10,13 @@
 #include <vector>
 #include <llvm/IR/Value.h>
 
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Type.h"
+
 #include "../exceptions/exceptions.hh"
 #include "../parse/symbol_table.hh"
 #include "../parse/codegen.hh"

@@ -10,4 +10,6 @@ add_executable(
   main.cc
 )
 
-target_link_libraries(../../parser parse node exceptions)
+SET(GCC_COVERAGE_LINK_FLAGS "-L/usr/lib/llvm-7/lib /usr/lib/llvm-7/lib/libLLVM-7.so -lLLVM-7")
+
+target_link_libraries(../../parser parse node exceptions ${GCC_COVERAGE_LINK_FLAGS})

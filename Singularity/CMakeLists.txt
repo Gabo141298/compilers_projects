@@ -7,7 +7,7 @@ project(parser)
 
 set(CXX "clang++")
 set(CMAKE_CXX_FLAGS_DEBUG "-Wall -W -Werror")
-set(CMAKE_CXX_FLAGS "-O3 -Wall -W -pedantic")
+set(CMAKE_CXX_FLAGS "-O3 -I/usr/lib/llvm-7/include -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
 
 #Defines subdirectory
 add_subdirectory(src/)
