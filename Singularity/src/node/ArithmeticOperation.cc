@@ -5,7 +5,86 @@
 namespace SNode
 {
 
-llvm::Value* ArithmeticOperation::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* ArithmeticOperation::createIntOperation(CodeGenContext& context, llvm::Value* left, llvm::Value* right)
+{
+    llvm::Value* result = nullptr;
+
+    switch(this->op)
+    {
+        case ArithmeticOperator::addition:
+            result = context.builder.CreateAdd(left, right);
+            break;
+        case ArithmeticOperator::substraction:
+            result = context.builder.CreateSub(left, right);
+            break;
+        case ArithmeticOperator::multiplication:
+            result = context.builder.CreateMul(left, right);
+            break;
+        case ArithmeticOperator::division:
+            result = context.builder.CreateSDiv(left, right);
+            break;
+        case ArithmeticOperator::modulo:
+            result = context.builder.CreateSRem(left, right);
+            break;
+        default:
+            break;
+    }
+    
+    return result;
+}
+
+llvm::Value* ArithmeticOperation::createFloatOperation(CodeGenContext& context, llvm::Value* left, llvm::Value* right)
+{
+    llvm::Value* result = nullptr;
+
+    switch(this->op)
+    {
+        case ArithmeticOperator::addition:
+            result = context.builder.CreateFAdd(left, right);
+            break;
+        case ArithmeticOperator::substraction:
+            result = context.builder.CreateFSub(left, right);
+            break;
+        case ArithmeticOperator::multiplication:
+            result = context.builder.CreateFMul(left, right);
+            break;
+        case ArithmeticOperator::division:
+            result = context.builder.CreateFDiv(left, right);
+            break;
+        case ArithmeticOperator::modulo:
+            result = context.builder.CreateFRem(left, right);
+            break;
+        default:
+            break;
+    }
+    
+    return result;
+}
+
+llvm::Value* ArithmeticOperation::codeGen(CodeGenContext& context) 
+{
+    llvm::Value* leftValue = this->left.codeGen(context);
+    llvm::Value* rightValue = this->right.codeGen(context);
+    llvm::Value* result = nullptr;
+
+    Datatype leftType = this->left.getExpressionType();
+    Datatype rightType = this->right.getExpressionType();
+
+    if(leftType == Datatype::INTEGER && rightType == Datatype::INTEGER)
+    {
+        result = createIntOperation(context, leftValue, rightValue);
+    }
+    else
+    {
+        leftValue = context.builder.CreateCast(llvm::Instruction::SIToFP, leftValue, llvm::Type::getDoubleTy(context.context));
+        rightValue = context.builder.CreateCast(llvm::Instruction::SIToFP, rightValue, llvm::Type::getDoubleTy(context.context));
+        result = createFloatOperation(context, leftValue, rightValue);
+    }
+    
+    return result;
+}
+
+
 void ArithmeticOperation::print(size_t tabs) const
 {
     printTabs(tabs);
