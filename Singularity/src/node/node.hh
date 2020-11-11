@@ -160,7 +160,7 @@ class Double : public Value {
 public:
     double value;
     Double(double value) : Value(NodeTypes::Double ), value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
+    virtual llvm::Value* codeGen(CodeGenContext&);
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -176,7 +176,7 @@ class String : public Value {
 public:
     std::string value;
     String(const std::string& value) : Value(NodeTypes::String), value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
+    virtual llvm::Value* codeGen(CodeGenContext&);
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -215,7 +215,7 @@ class Boolean : public Value {
 public:
     bool value;
     Boolean(bool value) : Value(NodeTypes:: Boolean), value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
+    virtual llvm::Value* codeGen(CodeGenContext&);
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
@@ -231,7 +231,7 @@ class ExpressionStatement : public Statement {
 public:
     Expression& expression;
     ExpressionStatement(Expression& expression) :Statement(NodeTypes::ExpressionStatement), expression(expression) { }
-    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
+    virtual llvm::Value* codeGen(CodeGenContext&);
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);
