@@ -17,6 +17,8 @@ public:
     void print(size_t tabs = 0) const override;
     Datatype getExpressionType() const override;
     std::vector<std::string> getFunctionCalls() override;
+    llvm::Value* createIntOperation(CodeGenContext& context, llvm::Value* left, llvm::Value* right);
+    llvm::Value* createFloatOperation(CodeGenContext& context, llvm::Value* left, llvm::Value* right);
 
 };
 
