@@ -5,7 +5,28 @@
 namespace SNode
 {
 
-llvm::Value* BooleanOperation::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* BooleanOperation::codeGen(CodeGenContext& context) 
+{ 
+    llvm::Value* leftValue = this->left.codeGen(context);
+    llvm::Value* rightValue = this->right.codeGen(context);
+    llvm::Value* result = nullptr;
+
+    switch(this->op)
+    {
+        case BooleanOperator::bAnd:
+            result = context.builder.CreateAnd(leftValue, rightValue);
+            break;
+        case BooleanOperator::bOr:
+            result = context.builder.CreateOr(leftValue, rightValue);
+            break;
+        case BooleanOperator::bXor:
+            result = context.builder.CreateXor(leftValue, rightValue);
+            break;
+        default:
+            break;
+    }
+    return result;
+}
 void BooleanOperation::print(size_t tabs) const
 {
     printTabs(tabs);
