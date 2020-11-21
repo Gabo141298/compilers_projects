@@ -6,6 +6,7 @@
 #include "exceptions/exceptions.hh"
 #include "node/node_headers.hh"
 #include "parse/symbol_table.hh"
+#include "parse/codegen.hh"
 
 extern SNode::Program* programBlock;
 extern SymbolTable symbolTable;
@@ -26,12 +27,15 @@ int main(int argc, char** argv)
     try
     {
         programBlock->createSymbolTable(symbolTable);
-        symbolTable.print();
+        // symbolTable.print();
     }
     catch(SingularityException exception)
     {
         handleException(exception);
     }
+
+    SNode::CodeGenContext context;
+    context.generateCode(*programBlock);
     
     return 0;
 }

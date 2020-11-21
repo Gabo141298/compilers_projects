@@ -1,11 +1,25 @@
 #include "Function.hh"
 
+#include "llvm/IR/Verifier.h"
+
 #include "node.hh"
 
 namespace SNode
 {
 
-llvm::Value* Function::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* Function::codeGen(CodeGenContext& context) 
+{
+    // Hay que cambiar el tipo de retorno.
+    llvm::FunctionType *funcType =
+        llvm::FunctionType::get(context.builder.getVoidTy(), llvm::Function::ExternalLinkage);
+    context.currentFunc = llvm::Function::Create(
+        funcType, llvm::Function::ExternalLinkage, id.name, context.module);
+    context.blockCaller = "entry";
+    block.codeGen(context);
+    llvm::verifyFunction(*context.currentFunc);
+    return context.currentFunc;
+}
+
 void Function::print(size_t tabs) const
 {
     printTabs(tabs);

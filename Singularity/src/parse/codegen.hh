@@ -18,8 +18,11 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/Support/raw_ostream.h>
+#include "llvm/IR/NoFolder.h"
 
 #pragma GCC diagnostic pop
+
+#include <iostream>
 
 namespace SNode
 {
@@ -28,29 +31,46 @@ class Program;
 class CodeGenBlock {
 public:
     llvm::BasicBlock *block;
+    CodeGenBlock* parent;
     std::map<std::string, llvm::Value*> locals;
+
+    CodeGenBlock(llvm::BasicBlock* block, CodeGenBlock* parent)
+        : parent(parent)
+        , block(block)
+    {
+    }
+    llvm::Value* searchVar(const std::string& name);
+    inline void insertVar(const std::string& name, llvm::Value* value) { this->locals[name] = value; }
 };
 
 class CodeGenContext {
-    std::stack<CodeGenBlock *> blocks;
+    CodeGenBlock* block;
     llvm::Function *mainFunction;
 
 public:
     llvm::LLVMContext context;
     llvm::Module *module;
-    llvm::IRBuilder<>& builder;
+    llvm::IRBuilder<llvm::NoFolder>& builder;
+
+    std::string blockCaller;
+    llvm::Function* currentFunc;
     CodeGenContext() 
-        : module (new llvm::Module("Singularity", context))
-        , builder( *(new llvm::IRBuilder<>(this->context)) )
+        : block ( nullptr)//new CodeGenBlock(llvm::BasicBlock::Create(context), nullptr) )
+        , module ( new llvm::Module("Singularity", context) )
+        , builder ( *(new llvm::IRBuilder<llvm::NoFolder>(this->context)) )
+        , currentFunc (nullptr)
     {
     }
     
     void generateCode(Program& root);
     //llvm::GenericValue runCode();
-    std::map<std::string, llvm::Value*>& locals() { return blocks.top()->locals; }
-    llvm::BasicBlock *currentBlock() { return blocks.top()->block; }
-    void pushBlock(llvm::BasicBlock *block) { blocks.push(new CodeGenBlock()); blocks.top()->block = block; }
-    void popBlock() { CodeGenBlock *top = blocks.top(); blocks.pop(); delete top; }
+    //std::map<std::string, llvm::Value*>& locals() { return block->locals; }
+    llvm::BasicBlock *currentBlock() { return this->block->block; }
+    void pushBlock(llvm::BasicBlock *block) { this->block = new CodeGenBlock(block, this->block); }
+    void popBlock() { CodeGenBlock* temp = this->block->parent; delete this->block; this->block = temp; }
+
+    inline llvm::Value* searchVar(const std::string& name) { return block->searchVar(name); }
+    inline void insertVar(const std::string& name, llvm::Value* value) { block->insertVar(name, value); }
 };
 
 }

@@ -5,7 +5,21 @@
 namespace SNode
 {
 
-llvm::Value* Block::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* Block::codeGen(CodeGenContext& context) 
+{
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(context.context, context.blockCaller, context.currentFunc);
+    context.pushBlock(block);
+    context.builder.SetInsertPoint(block);
+
+    for(size_t index = 0; index < statements.size(); ++index)
+    {
+        statements[index]->codeGen(context);
+    }
+
+    context.popBlock();
+    return block; 
+}
+
 void Block::print(size_t tabs) const
 {
     printTabs(tabs);

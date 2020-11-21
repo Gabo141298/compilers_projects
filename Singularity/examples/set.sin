@@ -1,4 +1,5 @@
 define function start
 begin
-	set print_number to 5
+	set a to 2
+	set print_number to 5 + a
 end

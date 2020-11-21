@@ -193,7 +193,7 @@ public:
     std::string name;
     SymbolTable& symbolTable;
     Identifier(const std::string& name, SymbolTable& symbolTable) : Value(NodeTypes::Identifier), name(name), symbolTable(symbolTable)  { }
-    virtual llvm::Value* codeGen(CodeGenContext&) { return nullptr; }
+    virtual llvm::Value* codeGen(CodeGenContext&);
     void print(size_t tabs = 0) const override
     {
         printTabs(tabs);

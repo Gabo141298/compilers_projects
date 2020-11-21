@@ -12,7 +12,7 @@ llvm::Value* ArithmeticOperation::createIntOperation(CodeGenContext& context, ll
     switch(this->op)
     {
         case ArithmeticOperator::addition:
-            result = context.builder.CreateAdd(left, right);
+            result = context.builder.CreateAdd(left, right, "tmpadd");
             break;
         case ArithmeticOperator::substraction:
             result = context.builder.CreateSub(left, right);
@@ -40,7 +40,7 @@ llvm::Value* ArithmeticOperation::createFloatOperation(CodeGenContext& context, 
     switch(this->op)
     {
         case ArithmeticOperator::addition:
-            result = context.builder.CreateFAdd(left, right);
+            result = context.builder.CreateFAdd(left, right, "tmpadd");
             break;
         case ArithmeticOperator::substraction:
             result = context.builder.CreateFSub(left, right);
@@ -67,10 +67,10 @@ llvm::Value* ArithmeticOperation::codeGen(CodeGenContext& context)
     llvm::Value* rightValue = this->right.codeGen(context);
     llvm::Value* result = nullptr;
 
-    Datatype leftType = this->left.getExpressionType();
-    Datatype rightType = this->right.getExpressionType();
+    llvm::Type* leftType = leftValue->getType();
+    llvm::Type* rightType = rightValue->getType();
 
-    if(leftType == Datatype::INTEGER && rightType == Datatype::INTEGER)
+    if(leftType->isIntegerTy() && rightType->isIntegerTy())
     {
         result = createIntOperation(context, leftValue, rightValue);
     }

@@ -59,12 +59,14 @@ std::vector<std::string> SNode::Expression::getFunctionCalls()
 
 llvm::Value* SNode::Integer::codeGen(CodeGenContext& context)
 {
-    return llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.context), this->value);
+    // return llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.context), this->value);
+    return context.builder.getInt64(this->value);
 }
 
 llvm::Value* SNode::Double::codeGen(CodeGenContext& context)
 {
     return llvm::ConstantFP::get(llvm::Type::getDoubleTy(context.context), this->value);
+    //return context.builder.getDouble(this->value);
 }
 
 // Tomado de https://stackoverflow.com/questions/51809274/llvm-defining-strings-and-arrays-via-c-api
@@ -103,10 +105,16 @@ llvm::Value* SNode::String::codeGen(CodeGenContext& context)
 
 llvm::Value* SNode::Boolean::codeGen(CodeGenContext& context)
 {
-    return llvm::ConstantInt::get(llvm::Type::getInt1Ty(context.context), this->value);
+    // return llvm::ConstantInt::get(llvm::Type::getInt1Ty(context.context), this->value);
+    return context.builder.getInt1(this->value);
 }
 
 llvm::Value* SNode::ExpressionStatement::codeGen(CodeGenContext& context)
 {
     return this->expression.codeGen(context);
+}
+
+llvm::Value* SNode::Identifier::codeGen(CodeGenContext& context)
+{
+    return context.searchVar(this->name);
 }
