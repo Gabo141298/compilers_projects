@@ -69,23 +69,16 @@ llvm::Value* ComparisonOperation::createStringComparison(CodeGenContext& context
     llvm::Value* rightValue = this->right.codeGen(context);
     llvm::Value* result = nullptr;
 
-    switch(this->op)
+    llvm::Type* leftType = leftValue->getType();
+    llvm::Type* rightType = rightValue->getType();
+
+    if(leftType->isIntegerTy() && rightType->isIntegerTy())
     {
-        case ComparisonOperator::leq:
-            //result = context.builder.CreateFCmpOLE(left,right);
-            break;
-        case ComparisonOperator::greater:
-            //result = context.builder.CreateFCmpOGT(left,right);
-            break;
-        case ComparisonOperator::less:
-            //result = context.builder.CreateFCmpOLT(left,right);
-            break;
-        case ComparisonOperator::equals:
-            //result = context.builder.CreateFCmpOEQ(left,right);
-            break;
-        case ComparisonOperator::isNot:
-            //result = context.builder.CreateFCmpONE(left,right);
-            break; 
+        result = createIntComparison(context, leftValue, rightValue);
+    }
+    else
+    {
+        result = createFloatComparison(context, leftValue, rightValue);
     }
 
     return result;
