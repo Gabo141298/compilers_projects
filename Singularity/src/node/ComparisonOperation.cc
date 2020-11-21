@@ -5,7 +5,121 @@
 namespace SNode
 {
 
-llvm::Value* ComparisonOperation::codeGen(CodeGenContext&) { return nullptr; }
+
+llvm::Value* ComparisonOperation::createIntComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right)
+{
+    llvm::Value* leftValue = this->left.codeGen(context);
+    llvm::Value* rightValue = this->right.codeGen(context);
+    llvm::Value* result = nullptr;
+
+    switch(this->op)
+    {
+        case ComparisonOperator::leq:
+            result = context.builder.CreateICmpSLE(left,right);
+            break;
+        case ComparisonOperator::greater:
+            result = context.builder.CreateICmpSGT(left,right);
+            break;
+        case ComparisonOperator::less:
+            result = context.builder.CreateICmpSLT(left,right);
+            break;
+        case ComparisonOperator::equals:
+            result = context.builder.CreateICmpEQ(left,right);
+            break;
+        case ComparisonOperator::isNot:
+            result = context.builder.CreateICmpNE(left,right);
+            break; 
+
+    }
+
+    return result;
+}
+
+llvm::Value* ComparisonOperation::createFloatComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right)
+{
+    llvm::Value* leftValue = this->left.codeGen(context);
+    llvm::Value* rightValue = this->right.codeGen(context);
+    llvm::Value* result = nullptr;
+
+    switch(this->op)
+    {
+        case ComparisonOperator::leq:
+            result = context.builder.CreateFCmpULE(left,right);
+            break;
+        case ComparisonOperator::greater:
+            result = context.builder.CreateFCmpUGT(left,right);
+            break;
+        case ComparisonOperator::less:
+            result = context.builder.CreateFCmpULT(left,right);
+            break;
+        case ComparisonOperator::equals:
+            result = context.builder.CreateFCmpUEQ(left,right);
+            break;
+        case ComparisonOperator::isNot:
+            result = context.builder.CreateFCmpUNE(left,right);
+            break; 
+    }
+
+    return result;
+}
+
+llvm::Value* ComparisonOperation::createStringComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right)
+{
+    llvm::Value* leftValue = this->left.codeGen(context);
+    llvm::Value* rightValue = this->right.codeGen(context);
+    llvm::Value* result = nullptr;
+
+    switch(this->op)
+    {
+        case ComparisonOperator::leq:
+            //result = context.builder.CreateFCmpOLE(left,right);
+            break;
+        case ComparisonOperator::greater:
+            //result = context.builder.CreateFCmpOGT(left,right);
+            break;
+        case ComparisonOperator::less:
+            //result = context.builder.CreateFCmpOLT(left,right);
+            break;
+        case ComparisonOperator::equals:
+            //result = context.builder.CreateFCmpOEQ(left,right);
+            break;
+        case ComparisonOperator::isNot:
+            //result = context.builder.CreateFCmpONE(left,right);
+            break; 
+    }
+
+    return result;
+}
+
+llvm::Value* ComparisonOperation::codeGen(CodeGenContext& context) 
+{ 
+    llvm::Value* leftValue = this->left.codeGen(context);
+    llvm::Value* rightValue = this->right.codeGen(context);
+    llvm::Value* result = nullptr;
+
+    Datatype leftType = this->left.getExpressionType();
+    Datatype rightType = this->right.getExpressionType();
+
+    if(leftType == Datatype::INTEGER && rightType == Datatype::INTEGER)
+    {
+        result = createIntComparison(context, leftValue, rightValue);
+    }
+    else if (leftType == Datatype::INTEGER && rightType == Datatype::DOUBLE
+            || leftType == Datatype::DOUBLE && rightType == Datatype::INTEGER)
+    {
+        leftValue = context.builder.CreateCast(llvm::Instruction::SIToFP, leftValue, llvm::Type::getDoubleTy(context.context));
+        rightValue = context.builder.CreateCast(llvm::Instruction::SIToFP, rightValue, llvm::Type::getDoubleTy(context.context));
+        result = createFloatComparison(context, leftValue, rightValue);
+    }
+    else if (leftType == Datatype::STRING && rightType == Datatype::STRING)
+    {
+        // F ;
+        ;
+    }
+
+    return result;
+}
+
 void ComparisonOperation::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -19,6 +133,7 @@ void ComparisonOperation::print(size_t tabs) const
     std::cout << "RightExpression:" << std::endl;
     right.print(tabs + 1);
 }
+
 Datatype ComparisonOperation::getExpressionType() const
 {
     Datatype leftType = left.getExpressionType();

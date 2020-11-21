@@ -14,6 +14,9 @@ public:
     ComparisonOperation(Expression& left, ComparisonOperator op, Expression& right) :
         Expression(NodeTypes::ComparisonOperation), left(left), op(op), right(right) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
+    llvm::Value* createIntComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right);
+    llvm::Value* createFloatComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right);
+    llvm::Value* createStringComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right);
     void print(size_t tabs = 0) const override;
     Datatype getExpressionType() const override;
     std::vector<std::string> getFunctionCalls() override;
