@@ -70,17 +70,17 @@ llvm::Value* SNode::Double::codeGen(CodeGenContext& context)
 }
 
 // Tomado de https://stackoverflow.com/questions/51809274/llvm-defining-strings-and-arrays-via-c-api
-llvm::Value* SNode::String::codeGen(CodeGenContext& context)
+
+llvm::Value* SNode::createString(CodeGenContext& context, std::string str)
 {
     //0. Defs
-    auto str = this->value;
     auto charType = llvm::IntegerType::get(context.context, 8);
 
 
     //1. Initialize chars vector
-    std::vector<llvm::Constant *> chars(this->value.length());
-    for(unsigned int i = 0; i < this->value.size(); i++) {
-        chars[i] = llvm::ConstantInt::get(charType, this->value[i]);
+    std::vector<llvm::Constant *> chars(str.length());
+    for(unsigned int i = 0; i < str.size(); i++) {
+        chars[i] = llvm::ConstantInt::get(charType, str[i]);
     }
 
     //1b. add a zero terminator too
@@ -91,7 +91,7 @@ llvm::Value* SNode::String::codeGen(CodeGenContext& context)
     auto stringType = llvm::ArrayType::get(charType, chars.size());
 
     //3. Create the declaration statement
-    auto globalDeclaration = (llvm::GlobalVariable*) context.module->getOrInsertGlobal(".str", stringType);
+    auto globalDeclaration = (llvm::GlobalVariable*) context.module->getOrInsertGlobal(str + ".str", stringType);
     globalDeclaration->setInitializer(llvm::ConstantArray::get(stringType, chars));
     globalDeclaration->setConstant(true);
     globalDeclaration->setLinkage(llvm::GlobalValue::LinkageTypes::PrivateLinkage);
@@ -101,6 +101,11 @@ llvm::Value* SNode::String::codeGen(CodeGenContext& context)
 
     //4. Return a cast to an i8*
     return llvm::ConstantExpr::getBitCast(globalDeclaration, charType->getPointerTo());
+}
+
+llvm::Value* SNode::String::codeGen(CodeGenContext& context)
+{
+    return createString(context, this->value);
 }
 
 llvm::Value* SNode::Boolean::codeGen(CodeGenContext& context)

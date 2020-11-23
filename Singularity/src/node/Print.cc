@@ -5,7 +5,23 @@
 namespace SNode
 {
 
-llvm::Value* Print::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* Print::codeGen(CodeGenContext& context)
+{
+	llvm::Value* expr = expression.codeGen(context);
+	/*Set up printf arguments*/
+	std::vector<llvm::Value*> printArgs;
+
+	if(expr->getType()->isDoubleTy())
+		printArgs.push_back(context.formatDouble);
+	else if(expr->getType()->isIntegerTy())
+		printArgs.push_back(context.formatInt);
+	else
+		printArgs.push_back(context.formatString);
+	printArgs.push_back(expr);
+
+	return context.builder.CreateCall(context.module->getFunction("printf"), printArgs);
+}
+
 void Print::print(size_t tabs) const
 {
     printTabs(tabs);

@@ -12,7 +12,7 @@ llvm::Value* ArithmeticOperation::createIntOperation(CodeGenContext& context, ll
     switch(this->op)
     {
         case ArithmeticOperator::addition:
-            result = context.builder.CreateAdd(left, right, "tmpadd");
+            result = context.builder.CreateAdd(left, right);
             break;
         case ArithmeticOperator::substraction:
             result = context.builder.CreateSub(left, right);
@@ -40,7 +40,7 @@ llvm::Value* ArithmeticOperation::createFloatOperation(CodeGenContext& context, 
     switch(this->op)
     {
         case ArithmeticOperator::addition:
-            result = context.builder.CreateFAdd(left, right, "tmpadd");
+            result = context.builder.CreateFAdd(left, right);
             break;
         case ArithmeticOperator::substraction:
             result = context.builder.CreateFSub(left, right);

@@ -54,13 +54,11 @@ public:
 
     std::string blockCaller;
     llvm::Function* currentFunc;
-    CodeGenContext() 
-        : block ( nullptr)//new CodeGenBlock(llvm::BasicBlock::Create(context), nullptr) )
-        , module ( new llvm::Module("Singularity", context) )
-        , builder ( *(new llvm::IRBuilder<llvm::NoFolder>(this->context)) )
-        , currentFunc (nullptr)
-    {
-    }
+
+    llvm::Value* formatInt;
+    llvm::Value* formatDouble;
+    llvm::Value* formatString;
+    CodeGenContext();
     
     void generateCode(Program& root);
     //llvm::GenericValue runCode();
@@ -71,6 +69,8 @@ public:
 
     inline llvm::Value* searchVar(const std::string& name) { return block->searchVar(name); }
     inline void insertVar(const std::string& name, llvm::Value* value) { block->insertVar(name, value); }
+
+    void createPrintf();
 };
 
 }

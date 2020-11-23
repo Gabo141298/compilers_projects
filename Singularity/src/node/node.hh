@@ -90,6 +90,8 @@ typedef std::vector<Identifier*> VariableList;
 typedef std::vector<Function*> FunctionList;
 typedef std::vector<VariableAssignment*> GlobalList;
 
+llvm::Value* createString(CodeGenContext& context, std::string str);
+
 class Node {
 public:
     virtual ~Node() {}
