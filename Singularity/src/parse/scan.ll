@@ -238,6 +238,10 @@ typedef parse::Parser::token_type token_type;
 ["][^"]*["]     {
                     /* printf("%s-%s\n", yytext, "STRING"); */
                     SAVE_TOKEN;
+                    if((*yylval->var)[yylval->var->length() - 1] == '"')
+                        yylval->var->pop_back();
+                    if((*yylval->var)[0] == '"')
+                        yylval->var->erase(yylval->var->begin());
                     return token::STRING;
                 }
 "\""            {
