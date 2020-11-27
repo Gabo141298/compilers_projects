@@ -8,8 +8,6 @@ namespace SNode
 
 llvm::Value* ComparisonOperation::createIntComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right)
 {
-    llvm::Value* leftValue = this->left.codeGen(context);
-    llvm::Value* rightValue = this->right.codeGen(context);
     llvm::Value* result = nullptr;
 
     switch(this->op)
@@ -37,8 +35,6 @@ llvm::Value* ComparisonOperation::createIntComparison(CodeGenContext& context, l
 
 llvm::Value* ComparisonOperation::createFloatComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right)
 {
-    llvm::Value* leftValue = this->left.codeGen(context);
-    llvm::Value* rightValue = this->right.codeGen(context);
     llvm::Value* result = nullptr;
 
     switch(this->op)
@@ -65,6 +61,11 @@ llvm::Value* ComparisonOperation::createFloatComparison(CodeGenContext& context,
 
 llvm::Value* ComparisonOperation::createStringComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right)
 {
+    return nullptr;
+}
+
+llvm::Value* ComparisonOperation::codeGen(CodeGenContext& context) 
+{ 
     llvm::Value* leftValue = this->left.codeGen(context);
     llvm::Value* rightValue = this->right.codeGen(context);
     llvm::Value* result = nullptr;
@@ -76,38 +77,11 @@ llvm::Value* ComparisonOperation::createStringComparison(CodeGenContext& context
     {
         result = createIntComparison(context, leftValue, rightValue);
     }
-    else
-    {
-        result = createFloatComparison(context, leftValue, rightValue);
-    }
-
-    return result;
-}
-
-llvm::Value* ComparisonOperation::codeGen(CodeGenContext& context) 
-{ 
-    llvm::Value* leftValue = this->left.codeGen(context);
-    llvm::Value* rightValue = this->right.codeGen(context);
-    llvm::Value* result = nullptr;
-
-    Datatype leftType = this->left.getExpressionType();
-    Datatype rightType = this->right.getExpressionType();
-
-    if(leftType == Datatype::INTEGER && rightType == Datatype::INTEGER)
-    {
-        result = createIntComparison(context, leftValue, rightValue);
-    }
-    else if (leftType == Datatype::INTEGER && rightType == Datatype::DOUBLE
-            || leftType == Datatype::DOUBLE && rightType == Datatype::INTEGER)
+    else if(leftType->isDoubleTy() || rightType->isDoubleTy())
     {
         leftValue = context.builder.CreateCast(llvm::Instruction::SIToFP, leftValue, llvm::Type::getDoubleTy(context.context));
         rightValue = context.builder.CreateCast(llvm::Instruction::SIToFP, rightValue, llvm::Type::getDoubleTy(context.context));
         result = createFloatComparison(context, leftValue, rightValue);
-    }
-    else if (leftType == Datatype::STRING && rightType == Datatype::STRING)
-    {
-        // F ;
-        ;
     }
 
     return result;

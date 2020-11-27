@@ -35,7 +35,11 @@ int main(int argc, char** argv)
     }
 
     SNode::CodeGenContext context;
-    context.generateCode(*programBlock);
+
+    if(argc > 2)
+        context.generateCode(*programBlock, argv[2]);
+    else
+        context.generateCode(*programBlock);
     
     return 0;
 }

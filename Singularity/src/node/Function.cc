@@ -23,6 +23,8 @@ llvm::Value* Function::codeGen(CodeGenContext& context)
 
     context.popBlock();
 
+    context.builder.CreateRetVoid();
+
     llvm::verifyFunction(*context.currentFunc);
     return context.currentFunc;
 }

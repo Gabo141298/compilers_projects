@@ -9,6 +9,7 @@ namespace SNode
 {
 
 class Program : public Node {
+	void createMain(CodeGenContext& context);
 public:
     FunctionList functions;
     GlobalList globals;

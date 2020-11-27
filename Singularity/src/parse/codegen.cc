@@ -3,6 +3,7 @@
 #include "../node/Program.hh"
 
 #include <iostream>
+#include <system_error>
 
 SNode::CodeGenContext::CodeGenContext()
         : block ( nullptr)//new CodeGenBlock(llvm::BasicBlock::Create(context), nullptr) )
@@ -16,11 +17,17 @@ SNode::CodeGenContext::CodeGenContext()
     }
 
 /* Compile the AST into a module */
-void SNode::CodeGenContext::generateCode(SNode::Program& root)
+void SNode::CodeGenContext::generateCode(SNode::Program& root, std::string filename)
 {
 	createPrintf();
     root.codeGen(*this);
-    module->print(llvm::errs(), nullptr);
+
+    llvm::raw_ostream* stream = &llvm::outs();
+    std::error_code ec;
+    if(filename.length())
+        stream = new llvm::raw_fd_ostream(filename, ec);
+
+    module->print(*stream, nullptr);
 }
 
 llvm::Value* SNode::CodeGenBlock::searchVar(const std::string& name)

@@ -59,7 +59,7 @@ public:
     //llvm::Value* formatString;
     CodeGenContext();
     
-    void generateCode(Program& root);
+    void generateCode(Program& root, std::string filename = "");
     llvm::BasicBlock *currentBlock() { return this->block->block; }
     inline void pushBlock(llvm::BasicBlock *block) { this->block = new CodeGenBlock(block, this->block); }
     inline void replaceBlock(llvm::BasicBlock *block) { this->block->block = block; }
