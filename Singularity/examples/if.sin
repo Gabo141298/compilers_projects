@@ -1,7 +1,11 @@
 define function start
 begin
+	set a to 6
+	set b to a + 1
 	if true
 	begin
 		print 5
 	end
+	print a
+	print b
 end

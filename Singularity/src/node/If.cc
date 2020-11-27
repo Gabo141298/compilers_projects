@@ -5,7 +5,38 @@
 namespace SNode
 {
 
-llvm::Value* If::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* If::codeGen(CodeGenContext& context) 
+{
+    llvm::Value* cond = condition.codeGen(context);
+    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then", context.currentFunc);
+    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge", context.currentFunc);
+    
+    if(!this->otherwise)
+    {
+        context.builder.CreateCondBr(cond, thenBlock, merge);
+    }
+    else
+    {
+        llvm::BasicBlock* elseBlock = llvm::BasicBlock::Create(context.context, "else", context.currentFunc);
+        context.builder.CreateCondBr(cond, thenBlock, elseBlock);
+        context.builder.SetInsertPoint(elseBlock);
+        context.pushBlock(elseBlock);
+        otherwise->codeGen(context);
+        context.popBlock();
+        context.builder.CreateBr(merge);
+    }
+
+    context.builder.SetInsertPoint(thenBlock);
+    context.pushBlock(thenBlock);
+    block.codeGen(context);
+    context.popBlock();
+    context.builder.CreateBr(merge);
+    
+    context.builder.SetInsertPoint(merge);
+    context.replaceBlock(merge);
+    return merge;
+}
+
 void If::print(size_t tabs) const
 {
     printTabs(tabs);

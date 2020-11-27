@@ -1,4 +1,4 @@
 define function start
 begin
-	print 5
+	print "Ajá ajá\n"
 end

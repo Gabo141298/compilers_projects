@@ -12,7 +12,7 @@ SNode::CodeGenContext::CodeGenContext()
     {
         formatInt = createString(*this, "%lld");
         formatDouble = createString(*this, "%lf");
-        formatString = createString(*this, "%s");
+        //formatString = createString(*this, "%s");
     }
 
 /* Compile the AST into a module */

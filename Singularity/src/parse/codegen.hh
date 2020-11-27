@@ -52,20 +52,18 @@ public:
     llvm::Module *module;
     llvm::IRBuilder<llvm::NoFolder>& builder;
 
-    std::string blockCaller;
     llvm::Function* currentFunc;
 
     llvm::Value* formatInt;
     llvm::Value* formatDouble;
-    llvm::Value* formatString;
+    //llvm::Value* formatString;
     CodeGenContext();
     
     void generateCode(Program& root);
-    //llvm::GenericValue runCode();
-    //std::map<std::string, llvm::Value*>& locals() { return block->locals; }
     llvm::BasicBlock *currentBlock() { return this->block->block; }
-    void pushBlock(llvm::BasicBlock *block) { this->block = new CodeGenBlock(block, this->block); }
-    void popBlock() { CodeGenBlock* temp = this->block->parent; delete this->block; this->block = temp; }
+    inline void pushBlock(llvm::BasicBlock *block) { this->block = new CodeGenBlock(block, this->block); }
+    inline void replaceBlock(llvm::BasicBlock *block) { this->block->block = block; }
+    inline void popBlock() { CodeGenBlock* temp = this->block->parent; delete this->block; this->block = temp; }
 
     inline llvm::Value* searchVar(const std::string& name) { return block->searchVar(name); }
     inline void insertVar(const std::string& name, llvm::Value* value) { block->insertVar(name, value); }

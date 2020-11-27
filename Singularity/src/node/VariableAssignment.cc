@@ -12,9 +12,6 @@ llvm::Value* VariableAssignment::codeGen(CodeGenContext& context)
 
 	context.insertVar(id.name, expr);
 
-    expr->print(llvm::errs());
-    std::cout << std::endl;
-
 	return expr;
 }
 

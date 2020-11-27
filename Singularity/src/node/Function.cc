@@ -14,8 +14,15 @@ llvm::Value* Function::codeGen(CodeGenContext& context)
         llvm::FunctionType::get(context.builder.getVoidTy(), llvm::Function::ExternalLinkage);
     context.currentFunc = llvm::Function::Create(
         funcType, llvm::Function::ExternalLinkage, id.name, context.module);
-    context.blockCaller = "entry";
-    block.codeGen(context);
+
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(context.context, "entry", context.currentFunc);
+    context.pushBlock(block);
+    context.builder.SetInsertPoint(block);
+
+    this->block.codeGen(context);
+
+    context.popBlock();
+
     llvm::verifyFunction(*context.currentFunc);
     return context.currentFunc;
 }

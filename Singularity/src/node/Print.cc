@@ -15,8 +15,6 @@ llvm::Value* Print::codeGen(CodeGenContext& context)
 		printArgs.push_back(context.formatDouble);
 	else if(expr->getType()->isIntegerTy())
 		printArgs.push_back(context.formatInt);
-	else
-		printArgs.push_back(context.formatString);
 	printArgs.push_back(expr);
 
 	return context.builder.CreateCall(context.module->getFunction("printf"), printArgs);
