@@ -5,7 +5,80 @@
 namespace SNode
 {
 
-llvm::Value* WhileCounting::codeGen(CodeGenContext&) { return nullptr; }
+//llvm::Value* WhileCounting::codeGen(CodeGenContext& context)
+//{
+
+//    llvm::BasicBlock* initBlock = llvm::BasicBlock::Create(context.context, "initializer", context.currentFunc);
+//    llvm::BasicBlock* conditionBlock = llvm::BasicBlock::Create(context.context, "condition", context.currentFunc);
+//    llvm::BasicBlock* loopBlock = llvm::BasicBlock::Create(context.context, "loop", context.currentFunc);
+//    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge", context.currentFunc);
+
+//    context.builder.CreateBr(initBlock);
+
+//    context.builder.SetInsertPoint(initBlock);
+//    context.pushBlock(loopBlock);
+
+//    llvm::Value* tmp =  this->beginValue.codeGen(context);
+//    llvm::PHINode* counterVariable = context.builder.CreatePHI(context.builder.getInt64Ty(), 2 , this->counter.name);
+//    counterVariable->addIncoming(tmp, initBlock);
+//    llvm::Value* endVariable = this->endValue.codeGen(context);
+//    context.insertVar(counter.name, counterVariable);
+//    llvm::Value* increment = context.builder.getInt64(1);
+//    context.builder.CreateBr(conditionBlock);
+
+
+//    context.builder.SetInsertPoint(conditionBlock);
+//    llvm::Value* conditionEvaluation = context.builder.CreateICmpSLE(counterVariable,endVariable);
+//    context.builder.CreateCondBr(conditionEvaluation, loopBlock, merge);
+
+//    context.builder.SetInsertPoint(loopBlock);
+//    this->block.codeGen(context);
+//    llvm::Value* sum = context.builder.CreateAdd(counterVariable, increment , "nextvar" );
+//    llvm::BasicBlock* endLoop = context.builder.GetInsertBlock();
+//    counterVariable->addIncoming(sum, endLoop);
+//    context.builder.CreateBr(conditionBlock);
+
+//    context.builder.SetInsertPoint(merge);
+//    context.popBlock();
+//    context.replaceBlock(merge);
+//    return merge;
+//}
+
+llvm::Value* WhileCounting::codeGen(CodeGenContext& context)
+{
+    llvm::Value* StartVal = this->beginValue.codeGen(context);
+
+    llvm::Function* TheFunction = context.builder.GetInsertBlock()->getParent();
+    llvm::BasicBlock* PreheaderBB = context.builder.GetInsertBlock();
+    llvm::BasicBlock* LoopBB = llvm::BasicBlock::Create(context.context, "loop", TheFunction);
+
+    context.builder.CreateBr(LoopBB);
+    context.builder.SetInsertPoint(LoopBB);
+    llvm::PHINode *Variable = context.builder.CreatePHI(llvm::Type::getInt64Ty(context.context), 2, this->counter.name);
+    Variable->addIncoming(StartVal, PreheaderBB);
+
+    context.pushBlock(LoopBB);
+    context.insertVar(counter.name, Variable);
+    this->block.codeGen(context);
+    llvm::Value* StepVal = context.builder.getInt64(1);
+    llvm::Value* NextVar = context.builder.CreateAdd(Variable, StepVal, "nextvar");
+
+    llvm::Value* EndCond = this->endValue.codeGen(context);
+
+    EndCond = context.builder.CreateICmpSLE(Variable, EndCond, "loopcond");
+
+    llvm::BasicBlock * LoopEndBB = context.builder.GetInsertBlock();
+    llvm::BasicBlock * AfterBB = llvm::BasicBlock::Create(context.context, "afterloop", TheFunction);
+
+    context.builder.CreateCondBr(EndCond, LoopBB, AfterBB);
+    context.builder.SetInsertPoint(AfterBB);
+
+    Variable->addIncoming(NextVar, LoopEndBB);
+
+    context.popBlock();
+
+    return  AfterBB;
+}
 void WhileCounting::print(size_t tabs) const
 {
     printTabs(tabs);

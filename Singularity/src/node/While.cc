@@ -5,7 +5,26 @@
 namespace SNode
 {
 
-llvm::Value* While::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* While::codeGen(CodeGenContext& context)
+{
+    llvm::Value* cond = this->condition.codeGen(context);
+    llvm::BasicBlock* conditionBlock = llvm::BasicBlock::Create(context.context, "condition", context.currentFunc);
+    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then", context.currentFunc);
+    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge", context.currentFunc);
+
+    context.builder.SetInsertPoint(conditionBlock);
+    context.builder.CreateCondBr(cond, thenBlock, merge);
+
+    context.builder.SetInsertPoint(thenBlock);
+    this->block.codeGen(context);
+    context.popBlock();
+    context.builder.CreateBr(conditionBlock);
+
+    context.builder.SetInsertPoint(merge);
+    context.replaceBlock(merge);
+    return merge;
+}
+
 void While::print(size_t tabs) const
 {
     printTabs(tabs);
