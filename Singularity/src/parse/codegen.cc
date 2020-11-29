@@ -9,7 +9,6 @@ SNode::CodeGenContext::CodeGenContext()
         : block ( nullptr)//new CodeGenBlock(llvm::BasicBlock::Create(context), nullptr) )
         , module ( new llvm::Module("Singularity", context) )
         , builder ( *(new llvm::IRBuilder<llvm::NoFolder>(this->context)) )
-        , currentFunc (nullptr)
     {
         formatInt = createString(*this, "%lld");
         formatDouble = createString(*this, "%lf");
@@ -47,4 +46,11 @@ void SNode::CodeGenContext::createPrintf()
 	/*`true` specifies the function as variadic*/
 	llvm::FunctionType *printfType = llvm::FunctionType::get(builder.getInt32Ty(), args, true);
 	llvm::Function::Create(printfType, llvm::Function::ExternalLinkage, "printf", module);
+}
+
+void SNode::CodeGenContext::freeFunction()
+{
+    this->returnValue = nullptr;
+    this->returnTypes.erase(this->returnTypes.begin(), this->returnTypes.end());
+    this->functionBlocks.erase(this->functionBlocks.begin(), this->functionBlocks.end());
 }

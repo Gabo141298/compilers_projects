@@ -6,16 +6,35 @@
 
 namespace SNode
 {
+llvm::Type* Function::getReturnType(const std::vector<llvm::Type*>& returnValues)
+{
+    return nullptr;
+}
+
+llvm::Function* Function::createFunction(CodeGenContext& context)
+{
+    llvm::Type* returnType = getReturnType(context.returnTypes);
+    llvm::FunctionType *funcType =
+        llvm::FunctionType::get(context.builder.getVoidTy(), llvm::Function::ExternalLinkage);
+    llvm::Function* currentFunc = llvm::Function::Create(
+        funcType, llvm::Function::ExternalLinkage, id.name, context.module);
+
+    for(size_t index = 0; index < context.functionBlocks.size(); ++index)
+    {
+        context.functionBlocks[index]->insertInto(currentFunc);
+    }
+
+    context.builder.CreateRetVoid();
+
+    return currentFunc;
+}
 
 llvm::Value* Function::codeGen(CodeGenContext& context) 
 {
-    // Hay que cambiar el tipo de retorno.
-    llvm::FunctionType *funcType =
-        llvm::FunctionType::get(context.builder.getVoidTy(), llvm::Function::ExternalLinkage);
-    context.currentFunc = llvm::Function::Create(
-        funcType, llvm::Function::ExternalLinkage, id.name, context.module);
+    context.freeFunction();
 
-    llvm::BasicBlock* block = llvm::BasicBlock::Create(context.context, "entry", context.currentFunc);
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(context.context, "entry");
+    context.insertFunctionBlock(block);
     context.pushBlock(block);
     context.builder.SetInsertPoint(block);
 
@@ -23,10 +42,10 @@ llvm::Value* Function::codeGen(CodeGenContext& context)
 
     context.popBlock();
 
-    context.builder.CreateRetVoid();
+    llvm::Function* func = createFunction(context);
 
-    llvm::verifyFunction(*context.currentFunc);
-    return context.currentFunc;
+    llvm::verifyFunction(*func);
+    return func;
 }
 
 void Function::print(size_t tabs) const

@@ -52,7 +52,9 @@ public:
     llvm::Module *module;
     llvm::IRBuilder<llvm::NoFolder>& builder;
 
-    llvm::Function* currentFunc;
+    std::vector<llvm::BasicBlock*> functionBlocks;
+    std::vector<llvm::Type*> returnTypes;
+    llvm::Value* returnValue;
 
     llvm::Value* formatInt;
     llvm::Value* formatDouble;
@@ -67,6 +69,10 @@ public:
 
     inline llvm::Value* searchVar(const std::string& name) { return block->searchVar(name); }
     inline void insertVar(const std::string& name, llvm::Value* value) { block->insertVar(name, value); }
+
+    void freeFunction();
+    inline void insertFunctionBlock(llvm::BasicBlock* block) { this->functionBlocks.push_back(block); }
+    inline void insertReturnType(llvm::Type* type) { this->returnTypes.push_back(type); }
 
     void createPrintf();
 };

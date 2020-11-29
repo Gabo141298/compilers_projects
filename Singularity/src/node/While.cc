@@ -8,20 +8,28 @@ namespace SNode
 llvm::Value* While::codeGen(CodeGenContext& context)
 {
     llvm::Value* cond = this->condition.codeGen(context);
-    llvm::BasicBlock* conditionBlock = llvm::BasicBlock::Create(context.context, "condition", context.currentFunc);
-    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then", context.currentFunc);
-    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge", context.currentFunc);
+    llvm::BasicBlock* conditionBlock = llvm::BasicBlock::Create(context.context, "condition");
+    context.insertFunctionBlock(conditionBlock);
+    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then");
+    context.insertFunctionBlock(thenBlock);
+    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge");
+    context.insertFunctionBlock(merge);
+
+    context.builder.CreateBr(conditionBlock);
 
     context.builder.SetInsertPoint(conditionBlock);
     context.builder.CreateCondBr(cond, thenBlock, merge);
 
+
     context.builder.SetInsertPoint(thenBlock);
+    context.pushBlock(thenBlock);
     this->block.codeGen(context);
     context.popBlock();
     context.builder.CreateBr(conditionBlock);
 
     context.builder.SetInsertPoint(merge);
     context.replaceBlock(merge);
+
     return merge;
 }
 
