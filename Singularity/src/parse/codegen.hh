@@ -28,6 +28,18 @@ namespace SNode
 {
 class Program;
 
+struct ReturnInfo
+{
+    llvm::Value* returnValue;
+    llvm::BasicBlock* block;
+
+    ReturnInfo(llvm::Value* returnValue, llvm::BasicBlock* block)
+        : returnValue(returnValue)
+        , block(block)
+    {
+    }
+};
+
 class CodeGenBlock {
 public:
     llvm::BasicBlock *block;
@@ -53,8 +65,7 @@ public:
     llvm::IRBuilder<llvm::NoFolder>& builder;
 
     std::vector<llvm::BasicBlock*> functionBlocks;
-    std::vector<llvm::Type*> returnTypes;
-    llvm::Value* returnValue;
+    std::vector<ReturnInfo> returns;
 
     llvm::Value* formatInt;
     llvm::Value* formatDouble;
@@ -72,7 +83,6 @@ public:
 
     void freeFunction();
     inline void insertFunctionBlock(llvm::BasicBlock* block) { this->functionBlocks.push_back(block); }
-    inline void insertReturnType(llvm::Type* type) { this->returnTypes.push_back(type); }
 
     void createPrintf();
 };

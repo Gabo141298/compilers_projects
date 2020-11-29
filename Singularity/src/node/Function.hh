@@ -8,7 +8,7 @@ namespace SNode
 {
 
 class Function : public Node {
-    llvm::Type* getReturnType(const std::vector<llvm::Type*>& returnValues);
+    llvm::Type* getReturnType(CodeGenContext& context);
     llvm::Function* createFunction(CodeGenContext& context);
 public:
     const Identifier& id;

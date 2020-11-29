@@ -5,7 +5,12 @@
 namespace SNode
 {
 
-llvm::Value* Answer::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* Answer::codeGen(CodeGenContext& context)
+{
+    llvm::Value* returnVal = returnExpression.codeGen(context);
+    context.returns.push_back(ReturnInfo(returnVal, context.builder.GetInsertBlock()));
+    return returnVal;
+}
 
 void Answer::print(size_t tabs) const
 {

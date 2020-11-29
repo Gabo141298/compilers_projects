@@ -50,7 +50,6 @@ void SNode::CodeGenContext::createPrintf()
 
 void SNode::CodeGenContext::freeFunction()
 {
-    this->returnValue = nullptr;
-    this->returnTypes.erase(this->returnTypes.begin(), this->returnTypes.end());
+    this->returns.erase(this->returns.begin(), this->returns.end());
     this->functionBlocks.erase(this->functionBlocks.begin(), this->functionBlocks.end());
 }

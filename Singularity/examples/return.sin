@@ -1,0 +1,9 @@
+define function aja
+begin
+	answer 10
+end
+
+define function start
+begin
+	print call aja
+end
