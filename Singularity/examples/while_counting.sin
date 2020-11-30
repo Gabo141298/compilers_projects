@@ -1,0 +1,7 @@
+define function start
+begin 
+	while index counting from 0 to 5
+	begin
+		print index
+	end
+end 
