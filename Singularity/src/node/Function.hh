@@ -8,6 +8,8 @@ namespace SNode
 {
 
 class Function : public Node {
+    llvm::Type* getReturnType(CodeGenContext& context);
+    llvm::Function* createFunction(CodeGenContext& context);
 public:
     const Identifier& id;
     VariableList arguments;

@@ -5,7 +5,11 @@
 namespace SNode
 {
 
-llvm::Value* FunctionCall::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* FunctionCall::codeGen(CodeGenContext& context)
+{
+    return context.builder.CreateCall(context.module->getFunction(id.name));
+}
+
 void FunctionCall::print(size_t tabs) const
 {
     printTabs(tabs);

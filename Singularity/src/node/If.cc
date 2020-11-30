@@ -8,8 +8,10 @@ namespace SNode
 llvm::Value* If::codeGen(CodeGenContext& context) 
 {
     llvm::Value* cond = condition.codeGen(context);
-    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then", context.currentFunc);
-    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge", context.currentFunc);
+    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then");
+    context.insertFunctionBlock(thenBlock);
+    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge");
+    context.insertFunctionBlock(merge);
     
     if(!this->otherwise)
     {
@@ -17,7 +19,8 @@ llvm::Value* If::codeGen(CodeGenContext& context)
     }
     else
     {
-        llvm::BasicBlock* elseBlock = llvm::BasicBlock::Create(context.context, "else", context.currentFunc);
+        llvm::BasicBlock* elseBlock = llvm::BasicBlock::Create(context.context, "else");
+        context.insertFunctionBlock(elseBlock);
         context.builder.CreateCondBr(cond, thenBlock, elseBlock);
         context.builder.SetInsertPoint(elseBlock);
         context.pushBlock(elseBlock);

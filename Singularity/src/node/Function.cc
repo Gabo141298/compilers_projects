@@ -6,16 +6,73 @@
 
 namespace SNode
 {
+llvm::Type* Function::getReturnType(CodeGenContext& context)
+{
+    if(context.returns.size() == 0)
+        return context.builder.getVoidTy();
+    llvm::Type* type = context.returns[0].returnValue->getType();
+    if(type->isDoubleTy() || type->isPointerTy())
+        return type;
+    // If it's an integer, check if there's a double as any other return type.
+    for(size_t index = 1; index < context.returns.size(); ++index)
+    {
+        if(context.returns[index].returnValue->getType()->isDoubleTy())
+            return context.returns[index].returnValue->getType();
+    }
+    return type;
+}
+
+llvm::Function* Function::createFunction(CodeGenContext& context)
+{
+    llvm::Type* returnType = getReturnType(context);
+    llvm::FunctionType *funcType =
+        llvm::FunctionType::get(returnType, llvm::Function::ExternalLinkage);
+    llvm::Function* currentFunc = llvm::Function::Create(
+        funcType, llvm::Function::ExternalLinkage, id.name, context.module);
+
+    llvm::AllocaInst* returnPtr = nullptr;
+
+    if(!returnType->isVoidTy())
+    {
+        llvm::BasicBlock* initBlock = llvm::BasicBlock::Create(context.context, "__init", currentFunc);
+        context.builder.SetInsertPoint(initBlock);
+        returnPtr = context.builder.CreateAlloca(returnType, nullptr, "__return.value");
+        context.builder.CreateBr(context.functionBlocks[0]);
+    }
+
+    for(size_t index = 0; index < context.functionBlocks.size(); ++index)
+    {
+        context.functionBlocks[index]->insertInto(currentFunc);
+    }
+
+    if(returnType->isVoidTy())
+    {
+        context.builder.CreateRetVoid();
+    }
+    else
+    {
+        llvm::BasicBlock* returnBlock = llvm::BasicBlock::Create(context.context, "__return", currentFunc);
+        context.builder.SetInsertPoint(returnBlock);
+        llvm::Value* retVal = context.builder.CreateLoad(returnPtr);
+        context.builder.CreateRet(retVal);
+
+        for(size_t index = 0; index < context.returns.size(); ++index)
+        {
+            context.builder.SetInsertPoint(context.returns[index].block);
+            context.builder.CreateStore(context.returns[index].returnValue, returnPtr);
+            context.builder.CreateBr(returnBlock);
+        }
+    }
+
+    return currentFunc;
+}
 
 llvm::Value* Function::codeGen(CodeGenContext& context) 
 {
-    // Hay que cambiar el tipo de retorno.
-    llvm::FunctionType *funcType =
-        llvm::FunctionType::get(context.builder.getVoidTy(), llvm::Function::ExternalLinkage);
-    context.currentFunc = llvm::Function::Create(
-        funcType, llvm::Function::ExternalLinkage, id.name, context.module);
+    context.freeFunction();
 
-    llvm::BasicBlock* block = llvm::BasicBlock::Create(context.context, "entry", context.currentFunc);
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(context.context, "entry");
+    context.insertFunctionBlock(block);
     context.pushBlock(block);
     context.builder.SetInsertPoint(block);
 
@@ -23,10 +80,10 @@ llvm::Value* Function::codeGen(CodeGenContext& context)
 
     context.popBlock();
 
-    context.builder.CreateRetVoid();
+    llvm::Function* func = createFunction(context);
 
-    llvm::verifyFunction(*context.currentFunc);
-    return context.currentFunc;
+    llvm::verifyFunction(*func);
+    return func;
 }
 
 void Function::print(size_t tabs) const

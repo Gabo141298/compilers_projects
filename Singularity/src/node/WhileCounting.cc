@@ -48,9 +48,9 @@ llvm::Value* WhileCounting::codeGen(CodeGenContext& context)
 {
     llvm::Value* StartVal = this->beginValue.codeGen(context);
 
-    llvm::Function* TheFunction = context.builder.GetInsertBlock()->getParent();
     llvm::BasicBlock* PreheaderBB = context.builder.GetInsertBlock();
-    llvm::BasicBlock* LoopBB = llvm::BasicBlock::Create(context.context, "loop", TheFunction);
+    llvm::BasicBlock* LoopBB = llvm::BasicBlock::Create(context.context, "loop");
+    context.insertFunctionBlock(LoopBB);
 
     context.builder.CreateBr(LoopBB);
     context.builder.SetInsertPoint(LoopBB);
@@ -68,7 +68,8 @@ llvm::Value* WhileCounting::codeGen(CodeGenContext& context)
     EndCond = context.builder.CreateICmpSLE(Variable, EndCond, "loopcond");
 
     llvm::BasicBlock * LoopEndBB = context.builder.GetInsertBlock();
-    llvm::BasicBlock * AfterBB = llvm::BasicBlock::Create(context.context, "afterloop", TheFunction);
+    llvm::BasicBlock * AfterBB = llvm::BasicBlock::Create(context.context, "afterloop");
+    context.insertFunctionBlock(AfterBB);
 
     context.builder.CreateCondBr(EndCond, LoopBB, AfterBB);
     context.builder.SetInsertPoint(AfterBB);
