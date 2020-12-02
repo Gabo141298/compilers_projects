@@ -14,8 +14,14 @@ llvm::Value* Read::codeGen(CodeGenContext& context) {
     
     // context.builder.SetInsertPoint(entry);
 
+    // Gets the function
+    llvm::Function *theScanf = context.module->getFunction("scanf");
+    llvm::BasicBlock *entry = llvm::BasicBlock::Create(context.context, "scanf", theScanf);
+    context.builder.SetInsertPoint(entry);
+    //context.builder.SetInsertPoint(context.builder.GetInsertBlock());
     // Format
-    llvm::Value *scanfFormat = context.builder.CreateGlobalStringPtr("%u");
+    
+    llvm::Value *scanfFormat = SNode::createString(context, "%u");
 
     // Allocate memory
     llvm::AllocaInst *Alloca = context.builder.CreateAlloca(llvm::Type::getInt64Ty(context.context), nullptr, this->identifier.name );    
@@ -23,11 +29,12 @@ llvm::Value* Read::codeGen(CodeGenContext& context) {
     // Vector with args
     std::vector<llvm::Value *> scanfArgs = {scanfFormat, Alloca};
 
-    // Gets the function
-    llvm::Function *theScanf = context.module->getFunction("scanf");
     
     // Build the call
-    return context.builder.CreateCall(theScanf, scanfArgs);;     
+    llvm::Value* response = context.builder.CreateCall(theScanf, scanfArgs);
+    
+         
+
 }
 void Read::print(size_t tabs) const
 {

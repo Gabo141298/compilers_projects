@@ -56,7 +56,7 @@ void SNode::CodeGenContext::createScanf()
 	std::vector<llvm::Type *> args;
 	args.push_back(llvm::Type::getInt8PtrTy(context));
 	/*`true` specifies the function as variadic*/
-	llvm::FunctionType *scanfType = llvm::FunctionType::get(builder.getInt32Ty(), args, true);
+	llvm::FunctionType *scanfType = llvm::FunctionType::get(builder.getInt64Ty(), args, true);
 	llvm::Function::Create(scanfType, llvm::Function::ExternalLinkage, "scanf", module);
 }
 

@@ -1,5 +1,4 @@
 define function start
 begin
 	read to n
-	print n
 end
