@@ -85,6 +85,8 @@ public:
     inline void insertFunctionBlock(llvm::BasicBlock* block) { this->functionBlocks.push_back(block); }
 
     void createPrintf();
+
+    void createScanf();
 };
 
 }

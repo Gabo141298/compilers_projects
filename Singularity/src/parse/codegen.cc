@@ -19,6 +19,8 @@ SNode::CodeGenContext::CodeGenContext()
 void SNode::CodeGenContext::generateCode(SNode::Program& root, std::string filename)
 {
 	createPrintf();
+    createScanf();
+
     root.codeGen(*this);
 
     llvm::raw_ostream* stream = &llvm::outs();
@@ -46,6 +48,16 @@ void SNode::CodeGenContext::createPrintf()
 	/*`true` specifies the function as variadic*/
 	llvm::FunctionType *printfType = llvm::FunctionType::get(builder.getInt32Ty(), args, true);
 	llvm::Function::Create(printfType, llvm::Function::ExternalLinkage, "printf", module);
+}
+
+
+void SNode::CodeGenContext::createScanf()
+{
+	std::vector<llvm::Type *> args;
+	args.push_back(llvm::Type::getInt8PtrTy(context));
+	/*`true` specifies the function as variadic*/
+	llvm::FunctionType *scanfType = llvm::FunctionType::get(builder.getInt32Ty(), args, true);
+	llvm::Function::Create(scanfType, llvm::Function::ExternalLinkage, "scanf", module);
 }
 
 void SNode::CodeGenContext::freeFunction()
