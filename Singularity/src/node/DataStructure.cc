@@ -8,16 +8,20 @@ namespace SNode
 llvm::Value* List::codeGen(CodeGenContext& context)
 {
     llvm::Type* elementType = context.builder.getInt8PtrTy();
-    llvm::Type* int32type = context.builder.getInt32Ty();
 
     auto layoutAllocSize = context.dataLayout.getTypeAllocSize(elementType);
-    std::cout << layoutAllocSize << std::endl;
 
-    auto elementSize = llvm::ConstantInt::get(int32type, layoutAllocSize);
-    auto arraySize = llvm::ConstantInt::get(int32type, 1);
-    auto allocSize = llvm::ConstantExpr::getMul(elementSize, arraySize);
+    auto elementSize = context.builder.getInt64(layoutAllocSize);
+    auto arraySize = context.builder.getInt64(10);
+    auto allocSize = context.builder.CreateMul(elementSize, arraySize);
 
-    llvm::BasicBlock* block = context.builder.GetInsertBlock();
+    std::vector<llvm::Value*> mallocArgs;
+
+    mallocArgs.push_back(allocSize);
+
+    return context.builder.CreateCall(context.module->getFunction("malloc"), mallocArgs);
+
+    /*llvm::BasicBlock* block = context.builder.GetInsertBlock();
     auto elTyPtr = elementType->getPointerTo();
 
     // malloc:
@@ -25,14 +29,14 @@ llvm::Value* List::codeGen(CodeGenContext& context)
         block, 
         elTyPtr, // T*
         elementType,                 // T
-        allocSize,                   // sizeof(T) * 100
+        elementSize,                   // sizeof(T) * 10
         arraySize,
         nullptr, 
-        "");
+        "arr");
 
     context.builder.Insert(arr);
 
-    return arr;
+    return arr;*/
 }
 
 void List::print(size_t tabs) const

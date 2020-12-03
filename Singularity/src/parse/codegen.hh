@@ -91,6 +91,8 @@ public:
     void createScanf();
 
     void createStrcmp();
+
+    void createMalloc();
 };
 
 }
