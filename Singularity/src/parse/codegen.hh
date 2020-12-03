@@ -64,8 +64,10 @@ class CodeGenContext {
 public:
     llvm::LLVMContext context;
     llvm::Module *module;
+    llvm::DataLayout dataLayout;
     llvm::IRBuilder<llvm::NoFolder>& builder;
 
+    llvm::BasicBlock* initBlock;
     std::vector<llvm::BasicBlock*> functionBlocks;
     std::vector<ReturnInfo> returns;
 
@@ -92,9 +94,7 @@ public:
 
     void createStrcmp();
 
-    void createStrtol();
-
-
+    void createMalloc();
 };
 
 }

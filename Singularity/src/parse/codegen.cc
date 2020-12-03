@@ -8,6 +8,7 @@
 SNode::CodeGenContext::CodeGenContext()
         : block ( nullptr)//new CodeGenBlock(llvm::BasicBlock::Create(context), nullptr) )
         , module ( new llvm::Module("Singularity", context) )
+        , dataLayout ( llvm::DataLayout(this->module) )
         , builder ( *(new llvm::IRBuilder<llvm::NoFolder>(this->context)) )
     {
         formatInt = createString(*this, "%lld");
@@ -21,7 +22,7 @@ void SNode::CodeGenContext::generateCode(SNode::Program& root, std::string filen
 	createPrintf();
     createScanf();
     createStrcmp();
-    createStrtol();
+
 
     root.codeGen(*this);
 
@@ -101,6 +102,14 @@ void SNode::CodeGenContext::createScanf()
 	/*`true` specifies the function as variadic*/
 	llvm::FunctionType *scanfType = llvm::FunctionType::get(builder.getInt64Ty(), args, true);
 	llvm::Function::Create(scanfType, llvm::Function::ExternalLinkage, "scanf", module);
+}
+
+void SNode::CodeGenContext::createMalloc()
+{
+    std::vector<llvm::Type *> args;
+    args.push_back(llvm::Type::getInt64Ty(context));
+    llvm::FunctionType *mallocType = llvm::FunctionType::get(builder.getInt8PtrTy(), args, false);
+    llvm::Function::Create(mallocType, llvm::Function::ExternalLinkage, "malloc", module);
 }
 
 void SNode::CodeGenContext::freeFunction()
