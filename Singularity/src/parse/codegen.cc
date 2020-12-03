@@ -21,6 +21,7 @@ void SNode::CodeGenContext::generateCode(SNode::Program& root, std::string filen
 	createPrintf();
     createScanf();
     createStrcmp();
+    createStrtol();
 
     root.codeGen(*this);
 
@@ -42,6 +43,28 @@ llvm::Value* SNode::CodeGenBlock::searchVar(const std::string& name)
     return nullptr;
 }
 
+bool SNode::CodeGenBlock::tryInsertVar(const std::string& name, llvm::Value* value)
+{
+    llvm::Value* currentValue = locals[name];
+    if(currentValue)
+    {
+        this->locals[name] = value;
+        return true;
+    }
+    else if(parent)
+        return this->parent->tryInsertVar(name, value);
+    else
+        return false;
+}
+
+void SNode::CodeGenBlock::insertVar(const std::string &name, llvm::Value *value)
+{
+    if(! tryInsertVar(name, value))
+    {
+        this->locals[name] = value;
+    }
+}
+
 void SNode::CodeGenContext::createPrintf()
 {
 	std::vector<llvm::Type *> args;
@@ -58,6 +81,17 @@ void SNode::CodeGenContext::createStrcmp()
     args.push_back(llvm::Type::getInt8PtrTy(context));
     llvm::FunctionType *strcmpType = llvm::FunctionType::get(builder.getInt32Ty(), args, false);
     llvm::Function::Create(strcmpType, llvm::Function::ExternalLinkage, "strcmp", module);
+}
+
+void SNode::CodeGenContext::createStrtol()
+{
+    std::vector<llvm::Type *> args;
+    args.push_back(llvm::Type::getInt8PtrTy(context));
+    args.push_back(llvm::Type::getInt8PtrTy(context));
+    args.push_back(llvm::Type::getInt32Ty(context));
+
+    llvm::FunctionType *strTolType = llvm::FunctionType::get(builder.getInt64Ty(), args, false);
+    llvm::Function::Create(strTolType, llvm::Function::ExternalLinkage, "strtol", module);
 }
 
 void SNode::CodeGenContext::createScanf()

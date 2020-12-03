@@ -52,7 +52,9 @@ public:
     {
     }
     llvm::Value* searchVar(const std::string& name);
-    inline void insertVar(const std::string& name, llvm::Value* value) { this->locals[name] = value; }
+    bool tryInsertVar(const std::string& name, llvm::Value* value);
+
+    void insertVar(const std::string& name, llvm::Value* value);
 };
 
 class CodeGenContext {
@@ -89,6 +91,10 @@ public:
     void createScanf();
 
     void createStrcmp();
+
+    void createStrtol();
+
+
 };
 
 }

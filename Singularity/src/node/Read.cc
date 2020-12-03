@@ -1,10 +1,11 @@
-#include "Read.hh"
+﻿#include "Read.hh"
 
 #include "node.hh"
 #include "llvm/IR/Instructions.h"
 
 namespace SNode
 {
+
 
 llvm::Value* Read::codeGen(CodeGenContext& context)
 {
@@ -21,6 +22,7 @@ llvm::Value* Read::codeGen(CodeGenContext& context)
         chars[i] = llvm::ConstantInt::get(charType, '\0');
     }
 
+    //Creates an empty string to use as a buffer
     auto stringType = llvm::ArrayType::get(charType, chars.size());
     auto globalDeclaration = (llvm::GlobalVariable*) context.module->getOrInsertGlobal("", stringType);
     globalDeclaration->setInitializer(llvm::ConstantArray::get(stringType, chars));
@@ -37,12 +39,49 @@ llvm::Value* Read::codeGen(CodeGenContext& context)
     std::vector<llvm::Value *> scanfArgs = {scanfFormat, buffer};
 
 
-    // Build the call
-    llvm::Value* response = context.builder.CreateCall(theScanf, scanfArgs);
+    // Build the call to scanf
+    context.builder.CreateCall(theScanf, scanfArgs);
 
+    // Get nullptr to use as a parameter
+    auto nullPointer = llvm::ConstantExpr::getBitCast( context.builder.getInt64(0), context.builder.getInt8PtrTy());
+//    llvm::Value* intVal = context.builder.getInt64(0);
+    // Build parameters for strtol
+    std::vector<llvm::Value*> args;
+    args.push_back(buffer);
+    args.push_back(nullPointer);
+    args.push_back(context.builder.getInt32(10));
     context.insertVar(this->identifier.name, buffer);
 
-    return buffer;
+    //Call strtol
+    llvm::Value* intVal =  context.builder.CreateCall(context.module->getFunction("strtol"), args);
+
+    // Check if the read value is an integer
+    llvm::Value* cond = context.builder.CreateICmpNE(intVal, context.builder.getInt64(0));
+    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then");
+    context.insertFunctionBlock(thenBlock);
+    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge");
+    context.insertFunctionBlock(merge);
+
+    // If it is an integer,
+    llvm::BasicBlock* elseBlock = llvm::BasicBlock::Create(context.context, "else");
+    context.insertFunctionBlock(elseBlock);
+    context.builder.CreateCondBr(cond, thenBlock, elseBlock);
+    context.builder.SetInsertPoint(elseBlock);
+    context.pushBlock(elseBlock);
+    context.insertVar(this->identifier.name, buffer);
+    context.popBlock();
+    context.builder.CreateBr(merge);
+
+    context.builder.SetInsertPoint(thenBlock);
+    context.pushBlock(thenBlock);
+    context.insertVar(this->identifier.name, intVal);
+    context.popBlock();
+    context.builder.CreateBr(merge);
+
+    context.builder.SetInsertPoint(merge);
+    context.replaceBlock(merge);
+
+    return merge;
 
 }
 void Read::print(size_t tabs) const
