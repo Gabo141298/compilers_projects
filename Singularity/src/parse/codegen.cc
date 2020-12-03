@@ -20,6 +20,7 @@ void SNode::CodeGenContext::generateCode(SNode::Program& root, std::string filen
 {
 	createPrintf();
     createScanf();
+    createStrcmp();
 
     root.codeGen(*this);
 
@@ -50,6 +51,14 @@ void SNode::CodeGenContext::createPrintf()
 	llvm::Function::Create(printfType, llvm::Function::ExternalLinkage, "printf", module);
 }
 
+void SNode::CodeGenContext::createStrcmp()
+{
+    std::vector<llvm::Type *> args;
+    args.push_back(llvm::Type::getInt8PtrTy(context));
+    args.push_back(llvm::Type::getInt8PtrTy(context));
+    llvm::FunctionType *strcmpType = llvm::FunctionType::get(builder.getInt32Ty(), args, false);
+    llvm::Function::Create(strcmpType, llvm::Function::ExternalLinkage, "strcmp", module);
+}
 
 void SNode::CodeGenContext::createScanf()
 {

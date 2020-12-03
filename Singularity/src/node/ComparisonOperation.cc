@@ -1,6 +1,7 @@
 #include "ComparisonOperation.hh"
 
 #include "node.hh"
+#include "llvm/ADT/StringRef.h"
 
 namespace SNode
 {
@@ -27,7 +28,6 @@ llvm::Value* ComparisonOperation::createIntComparison(CodeGenContext& context, l
         case ComparisonOperator::isNot:
             result = context.builder.CreateICmpNE(left,right);
             break; 
-
     }
 
     return result;
@@ -59,9 +59,32 @@ llvm::Value* ComparisonOperation::createFloatComparison(CodeGenContext& context,
     return result;
 }
 
-llvm::Value* ComparisonOperation::createStringComparison(CodeGenContext& context, llvm::Value* left, llvm::Value* right)
+
+llvm::Value* ComparisonOperation::createStringComparison(CodeGenContext& context, llvm::Value* strcmpValue)
 {
-    return nullptr;
+    llvm::Value* result = nullptr;
+
+    llvm::Value* zero = context.builder.getInt32(0);
+
+    switch(this->op)
+    {
+        case ComparisonOperator::leq:
+            result = context.builder.CreateICmpSLE(strcmpValue,zero);
+            break;
+        case ComparisonOperator::greater:
+            result = context.builder.CreateICmpSGT(strcmpValue,zero);
+            break;
+        case ComparisonOperator::less:
+            result = context.builder.CreateICmpSLT(strcmpValue,zero);
+            break;
+        case ComparisonOperator::equals:
+            result = context.builder.CreateICmpEQ(strcmpValue,zero);
+            break;
+        case ComparisonOperator::isNot:
+            result = context.builder.CreateICmpNE(strcmpValue,zero);
+            break; 
+    }
+    return result;
 }
 
 llvm::Value* ComparisonOperation::codeGen(CodeGenContext& context) 
@@ -82,6 +105,17 @@ llvm::Value* ComparisonOperation::codeGen(CodeGenContext& context)
         leftValue = context.builder.CreateCast(llvm::Instruction::SIToFP, leftValue, llvm::Type::getDoubleTy(context.context));
         rightValue = context.builder.CreateCast(llvm::Instruction::SIToFP, rightValue, llvm::Type::getDoubleTy(context.context));
         result = createFloatComparison(context, leftValue, rightValue);
+    }
+    else // Now we asume the values are string
+    {
+        std::vector<llvm::Value*> strcmpArgs;
+
+        strcmpArgs.push_back(leftValue);
+        strcmpArgs.push_back(rightValue);
+
+        llvm::Value* strcmpValue = context.builder.CreateCall(context.module->getFunction("strcmp"), strcmpArgs);
+
+        result = createStringComparison(context, strcmpValue);
     }
 
     return result;

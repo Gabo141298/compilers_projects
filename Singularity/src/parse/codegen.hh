@@ -87,6 +87,8 @@ public:
     void createPrintf();
 
     void createScanf();
+
+    void createStrcmp();
 };
 
 }

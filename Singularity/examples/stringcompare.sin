@@ -1,0 +1,10 @@
+define function start
+begin
+	set a to "ab"
+	set b to "cd"
+
+	if a < b
+	begin
+		print a
+	end
+end

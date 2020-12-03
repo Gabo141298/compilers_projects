@@ -97,8 +97,6 @@ llvm::Value* SNode::createString(CodeGenContext& context, std::string str)
     globalDeclaration->setLinkage(llvm::GlobalValue::LinkageTypes::PrivateLinkage);
     globalDeclaration->setUnnamedAddr (llvm::GlobalValue::UnnamedAddr::Global);
 
-
-
     //4. Return a cast to an i8*
     return llvm::ConstantExpr::getBitCast(globalDeclaration, charType->getPointerTo());
 }
