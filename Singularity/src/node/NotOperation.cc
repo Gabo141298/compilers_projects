@@ -5,7 +5,22 @@
 namespace SNode
 {
 
-llvm::Value* NotOperation::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* NotOperation::codeGen(CodeGenContext& context)
+{
+    llvm::Value* exprValue = this->expression.codeGen(context);
+    llvm::Value* result = nullptr;
+
+    llvm::Type* exprType = exprValue->getType();
+
+    if (exprType->isIntegerTy())
+    {   
+        result = context.builder.CreateNot(exprValue);
+    } 
+
+    return result;
+}
+
+
 void NotOperation::print(size_t tabs) const
 {
     printTabs(tabs);
@@ -15,6 +30,7 @@ void NotOperation::print(size_t tabs) const
     std::cout << "Expression:" << std::endl;
     expression.print(tabs + 1);
 }
+
 Datatype NotOperation::getExpressionType() const
 {
     Datatype type = expression.getExpressionType();

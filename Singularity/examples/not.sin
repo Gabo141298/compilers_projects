@@ -1,0 +1,7 @@
+define function start 
+begin	
+if not (false)
+begin
+	print 5
+end
+end
