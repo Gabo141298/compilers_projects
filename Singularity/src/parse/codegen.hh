@@ -95,6 +95,8 @@ public:
 
     void createStrcmp();
 
+    void createStrtol();
+
     void createMalloc();
 };
 
