@@ -68,9 +68,15 @@ public:
     llvm::DataLayout dataLayout;
     llvm::IRBuilder<llvm::NoFolder>& builder;
 
+    llvm::Function* dummy;
+
     llvm::BasicBlock* initBlock;
+    llvm::BasicBlock* exitBlock;
     std::vector<llvm::BasicBlock*> functionBlocks;
     std::vector<ReturnInfo> returns;
+
+    // Pointers to memory allocated with malloc that need to be freed.
+    std::vector<llvm::Value*> heapMemAlloc;
 
     llvm::Value* formatInt;
     llvm::Value* formatDouble;

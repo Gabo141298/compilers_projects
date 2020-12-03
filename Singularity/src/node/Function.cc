@@ -22,6 +22,23 @@ llvm::Type* Function::getReturnType(CodeGenContext& context)
     return type;
 }
 
+llvm::BasicBlock* Function::cloneBlock(CodeGenContext& context, llvm::Function* func, llvm::BasicBlock* block)
+{
+    llvm::BasicBlock* newBlock = llvm::BasicBlock::Create(context.context, block->getName(), func);
+    context.builder.SetInsertPoint(newBlock);
+    for(auto itr = block->begin(); itr != block->end(); ++itr)
+    {
+        if(itr->getOpcode() == llvm::Instruction::Br)
+            std::cout << "Hola" << std::endl;
+        else
+        {
+            llvm::Instruction* inst = itr->clone();
+            context.builder.Insert(inst);
+        }
+    }
+    return newBlock;
+}
+
 llvm::Function* Function::createFunction(CodeGenContext& context)
 {
     llvm::Type* returnType = getReturnType(context);
@@ -32,18 +49,22 @@ llvm::Function* Function::createFunction(CodeGenContext& context)
 
     llvm::AllocaInst* returnPtr = nullptr;
 
+    if(returnType->isVoidTy())
+        context.builder.CreateBr(context.exitBlock);
+
+    context.builder.SetInsertPoint(context.initBlock);
+
     if(!returnType->isVoidTy())
     {
-        llvm::BasicBlock* initBlock = llvm::BasicBlock::Create(context.context, "__init", currentFunc);
-        context.builder.SetInsertPoint(initBlock);
         returnPtr = context.builder.CreateAlloca(returnType, nullptr, "__return.value");
-        context.builder.CreateBr(context.functionBlocks[0]);
     }
 
-    for(size_t index = 0; index < context.functionBlocks.size(); ++index)
-    {
-        context.functionBlocks[index]->insertInto(currentFunc);
-    }
+    context.builder.CreateBr(context.functionBlocks[0]);
+
+    context.builder.SetInsertPoint(context.exitBlock);
+
+    currentFunc->getBasicBlockList().splice(currentFunc->begin(), context.dummy->getBasicBlockList());
+    context.dummy->eraseFromParent();
 
     if(returnType->isVoidTy())
     {
@@ -51,8 +72,6 @@ llvm::Function* Function::createFunction(CodeGenContext& context)
     }
     else
     {
-        llvm::BasicBlock* returnBlock = llvm::BasicBlock::Create(context.context, "__return", currentFunc);
-        context.builder.SetInsertPoint(returnBlock);
         llvm::Value* retVal = context.builder.CreateLoad(returnPtr);
         context.builder.CreateRet(retVal);
 
@@ -60,7 +79,7 @@ llvm::Function* Function::createFunction(CodeGenContext& context)
         {
             context.builder.SetInsertPoint(context.returns[index].block);
             context.builder.CreateStore(context.returns[index].returnValue, returnPtr);
-            context.builder.CreateBr(returnBlock);
+            context.builder.CreateBr(context.exitBlock);
         }
     }
 
@@ -71,7 +90,15 @@ llvm::Value* Function::codeGen(CodeGenContext& context)
 {
     context.freeFunction();
 
-    llvm::BasicBlock* block = llvm::BasicBlock::Create(context.context, "entry");
+    llvm::FunctionType *funcType =
+        llvm::FunctionType::get(context.builder.getVoidTy(), llvm::Function::ExternalLinkage);
+    context.dummy = llvm::Function::Create(
+        funcType, llvm::Function::ExternalLinkage, "dummy", context.module);
+
+    context.initBlock = llvm::BasicBlock::Create(context.context, "__init", context.dummy);
+    context.exitBlock = llvm::BasicBlock::Create(context.context, "__exit", context.dummy);
+
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(context.context, "entry", context.dummy);
     context.insertFunctionBlock(block);
     context.pushBlock(block);
     context.builder.SetInsertPoint(block);

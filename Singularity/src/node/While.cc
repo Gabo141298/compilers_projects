@@ -8,11 +8,11 @@ namespace SNode
 llvm::Value* While::codeGen(CodeGenContext& context)
 {
     llvm::Value* cond = this->condition.codeGen(context);
-    llvm::BasicBlock* conditionBlock = llvm::BasicBlock::Create(context.context, "condition");
+    llvm::BasicBlock* conditionBlock = llvm::BasicBlock::Create(context.context, "condition", context.dummy);
     context.insertFunctionBlock(conditionBlock);
-    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then");
+    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then", context.dummy);
     context.insertFunctionBlock(thenBlock);
-    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge");
+    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge", context.dummy);
     context.insertFunctionBlock(merge);
 
     context.builder.CreateBr(conditionBlock);

@@ -6,13 +6,19 @@ namespace SNode
 {
 
 llvm::Value* VariableAssignment::codeGen(CodeGenContext& context) 
-{ 
+{
 	llvm::Value* expr = assignmentExpr->codeGen(context);
-	expr->setName(id.name);
 
-	context.insertVar(id.name, expr);
+    llvm::BasicBlock* currBlock = context.builder.GetInsertBlock();
 
-	return expr;
+    context.builder.SetInsertPoint(context.initBlock);
+    llvm::Instruction* allocMem = context.builder.CreateAlloca(expr->getType(), nullptr);
+
+    context.builder.SetInsertPoint(currBlock);
+    context.builder.CreateStore(expr, allocMem);
+
+	context.insertVar(id.name, allocMem);
+	return allocMem;
 }
 
 void VariableAssignment::print(size_t tabs) const

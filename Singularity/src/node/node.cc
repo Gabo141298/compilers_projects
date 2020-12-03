@@ -119,5 +119,6 @@ llvm::Value* SNode::ExpressionStatement::codeGen(CodeGenContext& context)
 
 llvm::Value* SNode::Identifier::codeGen(CodeGenContext& context)
 {
-    return context.searchVar(this->name);
+    llvm::Value* memVal = context.searchVar(this->name);
+    return context.builder.CreateLoad(memVal);
 }

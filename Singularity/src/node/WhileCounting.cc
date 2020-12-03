@@ -49,7 +49,7 @@ llvm::Value* WhileCounting::codeGen(CodeGenContext& context)
     llvm::Value* StartVal = this->beginValue.codeGen(context);
 
     llvm::BasicBlock* PreheaderBB = context.builder.GetInsertBlock();
-    llvm::BasicBlock* LoopBB = llvm::BasicBlock::Create(context.context, "loop");
+    llvm::BasicBlock* LoopBB = llvm::BasicBlock::Create(context.context, "loop", context.dummy);
     context.insertFunctionBlock(LoopBB);
 
     context.builder.CreateBr(LoopBB);
@@ -61,14 +61,14 @@ llvm::Value* WhileCounting::codeGen(CodeGenContext& context)
     context.insertVar(counter.name, Variable);
     this->block.codeGen(context);
     llvm::Value* StepVal = context.builder.getInt64(1);
-    llvm::Value* NextVar = context.builder.CreateAdd(Variable, StepVal, "nextvar");
+    llvm::Value* NextVar = context.builder.CreateAdd(Variable, StepVal, "nextvar", context.dummy);
 
     llvm::Value* EndCond = this->endValue.codeGen(context);
 
     EndCond = context.builder.CreateICmpSLE(Variable, EndCond, "loopcond");
 
     llvm::BasicBlock * LoopEndBB = context.builder.GetInsertBlock();
-    llvm::BasicBlock * AfterBB = llvm::BasicBlock::Create(context.context, "afterloop");
+    llvm::BasicBlock * AfterBB = llvm::BasicBlock::Create(context.context, "afterloop", context.dummy);
     context.insertFunctionBlock(AfterBB);
 
     context.builder.CreateCondBr(EndCond, LoopBB, AfterBB);
