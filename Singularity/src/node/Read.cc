@@ -6,34 +6,43 @@
 namespace SNode
 {
 
-llvm::Value* Read::codeGen(CodeGenContext& context) { 
-    
-    // llvm::FunctionType *funcType = llvm::FunctionType::get(builder.getVoidTy(), false);
-    // llvm::Function *mainFunc = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", module);
-    // llvm::BasicBlock *entry = llvm::BasicBlock::Create(context.context, "read");
-    
-    // context.builder.SetInsertPoint(entry);
-
+llvm::Value* Read::codeGen(CodeGenContext& context)
+{
     // Gets the function
     llvm::Function *theScanf = context.module->getFunction("scanf");
-    llvm::BasicBlock *entry = llvm::BasicBlock::Create(context.context, "scanf", theScanf);
-    context.builder.SetInsertPoint(entry);
-    //context.builder.SetInsertPoint(context.builder.GetInsertBlock());
+
+
     // Format
-    
-    llvm::Value *scanfFormat = SNode::createString(context, "%u");
+    llvm::Value *scanfFormat = SNode::createString(context, "%s");
 
-    // Allocate memory
-    llvm::AllocaInst *Alloca = context.builder.CreateAlloca(llvm::Type::getInt64Ty(context.context), nullptr, this->identifier.name );    
-   
+    auto charType = llvm::IntegerType::get(context.context, 8);
+    std::vector<llvm::Constant *> chars(256);
+    for(unsigned int i = 0; i < 256; i++) {
+        chars[i] = llvm::ConstantInt::get(charType, '\0');
+    }
+
+    auto stringType = llvm::ArrayType::get(charType, chars.size());
+    auto globalDeclaration = (llvm::GlobalVariable*) context.module->getOrInsertGlobal("", stringType);
+    globalDeclaration->setInitializer(llvm::ConstantArray::get(stringType, chars));
+    globalDeclaration->setConstant(false);
+    globalDeclaration->setLinkage(llvm::GlobalValue::LinkageTypes::PrivateLinkage);
+    globalDeclaration->setUnnamedAddr (llvm::GlobalValue::UnnamedAddr::Global);
+
+
+
+    //4. Return a cast to an i8*
+    auto buffer = llvm::ConstantExpr::getBitCast(globalDeclaration, charType->getPointerTo());
+
     // Vector with args
-    std::vector<llvm::Value *> scanfArgs = {scanfFormat, Alloca};
+    std::vector<llvm::Value *> scanfArgs = {scanfFormat, buffer};
 
-    
+
     // Build the call
     llvm::Value* response = context.builder.CreateCall(theScanf, scanfArgs);
-    
-         
+
+    context.insertVar(this->identifier.name, buffer);
+
+    return buffer;
 
 }
 void Read::print(size_t tabs) const
