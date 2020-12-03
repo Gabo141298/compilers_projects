@@ -1,6 +1,7 @@
 ﻿#include "Read.hh"
 
 #include "node.hh"
+#include "VariableAssignment.hh"
 #include "llvm/IR/Instructions.h"
 
 namespace SNode
@@ -49,33 +50,28 @@ llvm::Value* Read::codeGen(CodeGenContext& context)
     std::vector<llvm::Value*> args;
     args.push_back(buffer);
     args.push_back(nullPointer);
-    args.push_back(context.builder.getInt32(10));
-    context.insertVar(this->identifier.name, buffer);
+    args.push_back(context.builder.getInt32(10));        
 
     //Call strtol
     llvm::Value* intVal =  context.builder.CreateCall(context.module->getFunction("strtol"), args);
 
     // Check if the read value is an integer
     llvm::Value* cond = context.builder.CreateICmpNE(intVal, context.builder.getInt64(0));
-    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then");
+    llvm::BasicBlock* thenBlock = llvm::BasicBlock::Create(context.context, "then", context.dummy);
     context.insertFunctionBlock(thenBlock);
-    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge");
+    llvm::BasicBlock* merge = llvm::BasicBlock::Create(context.context, "merge", context.dummy);
     context.insertFunctionBlock(merge);
 
     // If it is an integer,
-    llvm::BasicBlock* elseBlock = llvm::BasicBlock::Create(context.context, "else");
+    llvm::BasicBlock* elseBlock = llvm::BasicBlock::Create(context.context, "else", context.dummy);
     context.insertFunctionBlock(elseBlock);
     context.builder.CreateCondBr(cond, thenBlock, elseBlock);
     context.builder.SetInsertPoint(elseBlock);
-    context.pushBlock(elseBlock);
-    context.insertVar(this->identifier.name, buffer);
-    context.popBlock();
+    VariableAssignment::assignVariable(context, this->identifier.name, buffer);
     context.builder.CreateBr(merge);
 
     context.builder.SetInsertPoint(thenBlock);
-    context.pushBlock(thenBlock);
-    context.insertVar(this->identifier.name, intVal);
-    context.popBlock();
+    VariableAssignment::assignVariable(context, this->identifier.name, intVal);
     context.builder.CreateBr(merge);
 
     context.builder.SetInsertPoint(merge);

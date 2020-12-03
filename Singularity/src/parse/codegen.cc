@@ -22,6 +22,8 @@ void SNode::CodeGenContext::generateCode(SNode::Program& root, std::string filen
 	createPrintf();
     createScanf();
     createStrcmp();
+    createStrtol();
+    createMalloc();
 
 
     root.codeGen(*this);
