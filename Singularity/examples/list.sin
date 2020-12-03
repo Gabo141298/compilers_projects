@@ -1,0 +1,4 @@
+define function start
+begin
+	set arr as list
+end

@@ -8,6 +8,7 @@
 SNode::CodeGenContext::CodeGenContext()
         : block ( nullptr)//new CodeGenBlock(llvm::BasicBlock::Create(context), nullptr) )
         , module ( new llvm::Module("Singularity", context) )
+        , dataLayout ( llvm::DataLayout(this->module) )
         , builder ( *(new llvm::IRBuilder<llvm::NoFolder>(this->context)) )
     {
         formatInt = createString(*this, "%lld");
