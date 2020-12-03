@@ -22,23 +22,6 @@ llvm::Type* Function::getReturnType(CodeGenContext& context)
     return type;
 }
 
-llvm::BasicBlock* Function::cloneBlock(CodeGenContext& context, llvm::Function* func, llvm::BasicBlock* block)
-{
-    llvm::BasicBlock* newBlock = llvm::BasicBlock::Create(context.context, block->getName(), func);
-    context.builder.SetInsertPoint(newBlock);
-    for(auto itr = block->begin(); itr != block->end(); ++itr)
-    {
-        if(itr->getOpcode() == llvm::Instruction::Br)
-            std::cout << "Hola" << std::endl;
-        else
-        {
-            llvm::Instruction* inst = itr->clone();
-            context.builder.Insert(inst);
-        }
-    }
-    return newBlock;
-}
-
 llvm::Function* Function::createFunction(CodeGenContext& context)
 {
     llvm::Type* returnType = getReturnType(context);

@@ -10,7 +10,6 @@ namespace SNode
 class Function : public Node {
     llvm::Type* getReturnType(CodeGenContext& context);
     llvm::Function* createFunction(CodeGenContext& context);
-    llvm::BasicBlock* cloneBlock(CodeGenContext& context, llvm::Function* func, llvm::BasicBlock* block);
 public:
     const Identifier& id;
     VariableList arguments;
