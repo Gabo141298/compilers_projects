@@ -1,3 +1,17 @@
+define function start with arguments M, N
+begin
+	set mat as matrix of size M by N
+	while row counting from 0 to M
+	begin
+		set mat at[row,0] to call lowest with parameters (matrix at[row], M)
+		set mat at[row,N-1] to call greatest with parameters (matrix at[row], M)
+		while col counting from 1 to N-1
+		begin
+			set mat at[row,col] to row * col
+		end
+	end
+end
+
 define function lowest with arguments listNumber, size
 begin
 	set minor to listNumber at[0]
@@ -26,16 +40,3 @@ begin
 	answer biggest
 end
 
-define function create_matrix with arguments M, N
-begin
-	set mat as matrix of size M by N
-	while row counting from 0 to M
-	begin
-		set mat at[row,0] to call lowest with parameters (matrix at[row], M)
-		set mat at[row,N-1] to call greatest with parameters (matrix at[row], M)
-		while col counting from 1 to N-1
-		begin
-			set mat at[row,col] to row * col
-		end
-	end
-end

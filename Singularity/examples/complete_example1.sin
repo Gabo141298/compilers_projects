@@ -1,14 +1,24 @@
-set global to true
-set expr to (1 + 2) * (3.5 - 4)
-set arr as list
-set matr as matrix of size 3 by 3
-
-define function prime_number with arguments i, n
+define function start
 begin
-	set num to 1 * 2 + 3
+	set a to call isPrime with parameters (4)
+	set b to call isPrime with parameters (11)
+
+	if a 
+	begin	
+		print "Fallo al calcular el número 4"
+	end
+	if b
+	begin
+		print "Fallo al calcular el número 11"
+	end
+	
+end
+
+define function isPrime with arguments n
+begin
 	set isPrime to true
 
-	if (n = 0 and global) or n = 1
+	if n = 0 or n = 1
 	begin
 		set isPrime to false
 	end   
@@ -16,19 +26,12 @@ begin
 	begin
 		while index counting from 2 to n/2
 		begin
-			if n % i = 0
+			if n % index = 0
 			begin
 				set isPrime to false
 			end
 		end
 	end
 
-	if isPrime
-	begin	
-		print "It is a prime number"
-	end
-	otherwise
-	begin
-		print "It is not a prime number"
-	end
+	answer isPrime
 end
