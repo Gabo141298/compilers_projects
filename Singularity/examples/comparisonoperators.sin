@@ -1,0 +1,126 @@
+define function start
+begin
+	set intA to 1
+	set intB to 2
+	set floatA to 1.0
+	set floatB to 2.0
+	set stringA to "ab"
+	set stringB to "bc"
+
+	if intA < intB
+	begin
+		if floatA < floatB
+		begin
+			if stringA < stringB
+			begin
+				print " "
+			end
+			otherwise
+			begin
+				print "Falla la comparación < de strings"
+			end
+		end
+		otherwise
+		begin
+			print "Falla la comparación < de floats"
+		end
+	end
+	otherwise
+	begin
+		print "Falla la comparación < de ints"
+	end
+
+	if intB > intA
+	begin
+		if floatB > floatA
+		begin
+			if stringB > stringA
+			begin
+				print ">"
+			end
+			otherwise
+			begin
+				print "Falla la comparación > de strings"
+			end
+		end
+		otherwise
+		begin
+			print "Falla la comparación > de floats"
+		end
+	end
+	otherwise
+	begin
+		print "Falla la comparación > de ints"
+	end
+
+	if intA <= intB
+	begin
+		if floatA <= floatB
+		begin
+			if stringA <= stringB
+			begin
+				print "<="
+			end
+			otherwise
+			begin
+				print "Falla la comparación <= de strings"
+			end
+		end
+		otherwise
+		begin
+			print "Falla la comparación <= de floats"
+		end
+	end
+	otherwise
+	begin
+		print "Falla la comparación <= de ints"
+	end
+
+	if intB >= intA
+	begin
+		if floatB >= floatA
+		begin
+			if stringB >= stringA
+			begin
+				print ">="
+			end
+			otherwise
+			begin
+				print "Falla la comparación geq de strings"
+			end
+		end
+		otherwise
+		begin
+			print "Falla la comparación geq de floats"
+		end
+	end
+	otherwise
+	begin
+		print "Falla la comparación geq de ints"
+	end
+
+	if intB is not 1
+	begin
+		if floatB is not 1.0
+		begin
+			if stringB is not "ad"
+			begin
+				print "isnot"
+			end
+			otherwise
+			begin
+				print "Falla la comparación isnot de strings"
+			end
+		end
+		otherwise
+		begin
+			print "Falla la comparación isnot de floats"
+		end
+	end
+	otherwise
+	begin
+		print "Falla la comparación isnot de ints"
+	end
+
+	
+end
