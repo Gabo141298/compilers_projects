@@ -5,7 +5,14 @@
 namespace SNode
 {
 
-llvm::Value* DataPositionAssignment::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* DataPositionAssignment::codeGen(CodeGenContext& context)
+{
+    llvm::Value* expr = expression.codeGen(context);
+    llvm::Value* memVal = position.calculateMemDir(context, id.codeGen(context));
+
+    return context.builder.CreateStore(expr, memVal);
+}
+
 void DataPositionAssignment::print(size_t tabs) const
 {
     printTabs(tabs);

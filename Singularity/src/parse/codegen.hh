@@ -104,6 +104,8 @@ public:
     void createStrtol();
 
     void createMalloc();
+
+    void createFree();
 };
 
 }

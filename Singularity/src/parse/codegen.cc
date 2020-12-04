@@ -24,7 +24,7 @@ void SNode::CodeGenContext::generateCode(SNode::Program& root, std::string filen
     createStrcmp();
     createStrtol();
     createMalloc();
-
+    createFree();
 
     root.codeGen(*this);
 
@@ -112,6 +112,14 @@ void SNode::CodeGenContext::createMalloc()
     args.push_back(llvm::Type::getInt64Ty(context));
     llvm::FunctionType *mallocType = llvm::FunctionType::get(builder.getInt8PtrTy(), args, false);
     llvm::Function::Create(mallocType, llvm::Function::ExternalLinkage, "malloc", module);
+}
+
+void SNode::CodeGenContext::createFree()
+{
+    std::vector<llvm::Type*> args;
+    args.push_back(llvm::Type::getInt8PtrTy(context));
+    llvm::FunctionType *freeType = llvm::FunctionType::get(builder.getVoidTy(), args, false);
+    llvm::Function::Create(freeType, llvm::Function::ExternalLinkage, "free", module);
 }
 
 void SNode::CodeGenContext::freeFunction()
