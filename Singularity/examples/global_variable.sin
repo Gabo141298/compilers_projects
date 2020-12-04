@@ -1,0 +1,11 @@
+set myglobal to 3
+
+define function start
+begin
+	set a to 4 
+	set b to a + myglobal
+	print(b)
+	print(myglobal)
+	set myglobal to a + b
+	print(myglobal)
+end
