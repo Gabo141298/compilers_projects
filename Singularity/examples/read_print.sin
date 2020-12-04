@@ -1,0 +1,6 @@
+define function start
+begin 
+	# lee a una variable
+	read to variable
+	print variable
+end 
