@@ -7,7 +7,18 @@ namespace SNode
 
 llvm::Value* FunctionCall::codeGen(CodeGenContext& context)
 {
-    return context.builder.CreateCall(context.module->getFunction(id.name));
+    if(parameters.size() == 0)
+        return context.builder.CreateCall(context.module->getFunction(id.name));
+    std::vector<llvm::Value*> params;
+    for(size_t index = 0; index < parameters.size(); ++index)
+    {
+        llvm::Value* val = parameters[index]->codeGen(context);
+        if(val->getType()->isIntegerTy())
+            val = context.builder.CreateCast(llvm::Instruction::SIToFP, val, llvm::Type::getDoubleTy(context.context));
+        params.push_back(val);
+    }
+
+    return context.builder.CreateCall(context.module->getFunction(id.name), params);
 }
 
 void FunctionCall::print(size_t tabs) const

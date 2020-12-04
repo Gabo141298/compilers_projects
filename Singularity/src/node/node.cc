@@ -119,6 +119,14 @@ llvm::Value* SNode::ExpressionStatement::codeGen(CodeGenContext& context)
 
 llvm::Value* SNode::Identifier::codeGen(CodeGenContext& context)
 {
+    auto func = context.builder.GetInsertBlock()->getParent();
+    for(auto itr = func->arg_begin(); itr != func->arg_end(); ++itr)
+    {
+        if((std::string)itr->getName() == this->name)
+        {
+            return itr;
+        }
+    }
     llvm::Value* memVal = context.searchVar(this->name);
     return context.builder.CreateLoad(memVal);
 }

@@ -1,0 +1,9 @@
+define function abc with arguments n
+begin
+    print n
+end
+
+define function start
+begin
+    call abc with parameters(10)
+end
