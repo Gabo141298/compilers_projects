@@ -1,6 +1,7 @@
 #include "Position.hh"
 
 #include "node.hh"
+#include "Print.hh"
 
 namespace SNode
 {
@@ -32,17 +33,17 @@ void ListPosition::checkPosition()
     }
 }
 
-llvm::Value* ListPosition::calculateMemDir(CodeGenContext& context, llvm::Value* ptr)
+llvm::Value* ListPosition::calculateMemDir(CodeGenContext& context, llvm::Value* ptr, VariableInfo*)
 {
     llvm::Value* val = this->position.codeGen(context);
-    auto dataSize = context.builder.getInt64(context.dataLayout.getTypeAllocSize(context.builder.getInt64Ty()));
+    auto dataSize = context.builder.getInt64(context.dataLayout.getTypeAllocSize(context.builder.getDoubleTy()));
     if(val->getType()->isDoubleTy())
         val = context.builder.CreateCast(llvm::Instruction::FPToSI, val, context.builder.getInt64Ty());
     llvm::Value* pos = context.builder.CreateMul(val, dataSize);
 
     llvm::Value* intPtr = context.builder.CreatePtrToInt(ptr, context.builder.getInt64Ty());
 
-    return context.builder.CreateIntToPtr(context.builder.CreateAdd(intPtr, pos), context.builder.getInt64Ty()->getPointerTo());
+    return context.builder.CreateIntToPtr(context.builder.CreateAdd(intPtr, pos), context.builder.getDoubleTy()->getPointerTo());
 }
 
 llvm::Value* MatrixPosition::codeGen(CodeGenContext&) { return nullptr; }
@@ -84,9 +85,25 @@ void MatrixPosition::checkPosition()
         throw SingularityException(ExceptionType::MATRIX_POSITION_DOUBLE);
 }
 
-llvm::Value* MatrixPosition::calculateMemDir(CodeGenContext& context, llvm::Value* ptr)
+llvm::Value* MatrixPosition::calculateMemDir(CodeGenContext& context, llvm::Value* ptr, VariableInfo* varInfo)
 {
-    return nullptr;
+    llvm::Value* rowVal = this->row.codeGen(context);
+    llvm::Value* colVal = this->col.codeGen(context);
+    auto dataSize = context.builder.getInt64(context.dataLayout.getTypeAllocSize(context.builder.getDoubleTy()));
+    if(rowVal->getType()->isDoubleTy())
+        rowVal = context.builder.CreateCast(llvm::Instruction::FPToSI, rowVal, context.builder.getInt64Ty());
+    if(colVal->getType()->isDoubleTy())
+        colVal = context.builder.CreateCast(llvm::Instruction::FPToSI, colVal, context.builder.getInt64Ty());
+
+    llvm::Value* totalCol = varInfo->col;
+
+    llvm::Value* rowPos = context.builder.CreateMul(rowVal, totalCol);
+
+    llvm::Value* pos = context.builder.CreateMul(context.builder.CreateAdd(rowPos, colVal), dataSize);
+
+    llvm::Value* intPtr = context.builder.CreatePtrToInt(ptr, context.builder.getInt64Ty());
+
+    return context.builder.CreateIntToPtr(context.builder.CreateAdd(intPtr, pos), context.builder.getDoubleTy()->getPointerTo());
 }
 
 }

@@ -1,17 +1,17 @@
 define function start
 begin
     set accumulator_matrix as matrix of size 3 by 3 
-    while row counting from 0 to 3
+    while row counting from 0 to 2
     begin
-        while col counting from 0 to 3
+        while col counting from 0 to 2
         begin
             set accumulator_matrix at[row,col]  to row + col
         end
     end
 
-    while row counting from 0 to 3
+    while row counting from 0 to 2
     begin
-        while col counting from 0 to 3
+        while col counting from 0 to 2
         begin
             print(acumulator_matrix at [row, col])
             print ", "

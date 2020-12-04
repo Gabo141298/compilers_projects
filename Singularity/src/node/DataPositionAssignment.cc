@@ -8,7 +8,9 @@ namespace SNode
 llvm::Value* DataPositionAssignment::codeGen(CodeGenContext& context)
 {
     llvm::Value* expr = expression.codeGen(context);
-    llvm::Value* memVal = position.calculateMemDir(context, id.codeGen(context));
+    if(expr->getType()->isIntegerTy())
+        expr = context.builder.CreateCast(llvm::Instruction::SIToFP, expr, llvm::Type::getDoubleTy(context.context));
+    llvm::Value* memVal = position.calculateMemDir(context, id.codeGen(context), context.searchVarInfo(id.name));
 
     return context.builder.CreateStore(expr, memVal);
 }

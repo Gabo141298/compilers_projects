@@ -2,9 +2,13 @@ define function start
 begin
 	set arr as list
 
-	set arr[0] to 2
-	set arr[1] to 3
+	while index counting from 0 to 20
+	begin
+		set arr[index] to index
+	end
 
-	print arr[1]
-	print arr[0]
+	while index counting from 0 to 20
+	begin
+		print arr[index]
+	end
 end

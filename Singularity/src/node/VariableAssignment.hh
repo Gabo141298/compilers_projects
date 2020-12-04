@@ -16,7 +16,7 @@ public:
         , assignmentExpr(assignmentExpr)
     { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    static llvm::Value* assignVariable(CodeGenContext& context, std::string name ,llvm::Value* value );
+    static llvm::Value* assignVariable(CodeGenContext& context, std::string name ,llvm::Value* value, Expression* assignmentExpr = nullptr );
     void print(size_t tabs = 0) const override;
     void createSymbolTable(SymbolTable& table, std::string, size_t*) const override;
 };

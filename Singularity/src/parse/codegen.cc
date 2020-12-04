@@ -11,9 +11,9 @@ SNode::CodeGenContext::CodeGenContext()
         , dataLayout ( llvm::DataLayout(this->module) )
         , builder ( *(new llvm::IRBuilder<llvm::NoFolder>(this->context)) )
     {
-        formatInt = createString(*this, "%lld");
-        formatDouble = createString(*this, "%lf");
-        //formatString = createString(*this, "%s");
+        formatInt = createString(*this, "%lld\n");
+        formatDouble = createString(*this, "%lf\n");
+        formatString = createString(*this, "%s\n");
     }
 
 /* Compile the AST into a module */
@@ -38,33 +38,44 @@ void SNode::CodeGenContext::generateCode(SNode::Program& root, std::string filen
 
 llvm::Value* SNode::CodeGenBlock::searchVar(const std::string& name)
 {
-    llvm::Value* value = locals[name];
+    auto value = locals[name];
     if(value)
-        return value;
+        return value->value;
     else if(parent)
         return parent->searchVar(name);
     return nullptr;
 }
 
-bool SNode::CodeGenBlock::tryInsertVar(const std::string& name, llvm::Value* value)
+SNode::VariableInfo* SNode::CodeGenBlock::searchVarInfo(const std::string& name)
 {
-    llvm::Value* currentValue = locals[name];
+    VariableInfo* value = locals[name];
+    if(value)
+        return value;
+    else if(parent)
+        return parent->searchVarInfo(name);
+    return nullptr;
+}
+
+bool SNode::CodeGenBlock::tryInsertVar(const std::string& name, llvm::Value* value, llvm::Value* row, llvm::Value* col)
+{
+    auto currentValue = locals[name];
     if(currentValue)
     {
-        this->locals[name] = value;
+        delete currentValue;
+        this->locals[name] = new VariableInfo(value, row, col);
         return true;
     }
     else if(parent)
-        return this->parent->tryInsertVar(name, value);
+        return this->parent->tryInsertVar(name, value, row, col);
     else
         return false;
 }
 
-void SNode::CodeGenBlock::insertVar(const std::string &name, llvm::Value *value)
+void SNode::CodeGenBlock::insertVar(const std::string &name, llvm::Value *value, llvm::Value* row, llvm::Value* col)
 {
-    if(! tryInsertVar(name, value))
+    if(! tryInsertVar(name, value, row, col))
     {
-        this->locals[name] = value;
+        this->locals[name] = new VariableInfo(value, row, col);
     }
 }
 
@@ -110,7 +121,7 @@ void SNode::CodeGenContext::createMalloc()
 {
     std::vector<llvm::Type *> args;
     args.push_back(llvm::Type::getInt64Ty(context));
-    llvm::FunctionType *mallocType = llvm::FunctionType::get(builder.getInt8PtrTy(), args, false);
+    llvm::FunctionType *mallocType = llvm::FunctionType::get(builder.getDoubleTy()->getPointerTo(), args, false);
     llvm::Function::Create(mallocType, llvm::Function::ExternalLinkage, "malloc", module);
 }
 

@@ -7,13 +7,13 @@ namespace SNode
 
 llvm::Value* List::codeGen(CodeGenContext& context)
 {
-    llvm::Type* elementType = context.builder.getInt64Ty();
+    llvm::Type* elementType = context.builder.getDoubleTy();
 
     auto layoutAllocSize = context.dataLayout.getTypeAllocSize(elementType);
 
     auto elementSize = context.builder.getInt64(layoutAllocSize);
-    auto arraySize = context.builder.getInt64(10);
-    auto allocSize = context.builder.CreateMul(elementSize, arraySize);
+    this->size = context.builder.getInt64(100);
+    auto allocSize = context.builder.CreateMul(elementSize, size);
 
     std::vector<llvm::Value*> mallocArgs;
 
@@ -28,7 +28,24 @@ void List::print(size_t tabs) const
     std::cout << "List" << std::endl;
 }
 
-llvm::Value* Matrix::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* Matrix::codeGen(CodeGenContext& context)
+{
+    this->rowVal = this->row->codeGen(context);
+    this->colVal = this->col->codeGen(context);
+
+    llvm::Type* elementType = context.builder.getDoubleTy();
+    auto layoutAllocSize = context.dataLayout.getTypeAllocSize(elementType);
+    auto elementSize = context.builder.getInt64(layoutAllocSize);
+    auto allocSize = context.builder.CreateMul(elementSize, rowVal);
+    allocSize = context.builder.CreateMul(allocSize, colVal);
+    
+    std::vector<llvm::Value*> mallocArgs;
+
+    mallocArgs.push_back(allocSize);
+
+    return context.builder.CreateCall(context.module->getFunction("malloc"), mallocArgs);
+}
+
 void Matrix::print(size_t tabs) const
 {
     printTabs(tabs);

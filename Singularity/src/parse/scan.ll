@@ -222,7 +222,7 @@ typedef parse::Parser::token_type token_type;
                     /* printf("%s-%s\n", yytext, "CLOSE_PARENTHESIS"); */
                     return token::CLOSE_PARENTHESIS;
                 }
-(at)?"["        {
+(at)?[ ]*"["        {
                     /* printf("%s-%s\n", yytext, "OPEN_BRACKETS"); */
                     return token::OPEN_BRACKETS;
                 }

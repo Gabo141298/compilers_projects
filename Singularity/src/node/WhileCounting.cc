@@ -1,6 +1,7 @@
 #include "WhileCounting.hh"
 
 #include "node.hh"
+#include "VariableAssignment.hh"
 
 namespace SNode
 {
@@ -58,14 +59,14 @@ llvm::Value* WhileCounting::codeGen(CodeGenContext& context)
     Variable->addIncoming(StartVal, PreheaderBB);
 
     context.pushBlock(LoopBB);
-    context.insertVar(counter.name, Variable);
+    VariableAssignment::assignVariable(context, this->counter.name, Variable);
     this->block.codeGen(context);
     llvm::Value* StepVal = context.builder.getInt64(1);
     llvm::Value* NextVar = context.builder.CreateAdd(Variable, StepVal, "nextvar", context.dummy);
 
     llvm::Value* EndCond = this->endValue.codeGen(context);
 
-    EndCond = context.builder.CreateICmpSLE(Variable, EndCond, "loopcond");
+    EndCond = context.builder.CreateICmpSLT(Variable, EndCond, "loopcond");
 
     llvm::BasicBlock * LoopEndBB = context.builder.GetInsertBlock();
     llvm::BasicBlock * AfterBB = llvm::BasicBlock::Create(context.context, "afterloop", context.dummy);

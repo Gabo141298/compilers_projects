@@ -1,6 +1,7 @@
 #include "VariableAssignment.hh"
 
 #include "node.hh"
+#include "DataStructure.hh"
 
 namespace SNode
 {
@@ -8,10 +9,13 @@ namespace SNode
 llvm::Value* VariableAssignment::codeGen(CodeGenContext& context) 
 {
     llvm::Value* expr = assignmentExpr->codeGen(context);
-    return assignVariable(context, id.name, expr);
+
+    llvm::Value* allocMem = assignVariable(context, id.name, expr, assignmentExpr);
+
+    return allocMem;
 }
 
-llvm::Value *VariableAssignment::assignVariable(CodeGenContext& context, std::string name, llvm::Value *expr)
+llvm::Value *VariableAssignment::assignVariable(CodeGenContext& context, std::string name, llvm::Value *expr, Expression* assignmentExpr)
 {
     llvm::BasicBlock* currBlock = context.builder.GetInsertBlock();
 
@@ -21,7 +25,18 @@ llvm::Value *VariableAssignment::assignVariable(CodeGenContext& context, std::st
     context.builder.SetInsertPoint(currBlock);
     context.builder.CreateStore(expr, allocMem);
 
-    context.insertVar(name, allocMem);
+    if(assignmentExpr && assignmentExpr->getType() == NodeTypes::List)
+    {
+        context.insertVar(name, allocMem, reinterpret_cast<List*>(assignmentExpr)->size);
+    }
+    else if(assignmentExpr && assignmentExpr->getType() == NodeTypes::Matrix)
+    {
+        context.insertVar(name, allocMem, reinterpret_cast<Matrix*>(assignmentExpr)->rowVal, reinterpret_cast<Matrix*>(assignmentExpr)->colVal);
+    }
+    else
+    {
+        context.insertVar(name, allocMem);
+    }
     return allocMem;
 }
 

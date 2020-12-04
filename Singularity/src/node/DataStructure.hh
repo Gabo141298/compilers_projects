@@ -15,7 +15,7 @@ class DataStructure : public Expression {
 
 class List : public DataStructure {
 public:
-    std::vector<Value> values;
+    llvm::Value* size;
     List() : DataStructure(NodeTypes::List) {}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
@@ -29,6 +29,9 @@ class Matrix : public DataStructure {
 public:
     Value* row;
     Value* col;
+
+    llvm::Value* rowVal;
+    llvm::Value* colVal;
     std::vector<std::vector<Value>> matrix;
     Matrix(Value* row, Value* col) :
         DataStructure(NodeTypes::Matrix), row(row), col(col) { }

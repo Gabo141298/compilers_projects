@@ -7,7 +7,7 @@ namespace SNode
 
 llvm::Value* PositionAccess::codeGen(CodeGenContext& context)
 {
-    llvm::Value* memVal = position.calculateMemDir(context, id.codeGen(context));
+    llvm::Value* memVal = position.calculateMemDir(context, id.codeGen(context), context.searchVarInfo(id.name));
     return context.builder.CreateLoad(memVal);
 }
 

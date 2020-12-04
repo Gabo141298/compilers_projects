@@ -40,11 +40,25 @@ struct ReturnInfo
     }
 };
 
+struct VariableInfo
+{
+    llvm::Value* value;
+    llvm::Value* row;
+    llvm::Value* col;
+
+    VariableInfo(llvm::Value* value, llvm::Value* row = nullptr, llvm::Value* col = nullptr)
+        : value(value)
+        , row(row)
+        , col(col)
+    {
+    }
+};
+
 class CodeGenBlock {
 public:
     llvm::BasicBlock *block;
     CodeGenBlock* parent;
-    std::map<std::string, llvm::Value*> locals;
+    std::map<std::string, VariableInfo*> locals;
 
     CodeGenBlock(llvm::BasicBlock* block, CodeGenBlock* parent)
         : parent(parent)
@@ -53,9 +67,11 @@ public:
     }
     llvm::Value* searchVar(const std::string& name);
 
-    bool tryInsertVar(const std::string& name, llvm::Value* value);
+    VariableInfo* searchVarInfo(const std::string& name);
 
-    void insertVar(const std::string& name, llvm::Value* value);
+    bool tryInsertVar(const std::string& name, llvm::Value* value, llvm::Value* row = nullptr, llvm::Value* col = nullptr);
+
+    void insertVar(const std::string& name, llvm::Value* value, llvm::Value* row = nullptr, llvm::Value* col = nullptr);
 };
 
 class CodeGenContext {
@@ -80,7 +96,7 @@ public:
 
     llvm::Value* formatInt;
     llvm::Value* formatDouble;
-    //llvm::Value* formatString;
+    llvm::Value* formatString;
     CodeGenContext();
     
     void generateCode(Program& root, std::string filename = "");
@@ -90,7 +106,8 @@ public:
     inline void popBlock() { CodeGenBlock* temp = this->block->parent; delete this->block; this->block = temp; }
 
     inline llvm::Value* searchVar(const std::string& name) { return block->searchVar(name); }
-    void insertVar(const std::string& name, llvm::Value* value) { block->insertVar(name, value); }
+    VariableInfo* searchVarInfo(const std::string& name) { return block->searchVarInfo(name); }
+    void insertVar(const std::string& name, llvm::Value* value, llvm::Value* row = nullptr, llvm::Value* col = nullptr) { block->insertVar(name, value, row, col); }
 
     void freeFunction();
     inline void insertFunctionBlock(llvm::BasicBlock* block) { this->functionBlocks.push_back(block); }

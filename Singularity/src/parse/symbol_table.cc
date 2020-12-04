@@ -70,6 +70,8 @@ TableRow* Subtable::search(const std::string& id)
 	try
 	{
 		row = content.at(id);
+		if(!row)
+			row = parent->search(id);
 	}
 	catch(const std::out_of_range&)
 	{
