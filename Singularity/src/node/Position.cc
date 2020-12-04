@@ -32,6 +32,19 @@ void ListPosition::checkPosition()
     }
 }
 
+llvm::Value* ListPosition::calculateMemDir(CodeGenContext& context, llvm::Value* ptr)
+{
+    llvm::Value* val = this->position.codeGen(context);
+    auto dataSize = context.builder.getInt64(context.dataLayout.getTypeAllocSize(context.builder.getInt64Ty()));
+    if(val->getType()->isDoubleTy())
+        val = context.builder.CreateCast(llvm::Instruction::FPToSI, val, context.builder.getInt64Ty());
+    llvm::Value* pos = context.builder.CreateMul(val, dataSize);
+
+    llvm::Value* intPtr = context.builder.CreatePtrToInt(ptr, context.builder.getInt64Ty());
+
+    return context.builder.CreateIntToPtr(context.builder.CreateAdd(intPtr, pos), context.builder.getInt64Ty()->getPointerTo());
+}
+
 llvm::Value* MatrixPosition::codeGen(CodeGenContext&) { return nullptr; }
 void MatrixPosition::print(size_t tabs) const
 {
@@ -69,6 +82,11 @@ void MatrixPosition::checkPosition()
     // If any of the two expressions is a double, throw an error.
     else if(rowType == Datatype::DOUBLE || colType == Datatype::DOUBLE)
         throw SingularityException(ExceptionType::MATRIX_POSITION_DOUBLE);
+}
+
+llvm::Value* MatrixPosition::calculateMemDir(CodeGenContext& context, llvm::Value* ptr)
+{
+    return nullptr;
 }
 
 }

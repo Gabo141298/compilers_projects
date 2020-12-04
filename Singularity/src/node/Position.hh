@@ -10,6 +10,7 @@ class Position : public Expression {
 public:
     Position(NodeTypes type = NodeTypes::Position): Expression(type) {}
     virtual inline void checkPosition() { }
+    virtual llvm::Value* calculateMemDir(CodeGenContext& context, llvm::Value* ptr) { return nullptr; }
 };
 
 class ListPosition : public Position {
@@ -20,6 +21,7 @@ public:
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     void checkPosition();
+    virtual llvm::Value* calculateMemDir(CodeGenContext& context, llvm::Value* ptr);
 };
 
 class MatrixPosition : public Position {
@@ -31,6 +33,7 @@ public:
     virtual llvm::Value* codeGen(CodeGenContext& context);
     void print(size_t tabs = 0) const override;
     void checkPosition();
+    virtual llvm::Value* calculateMemDir(CodeGenContext& context, llvm::Value* ptr);
 };
 
 }
