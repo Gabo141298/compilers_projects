@@ -7,8 +7,12 @@ namespace SNode
 
 llvm::Value* VariableAssignment::codeGen(CodeGenContext& context) 
 {
-	llvm::Value* expr = assignmentExpr->codeGen(context);
+    llvm::Value* expr = assignmentExpr->codeGen(context);
+    return assignVariable(context, id.name, expr);
+}
 
+llvm::Value *VariableAssignment::assignVariable(CodeGenContext& context, std::string name, llvm::Value *expr)
+{
     llvm::BasicBlock* currBlock = context.builder.GetInsertBlock();
 
     context.builder.SetInsertPoint(context.initBlock);
@@ -17,8 +21,8 @@ llvm::Value* VariableAssignment::codeGen(CodeGenContext& context)
     context.builder.SetInsertPoint(currBlock);
     context.builder.CreateStore(expr, allocMem);
 
-	context.insertVar(id.name, allocMem);
-	return allocMem;
+    context.insertVar(name, allocMem);
+    return allocMem;
 }
 
 void VariableAssignment::print(size_t tabs) const

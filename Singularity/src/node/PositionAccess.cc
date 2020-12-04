@@ -5,7 +5,12 @@
 namespace SNode
 {
 
-llvm::Value* PositionAccess::codeGen(CodeGenContext&) { return nullptr; }
+llvm::Value* PositionAccess::codeGen(CodeGenContext& context)
+{
+    llvm::Value* memVal = position.calculateMemDir(context, id.codeGen(context));
+    return context.builder.CreateLoad(memVal);
+}
+
 void PositionAccess::print(size_t tabs) const
 {
     printTabs(tabs);

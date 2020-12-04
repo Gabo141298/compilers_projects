@@ -90,7 +90,7 @@ public:
     inline void popBlock() { CodeGenBlock* temp = this->block->parent; delete this->block; this->block = temp; }
 
     inline llvm::Value* searchVar(const std::string& name) { return block->searchVar(name); }
-    inline void insertVar(const std::string& name, llvm::Value* value) { block->insertVar(name, value); }
+    void insertVar(const std::string& name, llvm::Value* value) { block->insertVar(name, value); }
 
     void freeFunction();
     inline void insertFunctionBlock(llvm::BasicBlock* block) { this->functionBlocks.push_back(block); }
@@ -101,9 +101,11 @@ public:
 
     void createStrcmp();
 
-    void createStrtol();
+    void createStrtod();
 
     void createMalloc();
+
+    void createFree();
 };
 
 }
