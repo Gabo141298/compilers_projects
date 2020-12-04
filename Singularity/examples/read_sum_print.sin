@@ -1,0 +1,11 @@
+ 
+define function start
+begin 
+	read to variable
+	set other to 10
+	print variable
+	print "+"
+	print other
+	print "="
+	print variable + other
+end 
