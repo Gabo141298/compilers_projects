@@ -48,6 +48,7 @@ typedef parse::Parser::token_type token_type;
 
 %%
 [ \r\n\t]*      { continue; /* Skip blanks. */ }
+"#".*           {continue; }
 "set"           {
                     /*printf("%s-%s\n", yytext, "SET");*/
                     return token::SET;
@@ -247,10 +248,6 @@ typedef parse::Parser::token_type token_type;
 "\""            {
                     /* printf("%s-%s\n", yytext, "QUOTES_ERROR"); */
                     return token::QUOTES_ERROR;
-                }
-"#"             {
-                    /* printf("%s-%s\n", yytext, "HASH"); */
-                    return token::HASH;
                 }
 [a-zA-Z_][a-zA-Z0-9_]*  {
                             /*printf("%s-%s\n", yytext, "IDENTIFIER");*/
