@@ -62,26 +62,10 @@ llvm::Value* ArithmeticOperation::createFloatOperation(CodeGenContext& context, 
 }
 
 llvm::Value* ArithmeticOperation::codeGen(CodeGenContext& context) 
-{
+{    
     llvm::Value* leftValue = this->left.codeGen(context);
-    llvm::Value* rightValue = this->right.codeGen(context);
-    llvm::Value* result = nullptr;
-
-    llvm::Type* leftType = leftValue->getType();
-    llvm::Type* rightType = rightValue->getType();
-
-    if(leftType->isIntegerTy() && rightType->isIntegerTy())
-    {
-        result = createIntOperation(context, leftValue, rightValue);
-    }
-    else
-    {
-        leftValue = context.builder.CreateCast(llvm::Instruction::SIToFP, leftValue, llvm::Type::getDoubleTy(context.context));
-        rightValue = context.builder.CreateCast(llvm::Instruction::SIToFP, rightValue, llvm::Type::getDoubleTy(context.context));
-        result = createFloatOperation(context, leftValue, rightValue);
-    }
-    
-    return result;
+    llvm::Value* rightValue = this->right.codeGen(context);        
+    return this->createArithmeticOperation(context, leftValue, rightValue);
 }
 
 
@@ -137,7 +121,53 @@ std::vector<std::string> ArithmeticOperation::getFunctionCalls()
     std::vector<std::string> rightVector = this->right.getFunctionCalls();
     
     leftVector.insert(leftVector.end(),rightVector.begin(), rightVector.end());
-    return leftVector;    
+    return leftVector;
+}
+
+llvm::Value *ArithmeticOperation::getDoubleFromString(CodeGenContext &context, llvm::Value *string)
+{
+    llvm::Value* nullPointer = llvm::ConstantExpr::getBitCast( context.builder.getInt64(0), context.builder.getInt8PtrTy());
+    // Build parameters for strtol
+    std::vector<llvm::Value*> args;
+    args.push_back(string);
+    args.push_back(nullPointer);
+    args.push_back(context.builder.getInt32(10));
+    return context.builder.CreateCall(context.module->getFunction("strtod"), args);
+}
+
+
+
+llvm::Value *ArithmeticOperation::createArithmeticOperation(CodeGenContext &context, llvm::Value *leftValue, llvm::Value *rightValue)
+{
+    llvm::Value* result = nullptr;
+
+    llvm::Type* leftType = leftValue->getType();
+    llvm::Type* rightType = rightValue->getType();
+
+    if(leftType->isIntegerTy() && rightType->isIntegerTy())
+    {
+        result = createIntOperation(context, leftValue, rightValue);
+    }
+    else if( (leftType->isDoubleTy() || leftType->isIntegerTy()) && (rightType->isDoubleTy() || rightType->isIntegerTy()) )
+    {
+        leftValue = context.builder.CreateCast(llvm::Instruction::SIToFP, leftValue, llvm::Type::getDoubleTy(context.context));
+        rightValue = context.builder.CreateCast(llvm::Instruction::SIToFP, rightValue, llvm::Type::getDoubleTy(context.context));
+        result = createFloatOperation(context, leftValue, rightValue);
+    }
+    else if (leftType->isPointerTy())
+    {
+        // Get nullptr to use as a parameter
+        llvm::Value* doubleVal= getDoubleFromString(context, leftValue);
+        result = createArithmeticOperation(context, doubleVal, rightValue);
+    }
+    else if (rightType->isPointerTy())
+    {
+        // Get nullptr to use as a parameter
+        llvm::Value* doubleVal= getDoubleFromString(context, rightValue);
+        result = createArithmeticOperation(context, doubleVal, rightValue);
+    }
+
+    return result;
 }
 
 }

@@ -101,7 +101,7 @@ public:
 
     void createStrcmp();
 
-    void createStrtol();
+    void createStrtod();
 
     void createMalloc();
 
