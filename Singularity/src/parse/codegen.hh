@@ -120,6 +120,8 @@ public:
 
     void createStrtod();
 
+    void createStrtol();
+
     void createMalloc();
 
     void createFree();

@@ -6,6 +6,17 @@
 namespace SNode
 {
 
+llvm::Value *Position::getLongFromString(CodeGenContext &context, llvm::Value *string)
+{
+    llvm::Value* nullPointer = llvm::ConstantExpr::getBitCast( context.builder.getInt64(0), context.builder.getInt8PtrTy());
+    // Build parameters for strtol
+    std::vector<llvm::Value*> args;
+    args.push_back(string);
+    args.push_back(nullPointer);
+    args.push_back(context.builder.getInt32(10));
+    return context.builder.CreateCall(context.module->getFunction("strtol"), args);
+}
+
 llvm::Value* ListPosition::codeGen(CodeGenContext&) { return nullptr; }
 void ListPosition::print(size_t tabs) const
 {
@@ -39,6 +50,8 @@ llvm::Value* ListPosition::calculateMemDir(CodeGenContext& context, llvm::Value*
     auto dataSize = context.builder.getInt64(context.dataLayout.getTypeAllocSize(context.builder.getDoubleTy()));
     if(val->getType()->isDoubleTy())
         val = context.builder.CreateCast(llvm::Instruction::FPToSI, val, context.builder.getInt64Ty());
+    else if(val->getType()->isPointerTy())
+        val = getLongFromString(context, val);
     llvm::Value* pos = context.builder.CreateMul(val, dataSize);
 
     llvm::Value* intPtr = context.builder.CreatePtrToInt(ptr, context.builder.getInt64Ty());
@@ -92,8 +105,12 @@ llvm::Value* MatrixPosition::calculateMemDir(CodeGenContext& context, llvm::Valu
     auto dataSize = context.builder.getInt64(context.dataLayout.getTypeAllocSize(context.builder.getDoubleTy()));
     if(rowVal->getType()->isDoubleTy())
         rowVal = context.builder.CreateCast(llvm::Instruction::FPToSI, rowVal, context.builder.getInt64Ty());
+    else if(rowVal->getType()->isPointerTy())
+        rowVal = getLongFromString(context, rowVal);
     if(colVal->getType()->isDoubleTy())
         colVal = context.builder.CreateCast(llvm::Instruction::FPToSI, colVal, context.builder.getInt64Ty());
+    else if(colVal->getType()->isPointerTy())
+        colVal = getLongFromString(context, colVal);
 
     llvm::Value* totalCol = varInfo->col;
 

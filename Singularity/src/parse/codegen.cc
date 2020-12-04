@@ -23,6 +23,7 @@ void SNode::CodeGenContext::generateCode(SNode::Program& root, std::string filen
     createScanf();
     createStrcmp();
     createStrtod();
+    createStrtol();
     createMalloc();
     createFree();
 
@@ -106,6 +107,17 @@ void SNode::CodeGenContext::createStrtod()
 
     llvm::FunctionType *strTodType = llvm::FunctionType::get(llvm::Type::getDoubleTy(context), args, false);
     llvm::Function::Create(strTodType, llvm::Function::ExternalLinkage, "strtod", module);
+}
+
+void SNode::CodeGenContext::createStrtol()
+{
+    std::vector<llvm::Type *> args;
+    args.push_back(llvm::Type::getInt8PtrTy(context));
+    args.push_back(llvm::Type::getInt8PtrTy(context));
+    args.push_back(llvm::Type::getInt32Ty(context));
+
+    llvm::FunctionType *strTolType = llvm::FunctionType::get(llvm::Type::getInt64Ty(context), args, false);
+    llvm::Function::Create(strTolType, llvm::Function::ExternalLinkage, "strtol", module);
 }
 
 void SNode::CodeGenContext::createScanf()

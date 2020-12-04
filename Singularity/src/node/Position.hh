@@ -10,6 +10,7 @@ class Position : public Expression {
 public:
     Position(NodeTypes type = NodeTypes::Position): Expression(type) {}
     virtual inline void checkPosition() { }
+    llvm::Value* getLongFromString(CodeGenContext &context, llvm::Value *string);
     virtual llvm::Value* calculateMemDir(CodeGenContext& context, llvm::Value* ptr, VariableInfo* varInfo = nullptr) { return nullptr; }
 };
 
