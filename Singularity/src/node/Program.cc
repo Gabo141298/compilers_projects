@@ -5,7 +5,7 @@
 namespace SNode
 {
 
-void Program::createMain(CodeGenContext& context)
+llvm::BasicBlock* Program::createMain(CodeGenContext& context)
 {
 	llvm::FunctionType *funcType =
         llvm::FunctionType::get(context.builder.getInt32Ty(), llvm::Function::ExternalLinkage);
@@ -13,26 +13,51 @@ void Program::createMain(CodeGenContext& context)
         funcType, llvm::Function::ExternalLinkage, "main", context.module);
 
     llvm::BasicBlock* block = llvm::BasicBlock::Create(context.context, "entry", mainFunc);
-    context.builder.SetInsertPoint(block);
 
-    context.builder.CreateCall(context.module->getFunction("start"));
+    return block;
 
-    context.builder.CreateRet(context.builder.getInt32(0));
 }
 
 llvm::Value* Program::codeGen(CodeGenContext& context) 
 {
-	/*for(size_t index = 0; index < globals.size(); ++index)
+
+    llvm::BasicBlock* blockMain = createMain(context);
+    context.builder.SetInsertPoint(blockMain);
+
+    context.pushBlock(nullptr);
+    for(size_t index = 0; index < globals.size(); ++index)
 	{
-		context.module->getOrInsertGlobal(globals[index]->id.name, context.builder.getInt32Ty());
-		llvm::GlobalVariable *gVar = context.module->getNamedGlobal(globals[index]->id.name);
-		gVar->setLinkage(llvm::GlobalValue::CommonLinkage);
+        llvm::Value* expression = globals[index]->assignmentExpr->codeGen(context);
+        // Creates the variable
+        llvm::ConstantInt* const_int_val = context.builder.getInt64(4000);
+
+		llvm::Value* var = context.module->getOrInsertGlobal(llvm::StringRef(globals[index]->id.name), expression->getType() );
+		llvm::GlobalVariable *gVar = context.module->getNamedGlobal(llvm::StringRef(globals[index]->id.name));
+		gVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
 		gVar->setAlignment(8); 
-	}*/
+        gVar->setInitializer(context.builder.getInt64(0));
+
+        llvm::StoreInst* store = context.builder.CreateStore(expression, gVar);
+
+        context.insertVar( globals[index]->id.name, gVar);
+	}
+
+
 	for(size_t index = 0; index < functions.size(); ++index)
 		functions[index]->codeGen(context);
 
-	createMain(context);
+	
+        
+
+    context.builder.SetInsertPoint(blockMain);
+    
+
+    context.builder.CreateCall(context.module->getFunction("start"));
+
+    context.builder.CreateRet(context.builder.getInt32(0));
+
+
+
 
 	return nullptr;
 }
