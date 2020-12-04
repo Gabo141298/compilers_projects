@@ -27,7 +27,10 @@ llvm::Value* ComparisonOperation::createIntComparison(CodeGenContext& context, l
             break;
         case ComparisonOperator::isNot:
             result = context.builder.CreateICmpNE(left,right);
-            break; 
+            break;
+        case ComparisonOperator::geq:
+            result = context.builder.CreateICmpSGE(left, right);
+            break;
     }
 
     return result;
@@ -53,7 +56,10 @@ llvm::Value* ComparisonOperation::createFloatComparison(CodeGenContext& context,
             break;
         case ComparisonOperator::isNot:
             result = context.builder.CreateFCmpUNE(left,right);
-            break; 
+            break;
+        case ComparisonOperator::geq:
+            result = context.builder.CreateFCmpUGE(left, right);
+            break;
     }
 
     return result;
@@ -82,7 +88,10 @@ llvm::Value* ComparisonOperation::createStringComparison(CodeGenContext& context
             break;
         case ComparisonOperator::isNot:
             result = context.builder.CreateICmpNE(strcmpValue,zero);
-            break; 
+            break;
+        case ComparisonOperator::geq:
+            result = context.builder.CreateICmpSGE(strcmpValue, zero);
+            break;
     }
     return result;
 }
