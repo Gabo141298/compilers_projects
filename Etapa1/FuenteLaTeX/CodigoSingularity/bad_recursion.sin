@@ -1,9 +1,0 @@
-define function bad_recursion
-begin
-    call bad_recursion
-end
-
-define function start
-begin
-    call bad_recursion
-end
